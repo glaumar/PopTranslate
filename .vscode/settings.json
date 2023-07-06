@@ -1,0 +1,7 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "new": "cpp"
+    },
+    "commentTranslate.hover.enabled": false
+}
