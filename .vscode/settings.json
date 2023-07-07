@@ -1,7 +1,10 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "new": "cpp"
+        "new": "cpp",
+        "utility": "cpp",
+        "typeinfo": "cpp",
+        "qdebug": "cpp"
     },
     "commentTranslate.hover.enabled": false
 }

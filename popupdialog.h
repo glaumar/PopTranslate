@@ -4,6 +4,8 @@
 #include <KWayland/Client/plasmashell.h>
 #include <QDialog>
 #include <QDebug>
+#include <QMenu>
+
 #include "qonlinetranslator.h"
 
 namespace Ui {
@@ -22,11 +24,13 @@ class PopupDialog : public QDialog {
     void setNormalWindow(bool on = false);
 private:
     bool eventFilter(QObject *filtered, QEvent *event) override;
+    void initContextMenu();
 
     bool flag_normal_window;
     KWayland::Client::PlasmaShell *plasmashell;
     Ui::PopupDialog *ui;
     QOnlineTranslator translator_;
+    QMenu context_menu_;
 };
 
 #endif  // POPUPDIALOG_H
