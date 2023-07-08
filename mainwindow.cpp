@@ -29,14 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() { delete ui; }
 
 bool MainWindow::initGlobalShortcuts() {
-    QAction *act = new QAction(tr("scan popup"), this);
+    QAction *act = new QAction(tr("translate selection"), this);
     QKeySequence kseq(Qt::META | Qt::Key_G);
-    act->setObjectName(tr("poptrans_popup"));
-    // TODO: set ICON
+    act->setObjectName(tr("io.github.glaumar.PopTranslate"));
     bool ret = KGlobalAccel::setGlobalShortcut(act, kseq);
 
     if (!ret) {
-        qDebug() << tr("Failed to bind global shortcuts for scan popup");
+        qDebug() << tr("Failed to bind global shortcuts for translate selection");
         return ret;
     }
 
@@ -65,13 +64,13 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::initSystemTrayIcon() {
-    tray->setToolTip(tr("poptrans"));
-    tray->setIcon(QIcon());
+    tray->setToolTip(tr("PopTranslate"));
+    tray->setIcon(QIcon::fromTheme("io.github.glaumar.PopTranslate"));
 
     // set systemtray menu
     QMenu *menu = new QMenu(this);
-    menu->addAction(tr("Show main window"), this, [this]() { this->show(); });
-    menu->addAction(tr("exit"), this, [this]() {
+    menu->addAction(QIcon::fromTheme("settings-configure"),tr("Settings"), this, [this]() { this->show(); });
+    menu->addAction(QIcon::fromTheme("application-exit"),("Exit"), this, [this]() {
         tray->setVisible(false);
         this->close();
     });

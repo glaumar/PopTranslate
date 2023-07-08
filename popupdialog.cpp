@@ -17,7 +17,7 @@ PopupDialog::PopupDialog(QWidget *parent)
 
     initContextMenu();
 
-    // TODO: make poptrans as a normal window
+    // TODO: make poptranslate as a normal window
     // connect(ui->pin_push_button, &QPushButton::clicked, this, [this]() {
     //     setNormalWindow(!isNormalWindow());
     //     hide();
@@ -106,12 +106,12 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
 }
 
 void PopupDialog::initContextMenu() {
-    context_menu_.addAction(tr("Copy"), this, [this]{
+    context_menu_.addAction(QIcon::fromTheme("edit-copy"),tr("Copy translation"), this, [this]{
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(ui->trans_text_edit->toPlainText());
     });
 
-    QAction* action_source_text = context_menu_.addAction(tr("Source text"));
+    QAction* action_source_text = context_menu_.addAction(QIcon::fromTheme("texture"),("Source text"));
     action_source_text->setCheckable(true);
     connect(action_source_text , &QAction::triggered, this, [this](bool state){
         ui->src_plain_text_edit->setVisible(state);
@@ -119,5 +119,5 @@ void PopupDialog::initContextMenu() {
     ui->src_plain_text_edit->setVisible(false);
     action_source_text->setChecked(false);
     
-    context_menu_.addAction(tr("Settings"));
+    context_menu_.addAction(QIcon::fromTheme("settings-configure"),("Settings"));
 }

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Icon=io.github.glaumar.PopTranslate.svg
+Name=PopTranslate
+Exec=poptranslate
+Terminal=false
+Hidden=false
+Categories=Education
+Comment=Translate mouse selected text under wayland

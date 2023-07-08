@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 135.46667 135.46667"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="poptranslate5.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.1162328"
+     inkscape:cx="819.27354"
+     inkscape:cy="257.11482"
+     inkscape:window-width="3840"
+     inkscape:window-height="2024"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:lockguides="false" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1769"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+    <rect
+       x="290.76553"
+       y="893.20135"
+       width="129.86259"
+       height="358.54749"
+       id="rect1606" />
+    <rect
+       x="297.7338"
+       y="919.17383"
+       width="122.26089"
+       height="430.13028"
+       id="rect1490" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1486"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text1488"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1490);display:inline;fill:#000000;fill-opacity:1;stroke:none" />
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text1604"
+       style="font-style:normal;font-weight:normal;font-size:52.9134px;line-height:1.25;font-family:sans-serif;baseline-shift:sub;white-space:pre;shape-inside:url(#rect1606);display:inline;fill:#000000;fill-opacity:1;stroke:none"><tspan
+         x="290.76562"
+         y="1299.8926"
+         id="tspan1126"><tspan
+           dx="0 19.10174 29.843115 25.34552 19.101738 18.202202 25.34552 29.684464 32.541733 32.541733 32.541718 32.541718 32.541748"
+           style="baseline-shift:sub"
+           id="tspan1124">testfsadddddd</tspan></tspan></text>
+    <path
+       style="fill:#b53838;stroke:#000000;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1"
+       d="M 16.20627,84.575929 C 14.032374,76.087028 36.406079,18.838201 61.49764,17.362248 86.5892,15.886296 114.39669,70.180275 116.57069,78.669328 118.74469,87.158382 95.284473,49.840775 70.192867,51.317693 45.101261,52.794611 18.380166,93.06483 16.20627,84.575929 Z"
+       id="path1767"
+       inkscape:path-effect="#path-effect1769"
+       inkscape:original-d="M -8.3411427,133.33537 C 14.032134,76.086934 36.405834,18.838105 58.779967,-38.411091 86.588694,15.886555 114.39619,70.18053 142.20578,124.47739 118.7442,87.158687 95.283992,49.841077 71.823729,12.522323 45.101148,52.794536 18.38005,93.064753 -8.3411427,133.33537 Z"
+       sodipodi:nodetypes="ccccc" />
+    <ellipse
+       style="fill:#b53838;stroke-width:0.1;stroke-dasharray:none;fill-opacity:1"
+       id="path1771"
+       cx="99.969872"
+       cy="-67.753983"
+       rx="20.280474"
+       ry="30.420712"
+       transform="rotate(90)" />
+  </g>
+</svg>
