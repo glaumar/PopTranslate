@@ -4,7 +4,8 @@
         "new": "cpp",
         "utility": "cpp",
         "typeinfo": "cpp",
-        "qdebug": "cpp"
+        "qdebug": "cpp",
+        "qdbusconnectioninterface": "cpp"
     },
     "commentTranslate.hover.enabled": false
 }

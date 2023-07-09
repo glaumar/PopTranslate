@@ -111,7 +111,7 @@ void PopupDialog::initContextMenu() {
         clipboard->setText(ui->trans_text_edit->toPlainText());
     });
 
-    QAction* action_source_text = context_menu_.addAction(QIcon::fromTheme("texture"),("Source text"));
+    QAction* action_source_text = context_menu_.addAction(QIcon::fromTheme("texture"),tr("Source text"));
     action_source_text->setCheckable(true);
     connect(action_source_text , &QAction::triggered, this, [this](bool state){
         ui->src_plain_text_edit->setVisible(state);
@@ -119,5 +119,5 @@ void PopupDialog::initContextMenu() {
     ui->src_plain_text_edit->setVisible(false);
     action_source_text->setChecked(false);
     
-    context_menu_.addAction(QIcon::fromTheme("settings-configure"),("Settings"));
+    context_menu_.addAction(QIcon::fromTheme("settings-configure"),tr("Settings"));
 }

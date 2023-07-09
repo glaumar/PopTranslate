@@ -32,6 +32,7 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
         popupdialog.h popupdialog.cpp popupdialog.ui
+        poptranslate_dbus.cpp poptranslate_dbus.h
         ${TS_FILES}
 )
 

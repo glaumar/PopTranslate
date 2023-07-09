@@ -2,9 +2,17 @@
 #include <QLocale>
 #include <QTranslator>
 #include "mainwindow.h"
+#include "poptranslate_dbus.h"
 
 int main(int argc, char *argv[])
 {
+    if(PopTranslateDBus::isRegistered()) {
+        PopTranslateDBus::callTranslateSelection();
+        return 0;
+    }else{
+        PopTranslateDBus::instance()->registerService();
+    }
+
     QApplication a(argc, argv); 
     a.setDesktopFileName("io.github.glaumar.PopTranslate.desktop");
 
