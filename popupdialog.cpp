@@ -27,7 +27,9 @@ PopupDialog::PopupDialog(QWidget *parent)
     auto registry = new KWayland::Client::Registry(this);
     auto connection =
         KWayland::Client::ConnectionThread::fromApplication(qGuiApp);
-    connect(registry, &KWayland::Client::Registry::plasmaShellAnnounced, this,
+    connect(registry,
+            &KWayland::Client::Registry::plasmaShellAnnounced,
+            this,
             [registry, this](quint32 name, quint32 version) {
                 if (!plasmashell) {
                     plasmashell = registry->createPlasmaShell(name, version);
@@ -42,7 +44,8 @@ PopupDialog::~PopupDialog() { delete ui; }
 void PopupDialog::SetTransWords(const QString &words) {
     ui->src_plain_text_edit->setPlainText(words);
     ui->trans_text_edit->clear();
-    translator_.translate(words, QOnlineTranslator::Google,
+    translator_.translate(words,
+                          QOnlineTranslator::Google,
                           QOnlineTranslator::SimplifiedChinese);
     QObject::connect(&translator_, &QOnlineTranslator::finished, [&] {
         if (translator_.error() == QOnlineTranslator::NoError)
@@ -107,7 +110,10 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
 
 void PopupDialog::initContextMenu() {
     context_menu_.addAction(
-        QIcon::fromTheme("edit-copy"), tr("Copy translation"), this, [this] {
+        QIcon::fromTheme("edit-copy"),
+        tr("Copy translation"),
+        this,
+        [this] {
             QClipboard *clipboard = QApplication::clipboard();
             clipboard->setText(ui->trans_text_edit->toPlainText());
         });
@@ -115,8 +121,9 @@ void PopupDialog::initContextMenu() {
     QAction *action_source_text =
         context_menu_.addAction(QIcon::fromTheme("texture"), tr("Source text"));
     action_source_text->setCheckable(true);
-    connect(action_source_text, &QAction::triggered, this,
-            [this](bool state) { ui->src_plain_text_edit->setVisible(state); });
+    connect(action_source_text, &QAction::triggered, this, [this](bool state) {
+        ui->src_plain_text_edit->setVisible(state);
+    });
     ui->src_plain_text_edit->setVisible(false);
     action_source_text->setChecked(false);
 

@@ -56,18 +56,23 @@ void MyApplication::initSystemTrayIcon() {
 
     // set systemtray menu
     QMenu *menu = new QMenu(&pop);  // TODO: use a better parent
-    menu->addAction(QIcon::fromTheme("settings-configure"), tr("Settings"),
+    menu->addAction(QIcon::fromTheme("settings-configure"),
+                    tr("Settings"),
                     this,
                     [this]() {  // TODO: show settings window
                     });
-    menu->addAction(QIcon::fromTheme("application-exit"), ("Exit"), this,
+    menu->addAction(QIcon::fromTheme("application-exit"),
+                    tr("Exit"),
+                    this,
                     [this]() {
                         tray.setVisible(false);
                         this->quit();
                     });
     tray.setContextMenu(menu);
 
-    connect(&tray, &QSystemTrayIcon::activated, this,
+    connect(&tray,
+            &QSystemTrayIcon::activated,
+            this,
             &MyApplication::trayActivated);
     tray.show();
 }
@@ -75,11 +80,14 @@ void MyApplication::initSystemTrayIcon() {
 void MyApplication::initDBusInterface() {
     PopTranslateDBus::instance()->registerService();
     connect(PopTranslateDBus::instance(),
-            &PopTranslateDBus::receivedTranslateSelection, this,
+            &PopTranslateDBus::receivedTranslateSelection,
+            this,
             [this]() { this->showPop(true); });
 
-    connect(PopTranslateDBus::instance(), &PopTranslateDBus::receivedTranslate,
-            this, [this](const QString &text) {
+    connect(PopTranslateDBus::instance(),
+            &PopTranslateDBus::receivedTranslate,
+            this,
+            [this](const QString &text) {
                 this->pop.SetTransWords(text);
                 this->pop.show();
             });
