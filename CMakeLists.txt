@@ -28,9 +28,7 @@ set(TS_FILES poptranslate_zh_CN.ts)
 
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
+        myapplication.cpp myapplication.h
         popupdialog.h popupdialog.cpp popupdialog.ui
         poptranslate_dbus.cpp poptranslate_dbus.h
         ${TS_FILES}

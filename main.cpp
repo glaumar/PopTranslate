@@ -1,7 +1,7 @@
-#include <QApplication>
+
 #include <QLocale>
 #include <QTranslator>
-#include "mainwindow.h"
+#include "myapplication.h"
 #include "poptranslate_dbus.h"
 
 int main(int argc, char *argv[])
@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         PopTranslateDBus::instance()->registerService();
     }
 
-    QApplication a(argc, argv); 
+    MyApplication a(argc, argv); 
     a.setDesktopFileName("io.github.glaumar.PopTranslate.desktop");
 
     QTranslator translator;
@@ -26,8 +26,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    MainWindow w;
-    w.setWindowTitle("PopTranslate");
-    w.show();
+    // MainWindow w;
+    // w.setWindowTitle("PopTranslate");
+    // w.show();
     return a.exec();
 }
