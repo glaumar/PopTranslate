@@ -10,6 +10,7 @@
 #include <QKeySequence>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
+#include "poptranslate_dbus.h"
 
 #include "./ui_mainwindow.h"
 
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     initGlobalShortcuts();
     initSystemTrayIcon();
+    initDBusInterface();
 
     // pop->setAsnormalWindow(true);
 }
@@ -51,7 +53,6 @@ void MainWindow::showPop(bool unuse) {
 
     pop->SetTransWords(clipboard->text(QClipboard::Selection));
     pop->show();
-
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -79,6 +80,18 @@ void MainWindow::initSystemTrayIcon() {
     connect(tray, &QSystemTrayIcon::activated, this,
             &MainWindow::trayActivated);
     tray->show();
+}
+
+void MainWindow::initDBusInterface() {
+    PopTranslateDBus::instance()->registerService();
+    connect(PopTranslateDBus::instance(), &PopTranslateDBus::receivedTranslateSelection, this, [this]() {
+        this->showPop(true);
+    });
+
+    connect(PopTranslateDBus::instance(), &PopTranslateDBus::receivedTranslate, this, [this](const QString& text) {
+        this->pop->SetTransWords(text);
+        this->pop->show();
+    });
 }
 
 void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason) {

@@ -28,6 +28,7 @@ private slots:
 private:
     bool initGlobalShortcuts();
     void initSystemTrayIcon();
+    void initDBusInterface();
 
     Ui::MainWindow *ui;
     PopupDialog *pop;

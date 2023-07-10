@@ -22,6 +22,7 @@ void PopTranslateDBus::callTranslateSelection() {
     QDBusConnection::sessionBus().call(msg);
 }
 
+// Service is registered in constructor
 void PopTranslateDBus::registerService() {}
 
 bool PopTranslateDBus::isRegistered() {
@@ -29,5 +30,9 @@ bool PopTranslateDBus::isRegistered() {
 }
 
 void PopTranslateDBus::translateSelection() {
-    qDebug() << "translateSelection";
+    emit receivedTranslateSelection();
+}
+
+void PopTranslateDBus::translate(const QString& text) {
+    emit receivedTranslate(text);
 }
