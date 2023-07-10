@@ -27,11 +27,11 @@ FetchContent_MakeAvailable(QOnlineTranslator)
 set(TS_FILES poptranslate_zh_CN.ts)
 
 set(PROJECT_SOURCES
-        main.cpp
-        myapplication.cpp myapplication.h
-        popupdialog.h popupdialog.cpp popupdialog.ui
-        poptranslate_dbus.cpp poptranslate_dbus.h
-        ${TS_FILES}
+    main.cpp
+    myapplication.cpp myapplication.h
+    popupdialog.cpp popupdialog.h popupdialog.ui
+    poptranslate_dbus.cpp poptranslate_dbus.h
+    ${TS_FILES}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -42,34 +42,32 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
-        add_executable(poptranslate
-            ${PROJECT_SOURCES}
-        )
+    add_executable(poptranslate
+        ${PROJECT_SOURCES}
+    )
 
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
 target_link_libraries(poptranslate PRIVATE
-                                Qt${QT_VERSION_MAJOR}::Widgets
-                                KF5::GlobalAccel
-                                KF5::GuiAddons
-                                KF5::WaylandClient
-                                KF5::WindowSystem
-                                QOnlineTranslator)
-
+    Qt${QT_VERSION_MAJOR}::Widgets
+    KF5::GlobalAccel
+    KF5::GuiAddons
+    KF5::WaylandClient
+    KF5::WindowSystem
+    QOnlineTranslator)
 
 # set_target_properties(poptranslate PROPERTIES
-#     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-#     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-#     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-#     MACOSX_BUNDLE TRUE
-#     WIN32_EXECUTABLE TRUE
+# MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+# MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+# MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+# MACOSX_BUNDLE TRUE
+# WIN32_EXECUTABLE TRUE
 # )
 
 # install(TARGETS poptranslate
-#     BUNDLE DESTINATION .
-#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
+# BUNDLE DESTINATION .
+# LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(poptranslate)
 endif()

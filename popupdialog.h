@@ -2,8 +2,9 @@
 #define POPUPDIALOG_H
 
 #include <KWayland/Client/plasmashell.h>
-#include <QDialog>
+
 #include <QDebug>
+#include <QDialog>
 #include <QMenu>
 
 #include "qonlinetranslator.h"
@@ -22,7 +23,8 @@ class PopupDialog : public QDialog {
     bool event(QEvent *event) override;
     bool isNormalWindow() const;
     void setNormalWindow(bool on = false);
-private:
+
+   private:
     bool eventFilter(QObject *filtered, QEvent *event) override;
     void initContextMenu();
 

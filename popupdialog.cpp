@@ -5,8 +5,8 @@
 #include <KWayland/Client/surface.h>
 #include <KWindowSystem/kwindowsystem.h>
 
-#include <QDebug>
 #include <QClipboard>
+#include <QDebug>
 
 #include "ui_popupdialog.h"
 
@@ -42,14 +42,14 @@ PopupDialog::~PopupDialog() { delete ui; }
 void PopupDialog::SetTransWords(const QString &words) {
     ui->src_plain_text_edit->setPlainText(words);
     ui->trans_text_edit->clear();
-    translator_.translate(words, QOnlineTranslator::Google, QOnlineTranslator::SimplifiedChinese);
+    translator_.translate(words, QOnlineTranslator::Google,
+                          QOnlineTranslator::SimplifiedChinese);
     QObject::connect(&translator_, &QOnlineTranslator::finished, [&] {
-    if (translator_.error() == QOnlineTranslator::NoError)
-        ui->trans_text_edit->setText(translator_.translation());
-    else
-        ui->trans_text_edit->setText(translator_.errorString());
-});
-
+        if (translator_.error() == QOnlineTranslator::NoError)
+            ui->trans_text_edit->setText(translator_.translation());
+        else
+            ui->trans_text_edit->setText(translator_.errorString());
+    });
 }
 
 bool PopupDialog::isNormalWindow() const { return flag_normal_window; }
@@ -70,14 +70,14 @@ void PopupDialog::setNormalWindow(bool on) {
 
 bool PopupDialog::event(QEvent *event) {
     // show menu
-    if (event->type() == QEvent::ContextMenu)
-    {
+    if (event->type() == QEvent::ContextMenu) {
         context_menu_.popup(QCursor::pos());
         return true;
     }
 
     // hide window
-    if (!isNormalWindow() && event->type() == QEvent::Leave && context_menu_.isHidden()) {
+    if (!isNormalWindow() && event->type() == QEvent::Leave &&
+        context_menu_.isHidden()) {
         this->hide();
         return true;
     }
@@ -106,18 +106,20 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
 }
 
 void PopupDialog::initContextMenu() {
-    context_menu_.addAction(QIcon::fromTheme("edit-copy"),tr("Copy translation"), this, [this]{
-        QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(ui->trans_text_edit->toPlainText());
-    });
+    context_menu_.addAction(
+        QIcon::fromTheme("edit-copy"), tr("Copy translation"), this, [this] {
+            QClipboard *clipboard = QApplication::clipboard();
+            clipboard->setText(ui->trans_text_edit->toPlainText());
+        });
 
-    QAction* action_source_text = context_menu_.addAction(QIcon::fromTheme("texture"),tr("Source text"));
+    QAction *action_source_text =
+        context_menu_.addAction(QIcon::fromTheme("texture"), tr("Source text"));
     action_source_text->setCheckable(true);
-    connect(action_source_text , &QAction::triggered, this, [this](bool state){
-        ui->src_plain_text_edit->setVisible(state);
-    });
+    connect(action_source_text, &QAction::triggered, this,
+            [this](bool state) { ui->src_plain_text_edit->setVisible(state); });
     ui->src_plain_text_edit->setVisible(false);
     action_source_text->setChecked(false);
-    
-    context_menu_.addAction(QIcon::fromTheme("settings-configure"),tr("Settings"));
+
+    context_menu_.addAction(QIcon::fromTheme("settings-configure"),
+                            tr("Settings"));
 }

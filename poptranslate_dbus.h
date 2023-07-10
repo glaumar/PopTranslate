@@ -4,33 +4,32 @@
 #include <QObject>
 #include <QString>
 
-class PopTranslateDBus : public QObject
-{
+class PopTranslateDBus : public QObject {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "io.github.glaumar.PopTranslate")
-    
-    public:
-        static PopTranslateDBus *instance();
-        static void callTranslateSelection();
-        void registerService();
-        static bool isRegistered();
 
-        PopTranslateDBus(PopTranslateDBus const&) = delete;
-        void operator=(PopTranslateDBus const&) = delete;
-        PopTranslateDBus(PopTranslateDBus&&) = delete;
-        void operator=(PopTranslateDBus&&) = delete;
+   public:
+    static PopTranslateDBus* instance();
+    static void callTranslateSelection();
+    void registerService();
+    static bool isRegistered();
 
-    public slots:
-        // dbus method
-        void translateSelection();
-        void translate(const QString& text);
+    PopTranslateDBus(PopTranslateDBus const&) = delete;
+    void operator=(PopTranslateDBus const&) = delete;
+    PopTranslateDBus(PopTranslateDBus&&) = delete;
+    void operator=(PopTranslateDBus&&) = delete;
 
-    signals:
-        void receivedTranslateSelection();
-        void receivedTranslate(const QString& text);
+   public slots:
+    // dbus method
+    void translateSelection();
+    void translate(const QString& text);
 
-    private:
-        explicit PopTranslateDBus(QObject *parent = nullptr);
+   signals:
+    void receivedTranslateSelection();
+    void receivedTranslate(const QString& text);
+
+   private:
+    explicit PopTranslateDBus(QObject* parent = nullptr);
 };
 
-#endif // POPTRANSLATE_DBUS_H
+#endif  // POPTRANSLATE_DBUS_H
