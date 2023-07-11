@@ -28,8 +28,8 @@ class PopupDialog : public QDialog {
     bool eventFilter(QObject *filtered, QEvent *event) override;
     void initContextMenu();
 
-    bool flag_normal_window;
-    KWayland::Client::PlasmaShell *plasmashell;
+    bool flag_normal_window_;
+    KWayland::Client::PlasmaShell *plasmashell_;
     Ui::PopupDialog *ui;
     QOnlineTranslator translator_;
     QMenu context_menu_;

@@ -31,6 +31,8 @@ set(PROJECT_SOURCES
     myapplication.cpp myapplication.h
     popupdialog.cpp popupdialog.h popupdialog.ui
     poptranslate_dbus.cpp poptranslate_dbus.h
+    settingwindow.cpp settingwindow.h settingwindow.ui
+    defaultsettings.h
     ${TS_FILES}
 )
 
@@ -56,14 +58,6 @@ target_link_libraries(poptranslate PRIVATE
     KF5::WaylandClient
     KF5::WindowSystem
     QOnlineTranslator)
-
-# set_target_properties(poptranslate PROPERTIES
-# MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-# MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-# MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-# MACOSX_BUNDLE TRUE
-# WIN32_EXECUTABLE TRUE
-# )
 
 # install(TARGETS poptranslate
 # BUNDLE DESTINATION .

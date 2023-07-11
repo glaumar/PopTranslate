@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SettingWindow</class>
+ <widget class="QWidget" name="SettingWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>508</width>
+    <height>233</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Settings</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="labelAlignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+   <property name="formAlignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="translate_engine_label">
+     <property name="text">
+      <string>Translate Engine:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="translate_engine_combobox"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="target_lang_label_1">
+     <property name="text">
+      <string>Target Language 1:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="translate_lang_combobox_1"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="target_lang_label_2">
+     <property name="text">
+      <string>Target Language 2:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="translate_lang_combobox_2"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="target_lang_label_3">
+     <property name="text">
+      <string>Target Language 3:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QComboBox" name="translate_lang_combobox_3"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

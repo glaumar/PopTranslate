@@ -11,7 +11,7 @@
 #include "ui_popupdialog.h"
 
 PopupDialog::PopupDialog(QWidget *parent)
-    : QDialog(parent), plasmashell(nullptr), ui(new Ui::PopupDialog) {
+    : QDialog(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
     ui->setupUi(this);
     setNormalWindow(false);
 
@@ -31,8 +31,8 @@ PopupDialog::PopupDialog(QWidget *parent)
             &KWayland::Client::Registry::plasmaShellAnnounced,
             this,
             [registry, this](quint32 name, quint32 version) {
-                if (!plasmashell) {
-                    plasmashell = registry->createPlasmaShell(name, version);
+                if (!plasmashell_) {
+                    plasmashell_ = registry->createPlasmaShell(name, version);
                 }
             });
     registry->create(connection);
@@ -47,7 +47,7 @@ void PopupDialog::SetTransWords(const QString &words) {
     translator_.translate(words,
                           QOnlineTranslator::Google,
                           QOnlineTranslator::SimplifiedChinese);
-    QObject::connect(&translator_, &QOnlineTranslator::finished, [&] {
+    QObject::connect(&translator_, &QOnlineTranslator::finished, [this] {
         if (translator_.error() == QOnlineTranslator::NoError)
             ui->trans_text_edit->setText(translator_.translation());
         else
@@ -55,7 +55,7 @@ void PopupDialog::SetTransWords(const QString &words) {
     });
 }
 
-bool PopupDialog::isNormalWindow() const { return flag_normal_window; }
+bool PopupDialog::isNormalWindow() const { return flag_normal_window_; }
 
 void PopupDialog::setNormalWindow(bool on) {
     if (on) {
@@ -68,7 +68,7 @@ void PopupDialog::setNormalWindow(bool on) {
     } else {
         this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
     }
-    flag_normal_window = on;
+    flag_normal_window_ = on;
 }
 
 bool PopupDialog::event(QEvent *event) {
@@ -99,7 +99,7 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
     if (pop_window && event->type() == QEvent::Expose &&
         pop_window->isVisible()) {
         auto surface = KWayland::Client::Surface::fromWindow(pop_window);
-        auto plasmaSurface = plasmashell->createSurface(surface, pop_window);
+        auto plasmaSurface = plasmashell_->createSurface(surface, pop_window);
         plasmaSurface->openUnderCursor();
         plasmaSurface->setSkipTaskbar(!isNormalWindow());
         plasmaSurface->setSkipSwitcher(!isNormalWindow());

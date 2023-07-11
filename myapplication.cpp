@@ -15,14 +15,15 @@
 
 MyApplication::MyApplication(int &argc, char **argv)
     : QApplication(argc, argv),
-      pop(nullptr),
-      tray(nullptr),
-      clipboard(KSystemClipboard::instance()) {
+      pop_(nullptr),
+      tray_(nullptr),
+      setting_window_(nullptr),
+      clipboard_(KSystemClipboard::instance()) {
     setApplicationName("PopTranslate");
     initGlobalShortcuts();
     initSystemTrayIcon();
     initDBusInterface();
-    // pop.setAsnormalWindow(true);
+    // pop_.setAsnormalWindow(true);
 }
 
 bool MyApplication::initGlobalShortcuts() {
@@ -42,39 +43,40 @@ bool MyApplication::initGlobalShortcuts() {
 }
 
 void MyApplication::showPop(bool unuse) {
-    if (pop.isVisible() && !pop.isNormalWindow()) {
-        pop.hide();
+    if (pop_.isVisible() && !pop_.isNormalWindow()) {
+        pop_.hide();
         return;
     }
-    pop.SetTransWords(clipboard->text(QClipboard::Selection));
-    pop.show();
+    pop_.SetTransWords(clipboard_->text(QClipboard::Selection));
+    pop_.show();
 }
 
 void MyApplication::initSystemTrayIcon() {
-    tray.setToolTip(tr("PopTranslate"));
-    tray.setIcon(QIcon::fromTheme("io.github.glaumar.PopTranslate"));
+    tray_.setToolTip(tr("PopTranslate"));
+    tray_.setIcon(QIcon::fromTheme("io.github.glaumar.PopTranslate"));
 
     // set systemtray menu
-    QMenu *menu = new QMenu(&pop);  // TODO: use a better parent
+    QMenu *menu = new QMenu(&setting_window_);
+
     menu->addAction(QIcon::fromTheme("settings-configure"),
                     tr("Settings"),
                     this,
-                    [this]() {  // TODO: show settings window
-                    });
+                    [this]() { setting_window_.show(); });
+
     menu->addAction(QIcon::fromTheme("application-exit"),
                     tr("Exit"),
                     this,
                     [this]() {
-                        tray.setVisible(false);
+                        tray_.setVisible(false);
                         this->quit();
                     });
-    tray.setContextMenu(menu);
+    tray_.setContextMenu(menu);
 
-    connect(&tray,
+    connect(&tray_,
             &QSystemTrayIcon::activated,
             this,
             &MyApplication::trayActivated);
-    tray.show();
+    tray_.show();
 }
 
 void MyApplication::initDBusInterface() {
@@ -88,11 +90,12 @@ void MyApplication::initDBusInterface() {
             &PopTranslateDBus::receivedTranslate,
             this,
             [this](const QString &text) {
-                this->pop.SetTransWords(text);
-                this->pop.show();
+                this->pop_.SetTransWords(text);
+                this->pop_.show();
             });
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {
-    // TODO: Show settings window
+    bool is_visible = setting_window_.isVisible();
+    setting_window_.setVisible(!is_visible);
 }

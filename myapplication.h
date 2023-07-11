@@ -7,16 +7,12 @@
 #include <QSystemTrayIcon>
 
 #include "popupdialog.h"
-
-// QT_BEGIN_NAMESPACE
-// namespace Ui { class MyApplication; }
-// QT_END_NAMESPACE
+#include "settingwindow.h"
 
 class MyApplication : public QApplication {
     Q_OBJECT
 
    public:
-    // explicit MyApplication(QWidget *parent = nullptr);
     MyApplication(int &argc, char **argv);
 
    private slots:
@@ -28,8 +24,9 @@ class MyApplication : public QApplication {
     void initSystemTrayIcon();
     void initDBusInterface();
 
-    PopupDialog pop;
-    QSystemTrayIcon tray;
-    KSystemClipboard *clipboard;
+    PopupDialog pop_;
+    QSystemTrayIcon tray_;
+    SettingWindow setting_window_;
+    KSystemClipboard *clipboard_;
 };
 #endif  // MYAPPLICATION_H

@@ -6,7 +6,12 @@
         "typeinfo": "cpp",
         "qdebug": "cpp",
         "qdbusconnectioninterface": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "qwidget": "cpp",
+        "chrono": "cpp",
+        "variant": "cpp",
+        "*.ipp": "cpp",
+        "__node_handle": "cpp"
     },
     "commentTranslate.hover.enabled": false
 }
