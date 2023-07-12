@@ -23,6 +23,7 @@ MyApplication::MyApplication(int &argc, char **argv)
     initGlobalShortcuts();
     initSystemTrayIcon();
     initDBusInterface();
+    loadSettings();
     // pop_.setAsnormalWindow(true);
 }
 
@@ -47,7 +48,7 @@ void MyApplication::showPop(bool unuse) {
         pop_.hide();
         return;
     }
-    pop_.SetTransWords(clipboard_->text(QClipboard::Selection));
+    pop_.translate(clipboard_->text(QClipboard::Selection));
     pop_.show();
 }
 
@@ -90,9 +91,25 @@ void MyApplication::initDBusInterface() {
             &PopTranslateDBus::receivedTranslate,
             this,
             [this](const QString &text) {
-                this->pop_.SetTransWords(text);
+                this->pop_.translate(text);
                 this->pop_.show();
             });
+}
+
+void MyApplication::loadSettings() {
+    connect(&setting_window_,
+        &SettingWindow::translateEngineChanged,
+        &pop_,
+        &PopupDialog::setTranslateEngine);
+
+    connect(&setting_window_,
+        &SettingWindow::targetLanguagesChanged,
+        &pop_,
+        &PopupDialog::setTargetLanguages);
+    
+    // set init translate engine and target languages
+    pop_.setTranslateEngine(setting_window_.translateEngine());
+    pop_.setTargetLanguages(setting_window_.targetLanguages());
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

@@ -23,6 +23,7 @@ class MyApplication : public QApplication {
     bool initGlobalShortcuts();
     void initSystemTrayIcon();
     void initDBusInterface();
+    void loadSettings();
 
     PopupDialog pop_;
     QSystemTrayIcon tray_;

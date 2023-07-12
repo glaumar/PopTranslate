@@ -19,12 +19,18 @@ class SettingWindow : public QWidget {
     explicit SettingWindow(QWidget *parent = nullptr);
     ~SettingWindow();
 
-    static const DefaultSettings kDefaultSettings;
+    inline QVector<QOnlineTranslator::Language> targetLanguages() const {
+        return target_languages_;
+    };
+    
+    inline QOnlineTranslator::Engine translateEngine() const {
+        return strKeyToEnumValue<QOnlineTranslator::Engine>("translate_engine");
+    };
 
    signals:
     void settingLoaded();
     void translateEngineChanged(QOnlineTranslator::Engine engine);
-    void targetLanguageChanged(int index, QOnlineTranslator::Language language);
+    void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
 
    private:
     void initSettings();
@@ -36,7 +42,7 @@ class SettingWindow : public QWidget {
         if (!settings_->contains(key)) {
             settings_->setValue(key, value);
             qDebug()
-                << QString("Set %1 to default value: %2").arg(key).arg(value);
+                << QString("Settings: Set %1 to default value: %2").arg(key).arg(value);
         }
     }
 
@@ -48,7 +54,7 @@ class SettingWindow : public QWidget {
     // call this function with "translate_engine", it will return
     // QOnlineTranslator::Google
     template <class T>
-    inline T strKeyToEnumValue(const QString &setting_key) {
+    inline T strKeyToEnumValue(const QString &setting_key) const {
         auto emta_enum = QMetaEnum::fromType<T>();
         int value_int = emta_enum.keyToValue(
             settings_->value(setting_key).toString().toUtf8().data());
@@ -57,9 +63,9 @@ class SettingWindow : public QWidget {
 
     Ui::SettingWindow *ui;
     QSettings *settings_;
-    QVector<QComboBox *> translate_lang_combobox_;
-    DefaultSettings default_;
-    ;
+    QVector<QComboBox *> target_languages_combobox_;
+    QVector<QOnlineTranslator::Language> target_languages_;
+    const DefaultSettings default_;
 };
 
 #endif  // SettingWindow_H

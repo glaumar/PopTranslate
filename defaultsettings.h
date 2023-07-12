@@ -37,9 +37,8 @@ class DefaultSettings {
         return enumValueToKey(target_language_3);
     }
 
-   private:
     template <class T>
-    inline const char* enumValueToKey(const T value) const {
+    static inline const char* enumValueToKey(const T value) {
         return QMetaEnum::fromType<T>().valueToKey(value);
     }
 };

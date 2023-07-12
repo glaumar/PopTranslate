@@ -1,16 +1,22 @@
 #include "settingwindow.h"
 
 #include <QMetaEnum>
+#include <QSharedPointer>
 
 #include "ui_settingwindow.h"
 
 SettingWindow::SettingWindow(QWidget *parent)
     : QWidget(parent),
       ui(new Ui::SettingWindow),
-      settings_(new QSettings("PopTranslate", "PopTranslate", this)) {
+      settings_(new QSettings("PopTranslate", "PopTranslate", this)),
+      target_languages_({
+          default_.target_language_1,
+          default_.target_language_2,
+          default_.target_language_3,
+      }) {
     ui->setupUi(this);
 
-    translate_lang_combobox_ = {
+    target_languages_combobox_ = {
         ui->translate_lang_combobox_1,
         ui->translate_lang_combobox_2,
         ui->translate_lang_combobox_3,
@@ -44,7 +50,7 @@ void SettingWindow::initTranslateEngineComboBox() {
                 emit translateEngineChanged(
                     static_cast<QOnlineTranslator::Engine>(value));
 
-                qDebug() << tr("Change translate_engine to %1").arg(key);
+                qDebug() << tr("Settings: Change translate_engine to %1").arg(key);
             });
 
     // set current translate engine
@@ -64,46 +70,51 @@ void SettingWindow::initTargetLanguageComboBox() {
             languages.value(i) == QOnlineTranslator::NoLanguage)
             continue;
 
-        for (auto combobox : translate_lang_combobox_) {
+        for (auto combobox : target_languages_combobox_) {
             combobox->addItem(languages.key(i), languages.value(i));
         }
     }
 
     // emit signal when target language changed
-    for (int i = 0; i < translate_lang_combobox_.size(); i++) {
-        connect(translate_lang_combobox_[i],
+    for (int i = 0; i < target_languages_combobox_.size(); i++) {
+        connect(target_languages_combobox_[i],
                 QOverload<int>::of(&QComboBox::currentIndexChanged),
                 [this, i, languages](int index) {
                     int value =
-                        translate_lang_combobox_[i]->itemData(index).toInt();
+                        target_languages_combobox_[i]->itemData(index).toInt();
                     auto key = languages.valueToKey(value);
+
                     settings_->setValue(
                         QString("target_language_%1").arg(i + 1),
                         key);
 
-                    auto lang = static_cast<QOnlineTranslator::Language>(value);
-                    emit targetLanguageChanged(i + 1, lang);
+                    target_languages_[i] =
+                        static_cast<QOnlineTranslator::Language>(value);
+                    emit targetLanguagesChanged(target_languages_);
 
-                    qDebug() << QString("Change target_language_%1 to %2")
+                    qDebug() << QString("Settings: Change target_language_%1 to %2")
                                     .arg(i + 1)
                                     .arg(key);
                 });
     }
 
     // set current target languages
-    for (int i = 0; i < translate_lang_combobox_.size(); i++) {
-        auto current_lang = strKeyToEnumValue<QOnlineTranslator::Language>(
+    for (int i = 0; i < target_languages_combobox_.size(); i++) {
+        target_languages_[i] = strKeyToEnumValue<QOnlineTranslator::Language>(
             QString("target_language_%1").arg(i + 1));
-        // QOnlineTranslator::Auto(0) and QOnlineTranslator::NoLanguage(-1) are not in combobox
-        int index = static_cast<int>(current_lang) - 1;
-        translate_lang_combobox_[i]->setCurrentIndex(index >= 0 ? index : 0);
+
+        // QOnlineTranslator::Auto(0) and QOnlineTranslator::NoLanguage(-1) are
+        // not in combobox
+        int index = static_cast<int>(target_languages_[i]) - 1;
+        target_languages_combobox_[i]->setCurrentIndex(index >= 0 ? index : 0);
     }
 }
 
 void SettingWindow::initSettings() {
     if (settings_->status() != QSettings::NoError) {
-        qDebug() << "Failed to load settings";
+        qWarning() << "Settings: Failed to load settings";
     }
+    // using default settings if settings not exist
     setValueIfIsNull("translate_engine", default_.translate_engine_to_str());
     setValueIfIsNull("target_language_1", default_.target_language_1_to_str());
     setValueIfIsNull("target_language_2", default_.target_language_2_to_str());

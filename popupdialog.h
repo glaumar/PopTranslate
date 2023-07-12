@@ -7,6 +7,7 @@
 #include <QDialog>
 #include <QMenu>
 
+#include "defaultsettings.h"
 #include "qonlinetranslator.h"
 
 namespace Ui {
@@ -19,10 +20,15 @@ class PopupDialog : public QDialog {
    public:
     explicit PopupDialog(QWidget *parent = nullptr);
     ~PopupDialog();
-    void SetTransWords(const QString &words);
     bool event(QEvent *event) override;
     bool isNormalWindow() const;
     void setNormalWindow(bool on = false);
+   public slots:
+    void translate(const QString &text);
+    void retranslate();
+    void setTranslateEngine(QOnlineTranslator::Engine engine);
+    void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
+
 
    private:
     bool eventFilter(QObject *filtered, QEvent *event) override;
@@ -32,7 +38,11 @@ class PopupDialog : public QDialog {
     KWayland::Client::PlasmaShell *plasmashell_;
     Ui::PopupDialog *ui;
     QOnlineTranslator translator_;
+    const DefaultSettings default_;
+    QOnlineTranslator::Engine current_translate_engine_;
+    QOnlineTranslator::Language current_target_language_;
     QMenu context_menu_;
+    QMenu engine_menu_;
 };
 
 #endif  // POPUPDIALOG_H
