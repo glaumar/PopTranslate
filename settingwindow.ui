@@ -6,24 +6,36 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>542</width>
-    <height>258</height>
+    <width>536</width>
+    <height>338</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+   </property>
    <property name="labelAlignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
    <property name="formAlignment">
     <set>Qt::AlignHCenter|Qt::AlignTop</set>
    </property>
+   <property name="verticalSpacing">
+    <number>12</number>
+   </property>
    <item row="0" column="0">
     <widget class="QLabel" name="translate_engine_label">
      <property name="text">
-      <string>Translate Engine:</string>
+      <string>Translate Engine :</string>
      </property>
     </widget>
    </item>
@@ -33,7 +45,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="target_lang_label_1">
      <property name="text">
-      <string>Target Language 1:</string>
+      <string>Target Language 1 :</string>
      </property>
     </widget>
    </item>
@@ -43,7 +55,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="target_lang_label_2">
      <property name="text">
-      <string>Target Language 2:</string>
+      <string>Target Language 2 :</string>
      </property>
     </widget>
    </item>
@@ -53,7 +65,7 @@
    <item row="3" column="0">
     <widget class="QLabel" name="target_lang_label_3">
      <property name="text">
-      <string>Target Language 3:</string>
+      <string>Target Language 3 :</string>
      </property>
     </widget>
    </item>
@@ -63,7 +75,7 @@
    <item row="4" column="0">
     <widget class="QLabel" name="font_label">
      <property name="text">
-      <string>Font:</string>
+      <string>Font :</string>
      </property>
     </widget>
    </item>
@@ -80,6 +92,66 @@
      </property>
      <property name="title">
       <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="blur_checkbox">
+     <property name="text">
+      <string>Blur</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QSlider" name="opacity_slider">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>300</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximum">
+      <number>99</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="pageStep">
+      <number>20</number>
+     </property>
+     <property name="tracking">
+      <bool>false</bool>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="invertedAppearance">
+      <bool>false</bool>
+     </property>
+     <property name="invertedControls">
+      <bool>false</bool>
+     </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBelow</enum>
+     </property>
+     <property name="tickInterval">
+      <number>20</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="opacity_label">
+     <property name="text">
+      <string>Opacity :</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
    </item>

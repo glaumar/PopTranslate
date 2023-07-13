@@ -1,6 +1,7 @@
 #ifndef POPUPDIALOG_H
 #define POPUPDIALOG_H
 
+#include <KWayland/Client/blur.h>
 #include <KWayland/Client/plasmashell.h>
 
 #include <QDebug>
@@ -22,25 +23,26 @@ class PopupDialog : public QDialog {
     ~PopupDialog();
     bool event(QEvent *event) override;
     bool isNormalWindow() const;
-    void setNormalWindow(bool on = false);
+    void setNormalWindow(bool enable = false);
    public slots:
     void translate(const QString &text);
     void retranslate();
     void setTranslateEngine(QOnlineTranslator::Engine engine);
     void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
     void setFont(const QFont &font);
+    void setOpacity(qreal opacity);
+    void enableBlur(bool enable);
 
    private:
     bool eventFilter(QObject *filtered, QEvent *event) override;
     void initContextMenu();
+    void initWaylandConnection();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
     Ui::PopupDialog *ui;
     QOnlineTranslator translator_;
-    const DefaultSettings default_;
-    QOnlineTranslator::Engine current_translate_engine_;
-    QOnlineTranslator::Language current_target_language_;
+    DefaultSettings setting_;
     QMenu context_menu_;
     QMenu engine_menu_;
 };

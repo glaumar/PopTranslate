@@ -29,6 +29,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     initTranslateEngineComboBox();
     initTargetLanguageComboBox();
     initFont();
+    initOpacityAndBlur();
 }
 
 void SettingWindow::initTranslateEngineComboBox() {
@@ -79,27 +80,27 @@ void SettingWindow::initTargetLanguageComboBox() {
 
     // emit signal when target language changed
     for (int i = 0; i < target_languages_combobox_.size(); i++) {
-        connect(
-            target_languages_combobox_[i],
-            QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [this, i](int index) {
-                // get enum (QOnlineTranslator::Language) value and key
-                int value_int =
-                    target_languages_combobox_[i]->itemData(index).toInt();
-                auto value =
-                    static_cast<QOnlineTranslator::Language>(value_int);
-                auto key = default_.enumValueToKey<>(value);
+        connect(target_languages_combobox_[i],
+                QOverload<int>::of(&QComboBox::currentIndexChanged),
+                [this, i](int index) {
+                    // get enum (QOnlineTranslator::Language) value and key
+                    int value_int =
+                        target_languages_combobox_[i]->itemData(index).toInt();
+                    auto value =
+                        static_cast<QOnlineTranslator::Language>(value_int);
+                    auto key = default_.enumValueToKey<>(value);
 
-                settings_->setValue(QString("target_language_%1").arg(i + 1),
-                                    key);
+                    settings_->setValue(
+                        QString("target_language_%1").arg(i + 1),
+                        key);
 
-                target_languages_[i] = value;
-                emit targetLanguagesChanged(target_languages_);
+                    target_languages_[i] = value;
+                    emit targetLanguagesChanged(target_languages_);
 
-                qDebug() << QString("Settings: Change target_language_%1 to %2")
-                                .arg(i + 1)
-                                .arg(key);
-            });
+                    qDebug() << tr("Settings: Change target_language_%1 to %2")
+                                    .arg(i + 1)
+                                    .arg(key);
+                });
     }
 
     // set current target languages
@@ -125,6 +126,8 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("target_language_2", default_.target_language_2_to_str());
     setValueIfIsNull("target_language_3", default_.target_language_3_to_str());
     setValueIfIsNull("font", default_.font);
+    setValueIfIsNull("opacity", default_.opacity);
+    setValueIfIsNull("enable_blur", default_.enable_blur);
     // emit settingLoaded();
 }
 
@@ -143,6 +146,30 @@ void SettingWindow::initFont() {
             });
 
     ui->font_kfontrequester->setFont(font);
+}
+
+void SettingWindow::initOpacityAndBlur() {
+    auto opacity = settings_->value("opacity").value<qreal>();
+    auto enable_blur = settings_->value("enable_blur").value<bool>();
+
+    // emit signal when opacity changed
+    connect(ui->opacity_slider, &QSlider::valueChanged, [this](int value) {
+        qreal opacity = static_cast<qreal>(value) / 100;
+        settings_->setValue("opacity", opacity);
+        emit opacityChanged(opacity);
+        qDebug() << tr("Settings: Change opacity to %1").arg(opacity);
+    });
+
+    // emit signal when blur effect changed
+    connect(ui->blur_checkbox, &QCheckBox::stateChanged, [this](int state) {
+        auto enable_blur = state == Qt::Checked;
+        settings_->setValue("enable_blur", enable_blur);
+        emit triggerBlurEffect(enable_blur);
+        qDebug() << tr("Settings: Change blur effect to %1").arg(enable_blur);
+    });
+
+    ui->opacity_slider->setValue(static_cast<int>(opacity * 100));
+    ui->blur_checkbox->setChecked(enable_blur);
 }
 
 SettingWindow::~SettingWindow() {

@@ -18,6 +18,15 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -39,6 +48,9 @@
    </property>
    <item>
     <widget class="QPlainTextEdit" name="src_plain_text_edit">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="textInteractionFlags">
       <set>Qt::NoTextInteraction</set>
      </property>
@@ -46,6 +58,9 @@
    </item>
    <item>
     <widget class="QTextEdit" name="trans_text_edit">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -76,6 +91,9 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="textInteractionFlags">
       <set>Qt::NoTextInteraction</set>
+     </property>
+     <property name="placeholderText">
+      <string>Traslating...</string>
      </property>
     </widget>
    </item>

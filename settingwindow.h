@@ -31,23 +31,34 @@ class SettingWindow : public QWidget {
         return settings_->value("font").value<QFont>();
     };
 
+    inline qreal opacity() const {
+        return settings_->value("opacity").toReal();
+    };
+
+    inline bool isEnableBlur() const {
+        return settings_->value("enable_blur").toBool();
+    };
+
    signals:
     // void settingLoaded();
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
     void fontChanged(const QFont &font);
+    void opacityChanged(qreal opacity);
+    void triggerBlurEffect(bool enable);
 
    private:
     void initSettings();
     void initTranslateEngineComboBox();
     void initTargetLanguageComboBox();
     void initFont();
+    void initOpacityAndBlur();
 
     template <class T>
     inline void setValueIfIsNull(const QString &key, const T value) {
         if (!settings_->contains(key)) {
             settings_->setValue(key, value);
-            // qDebug() << QString("Settings: Set %1 to default value: %2")
+            // qDebug() << tr("Settings: Set %1 to default value: %2")
             //                 .arg(key)
             //                 .arg(value);
         }

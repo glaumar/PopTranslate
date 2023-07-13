@@ -5,8 +5,10 @@
 #include <KWayland/Client/surface.h>
 #include <KWindowSystem/kwindowsystem.h>
 
+#include <KWindowEffects>
 #include <QClipboard>
 #include <QDebug>
+#include <QGraphicsOpacityEffect>
 
 #include "ui_popupdialog.h"
 
@@ -15,54 +17,34 @@ PopupDialog::PopupDialog(QWidget *parent)
     ui->setupUi(this);
     setNormalWindow(false);
 
-    current_translate_engine_ = default_.translate_engine;
-    current_target_language_ = default_.target_language_1;
     initContextMenu();
-
-    // TODO: make poptranslate as a normal window
-    // connect(ui->pin_push_button, &QPushButton::clicked, this, [this]() {
-    //     setNormalWindow(!isNormalWindow());
-    //     hide();
-    //     show();
-    // });
-
-    auto registry = new KWayland::Client::Registry(this);
-    auto connection =
-        KWayland::Client::ConnectionThread::fromApplication(qGuiApp);
-    connect(registry,
-            &KWayland::Client::Registry::plasmaShellAnnounced,
-            this,
-            [registry, this](quint32 name, quint32 version) {
-                if (!plasmashell_) {
-                    plasmashell_ = registry->createPlasmaShell(name, version);
-                }
-            });
-    registry->create(connection);
-    registry->setup();
+    setOpacity(setting_.opacity);
+    setFont(setting_.font);
+    initWaylandConnection();
 }
 
 PopupDialog::~PopupDialog() { delete ui; }
 
 void PopupDialog::translate(const QString &text) {
     qDebug()
-        << QString(
+        << tr(
                "Translate: Engine: %1, Target language: %2, Source text: %3")
-               .arg(DefaultSettings::enumValueToKey(current_translate_engine_),
-                    DefaultSettings::enumValueToKey(current_target_language_),
+               .arg(DefaultSettings::enumValueToKey(setting_.translate_engine),
+                    DefaultSettings::enumValueToKey(setting_.target_language_1),
                     text);
 
     ui->src_plain_text_edit->setPlainText(text);
     ui->trans_text_edit->clear();
 
     translator_.translate(text,
-                          current_translate_engine_,
-                          current_target_language_);
+                          setting_.translate_engine,
+                          setting_.target_language_1);
     QObject::connect(&translator_, &QOnlineTranslator::finished, [this] {
         if (translator_.error() == QOnlineTranslator::NoError) {
             ui->trans_text_edit->setText(translator_.translation());
         } else {
             ui->trans_text_edit->setText(translator_.errorString());
-            qWarning() << QString("Failed Translate: %1")
+            qWarning() << tr("Failed Translate: %1")
                               .arg(translator_.errorString());
         }
     });
@@ -75,8 +57,8 @@ void PopupDialog::retranslate() {
 
 bool PopupDialog::isNormalWindow() const { return flag_normal_window_; }
 
-void PopupDialog::setNormalWindow(bool on) {
-    if (on) {
+void PopupDialog::setNormalWindow(bool enable) {
+    if (enable) {
         this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
         // KWindowSystem::setState(this->winId(), NET::SkipTaskbar |
         //                                            NET::SkipSwitcher |
@@ -86,13 +68,13 @@ void PopupDialog::setNormalWindow(bool on) {
     } else {
         this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
     }
-    flag_normal_window_ = on;
+    flag_normal_window_ = enable;
 }
 
 void PopupDialog::setTranslateEngine(QOnlineTranslator::Engine engine) {
-    qDebug() << QString("Translate: Set translate engine: %1")
-                    .arg(DefaultSettings::enumValueToKey(engine));
-    current_translate_engine_ = engine;
+    // qDebug() << tr("Translate: Set translate engine: %1")
+    //                 .arg(DefaultSettings::enumValueToKey(engine));
+    setting_.translate_engine = engine;
     engine_menu_.actions().at(engine)->setChecked(true);
 }
 
@@ -114,23 +96,34 @@ void PopupDialog::setTargetLanguages(
             DefaultSettings::enumValueToKey(lang));
         action->setCheckable(true);
         connect(action, &QAction::triggered, [this, lang]() {
-            current_target_language_ = lang;
+            setting_.target_language_1 = lang;
             retranslate();
         });
-        qDebug() << QString(
+        qDebug() << tr(
                         "Translate: Add target language to context menu: %1")
                         .arg(DefaultSettings::enumValueToKey(lang));
     }
 
-    current_target_language_ = languages.at(0);
+    setting_.target_language_1 = languages.at(0);
     target_languages_group->actions().at(0)->setChecked(true);
     context_menu_.addActions(target_languages_group->actions());
 }
 
 void PopupDialog::setFont(const QFont &font) {
+    setting_.font = font;
     ui->trans_text_edit->setFont(font);
     ui->src_plain_text_edit->setFont(font);
 }
+
+void PopupDialog::setOpacity(qreal opacity) {
+    setting_.opacity = opacity;
+    auto opacity_effect = new QGraphicsOpacityEffect(this);
+    opacity_effect->setOpacity(opacity);
+    this->setGraphicsEffect(opacity_effect);
+    this->setAutoFillBackground(true);
+}
+
+void PopupDialog::enableBlur(bool enable) { setting_.enable_blur = enable; }
 
 bool PopupDialog::event(QEvent *event) {
     // show menu
@@ -142,6 +135,7 @@ bool PopupDialog::event(QEvent *event) {
     // hide window
     if (!isNormalWindow() && event->type() == QEvent::Leave &&
         context_menu_.isHidden()) {
+        KWindowEffects::enableBlurBehind(this->windowHandle(), false);
         this->hide();
         return true;
     }
@@ -161,7 +155,11 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
         pop_window->isVisible()) {
         auto surface = KWayland::Client::Surface::fromWindow(pop_window);
         auto plasmaSurface = plasmashell_->createSurface(surface, pop_window);
+
         plasmaSurface->openUnderCursor();
+        // blur window Behind
+        KWindowEffects::enableBlurBehind(pop_window, setting_.enable_blur);
+
         plasmaSurface->setSkipTaskbar(!isNormalWindow());
         plasmaSurface->setSkipSwitcher(!isNormalWindow());
         pop_window->removeEventFilter(this);
@@ -202,10 +200,10 @@ void PopupDialog::initContextMenu() {
         auto engine = engines_enum.key(i);
         auto action = engine_group->addAction(engine);
         action->setCheckable(true);
-        action->setChecked(current_translate_engine_ == engines_enum.value(i));
+        action->setChecked(setting_.translate_engine == engines_enum.value(i));
 
         connect(action, &QAction::triggered, [this, engines_enum, i]() {
-            current_translate_engine_ =
+            setting_.translate_engine =
                 static_cast<QOnlineTranslator::Engine>(engines_enum.value(i));
             retranslate();
         });
@@ -215,7 +213,24 @@ void PopupDialog::initContextMenu() {
 
     // target_language
     context_menu_.addSeparator();
-    setTargetLanguages({default_.target_language_1,
-                        default_.target_language_2,
-                        default_.target_language_3});
+    setTargetLanguages({setting_.target_language_1,
+                        setting_.target_language_2,
+                        setting_.target_language_3});
+}
+
+void PopupDialog::initWaylandConnection() {
+    auto registry = new KWayland::Client::Registry(this);
+    auto connection =
+        KWayland::Client::ConnectionThread::fromApplication(qGuiApp);
+    connect(registry,
+            &KWayland::Client::Registry::plasmaShellAnnounced,
+            this,
+            [registry, this](quint32 name, quint32 version) {
+                if (!plasmashell_) {
+                    plasmashell_ = registry->createPlasmaShell(name, version);
+                }
+            });
+
+    registry->create(connection);
+    registry->setup();
 }

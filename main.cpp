@@ -6,6 +6,7 @@
 #include "poptranslate_dbus.h"
 
 int main(int argc, char *argv[]) {
+
     if (PopTranslateDBus::isRegistered()) {
         // PopTranslate is already running, using dbus to call
         // translateSelection

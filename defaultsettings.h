@@ -15,13 +15,17 @@ class DefaultSettings {
           target_language_1(QOnlineTranslator::Language::SimplifiedChinese),
           target_language_2(QOnlineTranslator::Language::English),
           target_language_3(QOnlineTranslator::Language::Japanese),
-          font() {}
+          font(),
+          opacity(0.6),
+          enable_blur(true) {}
 
     QOnlineTranslator::Engine translate_engine;
     QOnlineTranslator::Language target_language_1;
     QOnlineTranslator::Language target_language_2;
     QOnlineTranslator::Language target_language_3;
     QFont font;
+    qreal opacity;
+    bool enable_blur;
 
     inline const char* translate_engine_to_str() const {
         return enumValueToKey(translate_engine);

@@ -112,10 +112,22 @@ void MyApplication::loadSettings() {
             &pop_,
             &PopupDialog::setFont);
 
+    connect(&setting_window_,
+            &SettingWindow::opacityChanged,
+            &pop_,
+            &PopupDialog::setOpacity);
+
+    connect(&setting_window_,
+            &SettingWindow::triggerBlurEffect,
+            &pop_,
+            &PopupDialog::enableBlur);
+
     // load settings for popupdialog
     pop_.setTranslateEngine(setting_window_.translateEngine());
     pop_.setTargetLanguages(setting_window_.targetLanguages());
     pop_.setFont(setting_window_.font());
+    pop_.setOpacity(setting_window_.opacity());
+    pop_.enableBlur(setting_window_.isEnableBlur());
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {
