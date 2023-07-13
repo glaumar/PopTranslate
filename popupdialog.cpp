@@ -45,7 +45,8 @@ PopupDialog::~PopupDialog() { delete ui; }
 
 void PopupDialog::translate(const QString &text) {
     qDebug()
-        << QString("Engine: %1, Target language: %2, Source text: %3")
+        << QString(
+               "Translate: Engine: %1, Target language: %2, Source text: %3")
                .arg(DefaultSettings::enumValueToKey(current_translate_engine_),
                     DefaultSettings::enumValueToKey(current_target_language_),
                     text);
@@ -62,7 +63,7 @@ void PopupDialog::translate(const QString &text) {
         } else {
             ui->trans_text_edit->setText(translator_.errorString());
             qWarning() << QString("Failed Translate: %1")
-                            .arg(translator_.errorString());
+                              .arg(translator_.errorString());
         }
     });
 }
@@ -89,7 +90,7 @@ void PopupDialog::setNormalWindow(bool on) {
 }
 
 void PopupDialog::setTranslateEngine(QOnlineTranslator::Engine engine) {
-    qDebug() << QString("Set translate engine: %1")
+    qDebug() << QString("Translate: Set translate engine: %1")
                     .arg(DefaultSettings::enumValueToKey(engine));
     current_translate_engine_ = engine;
     engine_menu_.actions().at(engine)->setChecked(true);
@@ -116,13 +117,19 @@ void PopupDialog::setTargetLanguages(
             current_target_language_ = lang;
             retranslate();
         });
-        qDebug() << QString("Add target language to context menu: %1")
+        qDebug() << QString(
+                        "Translate: Add target language to context menu: %1")
                         .arg(DefaultSettings::enumValueToKey(lang));
     }
 
     current_target_language_ = languages.at(0);
     target_languages_group->actions().at(0)->setChecked(true);
     context_menu_.addActions(target_languages_group->actions());
+}
+
+void PopupDialog::setFont(const QFont &font) {
+    ui->trans_text_edit->setFont(font);
+    ui->src_plain_text_edit->setFont(font);
 }
 
 bool PopupDialog::event(QEvent *event) {
@@ -185,6 +192,7 @@ void PopupDialog::initContextMenu() {
                             tr("Settings"));
 
     // translate_engine
+    engine_menu_.setIcon(QIcon::fromTheme("search"));
     engine_menu_.setTitle(tr("Translate Engine"));
     auto engine_group = new QActionGroup(&engine_menu_);
     engine_group->setExclusive(true);

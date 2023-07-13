@@ -22,27 +22,34 @@ class SettingWindow : public QWidget {
     inline QVector<QOnlineTranslator::Language> targetLanguages() const {
         return target_languages_;
     };
-    
+
     inline QOnlineTranslator::Engine translateEngine() const {
         return strKeyToEnumValue<QOnlineTranslator::Engine>("translate_engine");
     };
 
+    inline QFont font() const {
+        return settings_->value("font").value<QFont>();
+    };
+
    signals:
-    void settingLoaded();
+    // void settingLoaded();
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
+    void fontChanged(const QFont &font);
 
    private:
     void initSettings();
     void initTranslateEngineComboBox();
     void initTargetLanguageComboBox();
+    void initFont();
 
     template <class T>
     inline void setValueIfIsNull(const QString &key, const T value) {
         if (!settings_->contains(key)) {
             settings_->setValue(key, value);
-            qDebug()
-                << QString("Settings: Set %1 to default value: %2").arg(key).arg(value);
+            // qDebug() << QString("Settings: Set %1 to default value: %2")
+            //                 .arg(key)
+            //                 .arg(value);
         }
     }
 

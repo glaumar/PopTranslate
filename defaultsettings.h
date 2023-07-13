@@ -1,25 +1,27 @@
 #ifndef DEFAULTSETTINGS_H
 #define DEFAULTSETTINGS_H
 
-#include <QOnlineTranslator>
 #include <QMetaEnum>
+#include <QOnlineTranslator>
 
-// get variable name as string, void(Variable) force compiler to check if variable exists
-// #define MACRO_VARIABLE_TO_STRING(Variable) (void(Variable),#Variable)
+// get variable name as string, void(Variable) force compiler to check if
+// variable exists #define MACRO_VARIABLE_TO_STRING(Variable)
+// (void(Variable),#Variable)
 
 class DefaultSettings {
    public:
-    DefaultSettings() {
-        translate_engine = QOnlineTranslator::Engine::Google;
-        target_language_1 = QOnlineTranslator::Language::SimplifiedChinese;
-        target_language_2 = QOnlineTranslator::Language::English;
-        target_language_3 = QOnlineTranslator::Language::Japanese;
-    }
+    DefaultSettings()
+        : translate_engine(QOnlineTranslator::Engine::Google),
+          target_language_1(QOnlineTranslator::Language::SimplifiedChinese),
+          target_language_2(QOnlineTranslator::Language::English),
+          target_language_3(QOnlineTranslator::Language::Japanese),
+          font() {}
 
     QOnlineTranslator::Engine translate_engine;
     QOnlineTranslator::Language target_language_1;
     QOnlineTranslator::Language target_language_2;
     QOnlineTranslator::Language target_language_3;
+    QFont font;
 
     inline const char* translate_engine_to_str() const {
         return enumValueToKey(translate_engine);

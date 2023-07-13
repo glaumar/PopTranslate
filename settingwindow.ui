@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>508</width>
-    <height>233</height>
+    <width>542</width>
+    <height>258</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -60,8 +60,38 @@
    <item row="3" column="1">
     <widget class="QComboBox" name="translate_lang_combobox_3"/>
    </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="font_label">
+     <property name="text">
+      <string>Font:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="KFontRequester" name="font_kfontrequester">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KFontRequester</class>
+   <extends>QWidget</extends>
+   <header>kfontrequester.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

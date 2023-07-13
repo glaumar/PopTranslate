@@ -28,7 +28,7 @@ class PopupDialog : public QDialog {
     void retranslate();
     void setTranslateEngine(QOnlineTranslator::Engine engine);
     void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
-
+    void setFont(const QFont &font);
 
    private:
     bool eventFilter(QObject *filtered, QEvent *event) override;

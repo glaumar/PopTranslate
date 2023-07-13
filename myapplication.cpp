@@ -98,18 +98,24 @@ void MyApplication::initDBusInterface() {
 
 void MyApplication::loadSettings() {
     connect(&setting_window_,
-        &SettingWindow::translateEngineChanged,
-        &pop_,
-        &PopupDialog::setTranslateEngine);
+            &SettingWindow::translateEngineChanged,
+            &pop_,
+            &PopupDialog::setTranslateEngine);
 
     connect(&setting_window_,
-        &SettingWindow::targetLanguagesChanged,
-        &pop_,
-        &PopupDialog::setTargetLanguages);
-    
-    // set init translate engine and target languages
+            &SettingWindow::targetLanguagesChanged,
+            &pop_,
+            &PopupDialog::setTargetLanguages);
+
+    connect(&setting_window_,
+            &SettingWindow::fontChanged,
+            &pop_,
+            &PopupDialog::setFont);
+
+    // load settings for popupdialog
     pop_.setTranslateEngine(setting_window_.translateEngine());
     pop_.setTargetLanguages(setting_window_.targetLanguages());
+    pop_.setFont(setting_window_.font());
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

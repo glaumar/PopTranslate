@@ -74,3 +74,4 @@ CMakeLists.txt.user*
 
 # CMakke
 build/
+.VSCodeCounter/
