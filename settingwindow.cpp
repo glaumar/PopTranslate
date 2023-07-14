@@ -36,6 +36,13 @@ void SettingWindow::initTranslateEngineComboBox() {
     const QMetaEnum engines = QMetaEnum::fromType<QOnlineTranslator::Engine>();
     // add all translate engines to translate engine combobox
     for (int i = 0; i < engines.keyCount(); i++) {
+        // TODO: Add support for LibreTranslate and Lingva
+        // Disable LibreTranslate and Lingva
+        if (engines.value(i) ==
+                QOnlineTranslator::Engine::LibreTranslate ||
+            engines.value(i) == QOnlineTranslator::Engine::Lingva) {
+            continue;
+        }
         ui->translate_engine_combobox->addItem(engines.key(i),
                                                engines.value(i));
     }

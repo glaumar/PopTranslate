@@ -196,6 +196,14 @@ void PopupDialog::initContextMenu() {
 
     QMetaEnum engines_enum = QMetaEnum::fromType<QOnlineTranslator::Engine>();
     for (int i = 0; i < engines_enum.keyCount(); i++) {
+        // TODO: Add support for LibreTranslate and Lingva
+        // Disable LibreTranslate and Lingva
+        if (engines_enum.value(i) ==
+                QOnlineTranslator::Engine::LibreTranslate ||
+            engines_enum.value(i) == QOnlineTranslator::Engine::Lingva) {
+            continue;
+        }
+
         auto engine = engines_enum.key(i);
         auto action = engine_group->addAction(engine);
         action->setCheckable(true);
