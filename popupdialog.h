@@ -37,6 +37,7 @@ class PopupDialog : public QDialog {
     bool eventFilter(QObject *filtered, QEvent *event) override;
     void initContextMenu();
     void initWaylandConnection();
+    void initTranslator();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;

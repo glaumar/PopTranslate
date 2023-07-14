@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
-    <height>260</height>
+    <width>535</width>
+    <height>343</height>
    </rect>
   </property>
   <property name="font">
@@ -51,6 +51,12 @@
      <property name="styleSheet">
       <string notr="true"/>
      </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
      <property name="textInteractionFlags">
       <set>Qt::NoTextInteraction</set>
      </property>
@@ -58,6 +64,12 @@
    </item>
    <item>
     <widget class="QTextEdit" name="trans_text_edit">
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
      <property name="styleSheet">
       <string notr="true"/>
      </property>

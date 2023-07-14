@@ -21,14 +21,23 @@ PopupDialog::PopupDialog(QWidget *parent)
     setOpacity(setting_.opacity);
     setFont(setting_.font);
     initWaylandConnection();
+    initTranslator();
 }
 
 PopupDialog::~PopupDialog() { delete ui; }
 
 void PopupDialog::translate(const QString &text) {
+    if (text.isEmpty()) {
+        return;
+    }
+
+    if (translator_.isRunning()) {
+        qDebug() << tr("Translate: Abort previous translation");
+        translator_.abort();
+    }
+
     qDebug()
-        << tr(
-               "Translate: Engine: %1, Target language: %2, Source text: %3")
+        << tr("Translate: Engine: %1, Target language: %2, Source text: %3")
                .arg(DefaultSettings::enumValueToKey(setting_.translate_engine),
                     DefaultSettings::enumValueToKey(setting_.target_language_1),
                     text);
@@ -39,15 +48,6 @@ void PopupDialog::translate(const QString &text) {
     translator_.translate(text,
                           setting_.translate_engine,
                           setting_.target_language_1);
-    QObject::connect(&translator_, &QOnlineTranslator::finished, [this] {
-        if (translator_.error() == QOnlineTranslator::NoError) {
-            ui->trans_text_edit->setText(translator_.translation());
-        } else {
-            ui->trans_text_edit->setText(translator_.errorString());
-            qWarning() << tr("Failed Translate: %1")
-                              .arg(translator_.errorString());
-        }
-    });
 }
 
 void PopupDialog::retranslate() {
@@ -72,8 +72,8 @@ void PopupDialog::setNormalWindow(bool enable) {
 }
 
 void PopupDialog::setTranslateEngine(QOnlineTranslator::Engine engine) {
-    // qDebug() << tr("Translate: Set translate engine: %1")
-    //                 .arg(DefaultSettings::enumValueToKey(engine));
+    qDebug() << tr("Translate: Change translate engine: %1")
+                    .arg(DefaultSettings::enumValueToKey(engine));
     setting_.translate_engine = engine;
     engine_menu_.actions().at(engine)->setChecked(true);
 }
@@ -99,8 +99,7 @@ void PopupDialog::setTargetLanguages(
             setting_.target_language_1 = lang;
             retranslate();
         });
-        qDebug() << tr(
-                        "Translate: Add target language to context menu: %1")
+        qDebug() << tr("Translate: Add target language to context menu: %1")
                         .arg(DefaultSettings::enumValueToKey(lang));
     }
 
@@ -137,6 +136,7 @@ bool PopupDialog::event(QEvent *event) {
         context_menu_.isHidden()) {
         KWindowEffects::enableBlurBehind(this->windowHandle(), false);
         this->hide();
+        translator_.abort();
         return true;
     }
 
@@ -156,10 +156,9 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
         auto surface = KWayland::Client::Surface::fromWindow(pop_window);
         auto plasmaSurface = plasmashell_->createSurface(surface, pop_window);
 
-        plasmaSurface->openUnderCursor();
         // blur window Behind
         KWindowEffects::enableBlurBehind(pop_window, setting_.enable_blur);
-
+        plasmaSurface->openUnderCursor();
         plasmaSurface->setSkipTaskbar(!isNormalWindow());
         plasmaSurface->setSkipSwitcher(!isNormalWindow());
         pop_window->removeEventFilter(this);
@@ -233,4 +232,22 @@ void PopupDialog::initWaylandConnection() {
 
     registry->create(connection);
     registry->setup();
+}
+
+void PopupDialog::initTranslator() {
+    QObject::connect(&translator_, &QOnlineTranslator::finished, [this] {
+        if (translator_.error() == QOnlineTranslator::NoError) {
+            qDebug() << tr("Translate Success: %1").arg(translator_.source());
+            ui->trans_text_edit->setText(translator_.translation());
+        } else {
+            auto error_msg =
+                tr("Failed Translate: %1 (%2)")
+                    .arg(translator_.errorString(), translator_.source());
+            if (this->isVisible() &&
+                translator_.errorString() != QString("Operation canceled")) {
+                ui->trans_text_edit->setText(error_msg);
+            }
+            qWarning() << error_msg;
+        }
+    });
 }
