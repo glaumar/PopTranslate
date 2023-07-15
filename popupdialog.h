@@ -10,7 +10,6 @@
 
 #include "defaultsettings.h"
 #include "qonlinetranslator.h"
-
 namespace Ui {
 class PopupDialog;
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>597</width>
-    <height>380</height>
+    <width>691</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -95,10 +95,13 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QCheckBox" name="blur_checkbox">
+   <item row="5" column="0">
+    <widget class="QLabel" name="opacity_label">
      <property name="text">
-      <string>Blur</string>
+      <string>Opacity :</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
    </item>
@@ -145,13 +148,97 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="opacity_label">
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="blur_checkbox">
      <property name="text">
-      <string>Opacity :</string>
+      <string>Blur</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="proxy_host_label">
+     <property name="text">
+      <string>Proxy Host :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QLineEdit" name="proxy_host_lineedit">
+     <property name="maxLength">
+      <number>1024</number>
+     </property>
+     <property name="placeholderText">
+      <string>127.0.0.1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="proxy_port_lable">
+     <property name="text">
+      <string>Proxy Port :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QSpinBox" name="proxy_port_spinbox">
+     <property name="maximum">
+      <number>65535</number>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="auth_lable">
+     <property name="text">
+      <string>Authentication :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="QCheckBox" name="auth_checkbox">
+     <property name="text">
+      <string>Enable</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="username_lable">
+     <property name="text">
+      <string>Username :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QLineEdit" name="username_lineedit">
+     <property name="placeholderText">
+      <string>user</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="password_lable">
+     <property name="text">
+      <string>Password :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="1">
+    <widget class="QLineEdit" name="password_lineedit">
+     <property name="placeholderText">
+      <string>pass</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QCheckBox" name="http_proxy_checkbox">
+     <property name="text">
+      <string>Enable</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="http_proxy_label">
+     <property name="text">
+      <string>HTTP Proxy :</string>
      </property>
     </widget>
    </item>

@@ -2,6 +2,7 @@
 #define SettingWindow_H
 
 #include <QComboBox>
+#include <QNetworkProxy>
 #include <QSettings>
 #include <QWidget>
 
@@ -39,8 +40,9 @@ class SettingWindow : public QWidget {
         return settings_->value("enable_blur").toBool();
     };
 
+    inline QNetworkProxy proxy() const { return proxy_; };
+
    signals:
-    // void settingLoaded();
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
     void fontChanged(const QFont &font);
@@ -53,6 +55,12 @@ class SettingWindow : public QWidget {
     void initTargetLanguageComboBox();
     void initFont();
     void initOpacityAndBlur();
+    void initProxy();
+    // inline void enableProxy() {
+    //     settings_->setValue("enable_proxy", enable);
+    //     QNetworkProxy::setApplicationProxy(proxy_);
+
+    // };
 
     template <class T>
     inline void setValueIfIsNull(const QString &key, const T value) {
@@ -84,6 +92,7 @@ class SettingWindow : public QWidget {
     QVector<QComboBox *> target_languages_combobox_;
     QVector<QOnlineTranslator::Language> target_languages_;
     const DefaultSettings default_;
+    QNetworkProxy proxy_;
 };
 
 #endif  // SettingWindow_H

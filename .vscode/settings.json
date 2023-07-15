@@ -28,7 +28,9 @@
         "__memory": "cpp",
         "limits": "cpp",
         "locale": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "qcombobox": "cpp",
+        "qsettings": "cpp"
     },
     "commentTranslate.hover.enabled": false
 }

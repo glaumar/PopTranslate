@@ -17,7 +17,13 @@ class DefaultSettings {
           target_language_3(QOnlineTranslator::Language::Japanese),
           font(),
           opacity(0.6),
-          enable_blur(true) {}
+          enable_blur(true),
+          enable_proxy(false),
+          proxy_hostname("localhost"),
+          proxy_port(8080),
+          enable_auth(false),
+          proxy_username(),
+          proxy_password() {}
 
     QOnlineTranslator::Engine translate_engine;
     QOnlineTranslator::Language target_language_1;
@@ -26,6 +32,12 @@ class DefaultSettings {
     QFont font;
     qreal opacity;
     bool enable_blur;
+    bool enable_proxy;
+    QString proxy_hostname;
+    quint16 proxy_port;
+    bool enable_auth;
+    QString proxy_username;
+    QString proxy_password;
 
     inline const char* translate_engine_to_str() const {
         return enumValueToKey(translate_engine);

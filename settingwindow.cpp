@@ -30,6 +30,12 @@ SettingWindow::SettingWindow(QWidget *parent)
     initTargetLanguageComboBox();
     initFont();
     initOpacityAndBlur();
+    initProxy();
+}
+
+SettingWindow::~SettingWindow() {
+    settings_->sync();
+    delete ui;
 }
 
 void SettingWindow::initTranslateEngineComboBox() {
@@ -38,8 +44,7 @@ void SettingWindow::initTranslateEngineComboBox() {
     for (int i = 0; i < engines.keyCount(); i++) {
         // TODO: Add support for LibreTranslate and Lingva
         // Disable LibreTranslate and Lingva
-        if (engines.value(i) ==
-                QOnlineTranslator::Engine::LibreTranslate ||
+        if (engines.value(i) == QOnlineTranslator::Engine::LibreTranslate ||
             engines.value(i) == QOnlineTranslator::Engine::Lingva) {
             continue;
         }
@@ -135,6 +140,12 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("font", default_.font);
     setValueIfIsNull("opacity", default_.opacity);
     setValueIfIsNull("enable_blur", default_.enable_blur);
+    setValueIfIsNull("enable_proxy", default_.enable_proxy);
+    setValueIfIsNull("proxy_hostname", default_.proxy_hostname);
+    setValueIfIsNull("proxy_port", default_.proxy_port);
+    setValueIfIsNull("enable_auth", default_.enable_auth);
+    setValueIfIsNull("proxy_username", default_.proxy_username);
+    setValueIfIsNull("proxy_password", default_.proxy_password);
     // emit settingLoaded();
 }
 
@@ -179,7 +190,132 @@ void SettingWindow::initOpacityAndBlur() {
     ui->blur_checkbox->setChecked(enable_blur);
 }
 
-SettingWindow::~SettingWindow() {
-    settings_->sync();
-    delete ui;
+void SettingWindow::initProxy() {
+    auto enable_proxy = settings_->value("enable_proxy").toBool();
+    auto proxy_hostname = settings_->value("proxy_hostname").toString();
+    auto proxy_port = settings_->value("proxy_port").value<quint16>();
+    auto enable_auth = settings_->value("enable_auth").toBool();
+    auto proxy_username = settings_->value("proxy_username").toString();
+    auto proxy_password = settings_->value("proxy_password").toString();
+
+    // set proxy for application
+    if (enable_proxy) {
+        if (enable_auth) {
+            proxy_ = QNetworkProxy(QNetworkProxy::HttpProxy,
+                                   proxy_hostname,
+                                   proxy_port);
+        } else {
+            proxy_ = QNetworkProxy(QNetworkProxy::HttpProxy,
+                                   proxy_hostname,
+                                   proxy_port,
+                                   proxy_username,
+                                   proxy_password);
+        }
+        QNetworkProxy::setApplicationProxy(proxy_);
+
+        qDebug() << tr("Settings: Change proxy to %1:%2")
+                        .arg(proxy_.hostName())
+                        .arg(proxy_.port());
+    } else {
+        QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
+    }
+
+    // set proxy settings ui
+    ui->http_proxy_checkbox->setChecked(enable_proxy);
+    ui->proxy_host_lineedit->setText(proxy_hostname);
+    ui->proxy_port_spinbox->setValue(proxy_port);
+    ui->auth_checkbox->setChecked(enable_auth);
+    ui->username_lineedit->setText(proxy_username);
+    ui->password_lineedit->setText(proxy_password);
+
+    // enable/disable proxy settings ui
+    ui->proxy_host_lineedit->setEnabled(enable_proxy);
+    ui->proxy_port_spinbox->setEnabled(enable_proxy);
+    ui->auth_checkbox->setEnabled(enable_proxy);
+    ui->username_lineedit->setEnabled(enable_auth && enable_proxy);
+    ui->password_lineedit->setEnabled(enable_auth && enable_proxy);
+
+    // Enable/Disable proxy
+    connect(
+        ui->http_proxy_checkbox,
+        &QCheckBox::stateChanged,
+        [this](int state) {
+            auto enable_proxy = state == Qt::Checked;
+            settings_->setValue("enable_proxy", enable_proxy);
+            if (enable_proxy) {
+                QNetworkProxy::setApplicationProxy(proxy_);
+            } else {
+                QNetworkProxy::setApplicationProxy(QNetworkProxy::NoProxy);
+            }
+
+            auto enable_auth = ui->auth_checkbox->isChecked();
+            ui->proxy_host_lineedit->setEnabled(enable_proxy);
+            ui->proxy_port_spinbox->setEnabled(enable_proxy);
+            ui->auth_checkbox->setEnabled(enable_proxy);
+            ui->username_lineedit->setEnabled(enable_auth && enable_proxy);
+            ui->password_lineedit->setEnabled(enable_auth && enable_proxy);
+
+            qDebug() << tr("Settings: %1 proxy %2:%3")
+                            .arg(enable_proxy ? tr("Enable") : tr("Disable"))
+                            .arg(proxy_.hostName())
+                            .arg(proxy_.port());
+        });
+
+    // Enable/Disable proxy auth
+    connect(ui->auth_checkbox, &QCheckBox::stateChanged, [this](int state) {
+        auto enable_auth = state == Qt::Checked;
+
+        if (enable_auth) {
+            proxy_.setUser(ui->username_lineedit->text());
+            proxy_.setPassword(ui->password_lineedit->text());
+        } else {
+            proxy_.setUser(QString());
+            proxy_.setPassword(QString());
+        }
+
+        ui->username_lineedit->setEnabled(enable_auth);
+        ui->password_lineedit->setEnabled(enable_auth);
+
+        settings_->setValue("enable_auth", enable_auth);
+
+        qDebug() << tr("Settings: %1 proxy auth")
+                        .arg(enable_auth ? tr("Enable") : tr("Disable"));
+    });
+
+    // Set slot for change proxy setting
+    connect(
+        ui->proxy_host_lineedit,
+        &QLineEdit::textChanged,
+        [this](const QString &text) {
+            proxy_.setHostName(text);
+            QNetworkProxy::setApplicationProxy(proxy_);
+            settings_->setValue("proxy_hostname", text);
+            qDebug() << tr("Settings: Change proxy hostname to %1").arg(text);
+        });
+    connect(ui->proxy_port_spinbox,
+            QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int value) {
+                proxy_.setPort(value);
+                QNetworkProxy::setApplicationProxy(proxy_);
+                settings_->setValue("proxy_port", value);
+                qDebug() << tr("Settings: Change proxy port to %1").arg(value);
+            });
+    connect(
+        ui->username_lineedit,
+        &QLineEdit::textChanged,
+        [this](const QString &text) {
+            proxy_.setUser(text);
+            QNetworkProxy::setApplicationProxy(proxy_);
+            settings_->setValue("proxy_username", text);
+            qDebug() << tr("Settings: Change proxy username to %1").arg(text);
+        });
+    connect(
+        ui->password_lineedit,
+        &QLineEdit::textChanged,
+        [this](const QString &text) {
+            proxy_.setPassword(text);
+            QNetworkProxy::setApplicationProxy(proxy_);
+            settings_->setValue("proxy_password", text);
+            qDebug() << tr("Settings: Change proxy password to %1").arg(text);
+        });
 }
