@@ -44,6 +44,7 @@ bool MyApplication::initGlobalShortcuts() {
 }
 
 void MyApplication::showPop(bool unuse) {
+    Q_UNUSED(unuse);
     if (pop_.isVisible() && !pop_.isNormalWindow()) {
         pop_.hide();
         return;
@@ -131,6 +132,7 @@ void MyApplication::loadSettings() {
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {
+    Q_UNUSED(reason);
     bool is_visible = setting_window_.isVisible();
     setting_window_.setVisible(!is_visible);
 }

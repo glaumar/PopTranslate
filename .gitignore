@@ -72,6 +72,8 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
-# CMakke
+# CMake
 build/
 .VSCodeCounter/
+.flatpak-builder/
+build-dir/

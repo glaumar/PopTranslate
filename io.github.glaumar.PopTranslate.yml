@@ -1,0 +1,30 @@
+app-id: io.github.glaumar.PopTranslate
+runtime: org.kde.Platform
+runtime-version: "5.15-22.08"
+sdk: org.kde.Sdk
+command: poptranslate
+finish-args:
+  - --socket=wayland
+  - --socket=session-bus
+  - --share=network
+  - --device=dri
+build-options:
+  build-args:
+    - --share=network
+modules:
+  - name: poptranslate
+    buildsystem: cmake
+    sources:
+      - type: dir
+        path: .
+        skip:
+          - .gitignore
+          - .git
+          - io.github.glaumar.PopTranslate.yml
+          - .clang-format
+          - .vscode
+          - CMakeLists.txt.user
+          - build
+          - build-dir
+          - .flatpak-builder
+          - .VSCodeCounter

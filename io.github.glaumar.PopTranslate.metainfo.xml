@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>io.github.glaumar.PopTranslate</id>
+
+    <name>PopTranslate</name>
+    <summary>Translate mouse selected text</summary>
+
+    <metadata_license>FSFAP</metadata_license>
+    <project_license>GPL-3.0-or-later</project_license>
+
+    <url type="homepage">https://github.com/glaumar/PopTranslate</url>
+    <developer_name>Glaumar</developer_name>
+
+    <description>
+        <p>
+            Translate mouse selected text and show result on a pop up window, support wayland only.
+        </p>
+    </description>
+    <content_rating type="oars-1.1" />
+    <launchable type="desktop-id">io.github.glaumar.PopTranslate.desktop</launchable>
+</component>

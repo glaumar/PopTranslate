@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools wayland)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
+
 find_package(KF5GlobalAccel)
 find_package(KF5GuiAddons)
 find_package(KF5Wayland)
@@ -28,29 +28,20 @@ FetchContent_MakeAvailable(QOnlineTranslator)
 set(TS_FILES poptranslate_zh_CN.ts)
 
 set(PROJECT_SOURCES
-    main.cpp
-    myapplication.cpp myapplication.h
-    popupdialog.cpp popupdialog.h popupdialog.ui
-    poptranslate_dbus.cpp poptranslate_dbus.h
-    settingwindow.cpp settingwindow.h settingwindow.ui
-    defaultsettings.h
+    src/main.cpp
+    src/myapplication.cpp src/myapplication.h
+    src/popupdialog.cpp src/popupdialog.h src/popupdialog.ui
+    src/poptranslate_dbus.cpp src/poptranslate_dbus.h
+    src/settingwindow.cpp src/settingwindow.h src/settingwindow.ui
+    src/defaultsettings.h
     ${TS_FILES}
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(poptranslate
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-    )
+add_executable(poptranslate
+    ${PROJECT_SOURCES}
+)
 
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-else()
-    add_executable(poptranslate
-        ${PROJECT_SOURCES}
-    )
-
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-endif()
+qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 
 target_link_libraries(poptranslate PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -61,9 +52,7 @@ target_link_libraries(poptranslate PRIVATE
     KF5::WidgetsAddons
     QOnlineTranslator)
 
-# install(TARGETS poptranslate
-# BUNDLE DESTINATION .
-# LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(poptranslate)
-endif()
+install(TARGETS poptranslate DESTINATION bin)
+install(FILES data/io.github.glaumar.PopTranslate.desktop DESTINATION share/applications)
+install(FILES data/io.github.glaumar.PopTranslate.svg DESTINATION share/icons/hicolor/scalable/apps)
+install(FILES io.github.glaumar.PopTranslate.metainfo.xml DESTINATION share/metainfo)
