@@ -72,8 +72,12 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
-# CMake
-build/
-.VSCodeCounter/
+# Flatpak
 .flatpak-builder/
 build-dir/
+.flatpak/
+_build/
+
+build/
+.VSCodeCounter/
+io.github.glaumar.PopTranslate.flatpak

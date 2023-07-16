@@ -31,6 +31,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     initFont();
     initOpacityAndBlur();
     initProxy();
+    initShortcut();
 }
 
 SettingWindow::~SettingWindow() {
@@ -146,6 +147,8 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("enable_auth", default_.enable_auth);
     setValueIfIsNull("proxy_username", default_.proxy_username);
     setValueIfIsNull("proxy_password", default_.proxy_password);
+    setValueIfIsNull("shortcut_popup_main", default_.shortcut_popup_main);
+    setValueIfIsNull("shortcut_popup_alt", default_.shortcut_popup_alt);
     // emit settingLoaded();
 }
 
@@ -318,4 +321,26 @@ void SettingWindow::initProxy() {
             settings_->setValue("proxy_password", text);
             qDebug() << tr("Settings: Change proxy password to %1").arg(text);
         });
+}
+
+void SettingWindow::initShortcut() {
+    auto shortcuts = this->shortcuts();
+
+    // emit signal when shortcut changed
+    connect(ui->shortcut_kshortcutwidget,
+            &KShortcutWidget::shortcutChanged,
+            [this](const QList<QKeySequence> &shortcuts) {
+                settings_->setValue("shortcut_popup_main", shortcuts.at(0));
+                qDebug() << tr("Settings: Change main shortcut to %1")
+                                .arg(shortcuts.at(0).toString());
+                if (shortcuts.size() > 1) {
+                    settings_->setValue("shortcut_popup_alt", shortcuts.at(1));
+                    qDebug() << tr("Settings: Change alternate shortcut to %1")
+                                    .arg(shortcuts.at(1).toString());
+                }
+
+                emit shortcutChanged(shortcuts);
+            });
+
+    ui->shortcut_kshortcutwidget->setShortcut(shortcuts);
 }

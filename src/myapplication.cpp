@@ -27,20 +27,15 @@ MyApplication::MyApplication(int &argc, char **argv)
     // pop_.setAsnormalWindow(true);
 }
 
-bool MyApplication::initGlobalShortcuts() {
-    QAction *act = new QAction(tr("translate selection"), this);
-    QKeySequence kseq(Qt::META | Qt::Key_G);
-    act->setObjectName("io.github.glaumar.PopTranslate");
-    bool ret = KGlobalAccel::setGlobalShortcut(act, kseq);
-
-    if (!ret) {
-        qDebug() << tr(
-            "Failed to bind global shortcuts for translate selection");
-        return ret;
-    }
-
-    connect(act, &QAction::triggered, this, &MyApplication::showPop);
-    return ret;
+void MyApplication::initGlobalShortcuts() {
+    shortcut_act_ = new QAction(tr("translate selection"), this);
+    shortcut_act_->setObjectName("io.github.glaumar.PopTranslate");
+    setShortcut(setting_window_.shortcuts());
+    connect(shortcut_act_, &QAction::triggered, this, &MyApplication::showPop);
+    connect(&setting_window_,
+            &SettingWindow::shortcutChanged,
+            this,
+            &MyApplication::setShortcut);
 }
 
 void MyApplication::showPop(bool unuse) {
@@ -131,7 +126,8 @@ void MyApplication::loadSettings() {
     pop_.setOpacity(setting_window_.opacity());
     pop_.enableBlur(setting_window_.isEnableBlur());
 
-    // Show setting window when PopupDialog contextmenu action "settings" triggered
+    // Show setting window when PopupDialog contextmenu action "settings"
+    // triggered
     connect(&pop_, &PopupDialog::settingsActionTriggered, [this]() {
         setting_window_.show();
     });
@@ -141,4 +137,17 @@ void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {
     Q_UNUSED(reason);
     bool is_visible = setting_window_.isVisible();
     setting_window_.setVisible(!is_visible);
+}
+
+bool MyApplication::setShortcut(const QList<QKeySequence> &shortcuts) {
+    KGlobalAccel::self()->removeAllShortcuts(shortcut_act_);
+    bool ret = KGlobalAccel::setGlobalShortcut(shortcut_act_, shortcuts);
+    for (auto shortcut : shortcuts) {
+        if (shortcut.isEmpty()) continue;
+        qDebug() << tr("Bind global shortcuts (%1) for translate selection %2")
+                        .arg(shortcut.toString(),
+                             ret ? tr("success") : tr("failed"));
+    }
+
+    return ret;
 }

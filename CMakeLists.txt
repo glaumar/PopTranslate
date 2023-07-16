@@ -16,6 +16,7 @@ find_package(KF5GuiAddons)
 find_package(KF5Wayland)
 find_package(KF5WindowSystem)
 find_package(KF5WidgetsAddons)
+find_package(KF5XmlGui)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -50,6 +51,7 @@ target_link_libraries(poptranslate PRIVATE
     KF5::WaylandClient
     KF5::WindowSystem
     KF5::WidgetsAddons
+    KF5::XmlGui
     QOnlineTranslator)
 
 install(TARGETS poptranslate DESTINATION bin)

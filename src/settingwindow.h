@@ -42,12 +42,21 @@ class SettingWindow : public QWidget {
 
     inline QNetworkProxy proxy() const { return proxy_; };
 
+    inline QList<QKeySequence> shortcuts() const {
+        QList<QKeySequence> shortcuts;
+        shortcuts
+            << settings_->value("shortcut_popup_main").value<QKeySequence>()
+            << settings_->value("shortcut_popup_alt").value<QKeySequence>();
+        return shortcuts;
+    };
+
    signals:
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
     void fontChanged(const QFont &font);
     void opacityChanged(qreal opacity);
     void triggerBlurEffect(bool enable);
+    void shortcutChanged(const QList<QKeySequence> &shortcuts);
 
    private:
     void initSettings();
@@ -56,6 +65,7 @@ class SettingWindow : public QWidget {
     void initFont();
     void initOpacityAndBlur();
     void initProxy();
+    void initShortcut();
     // inline void enableProxy() {
     //     settings_->setValue("enable_proxy", enable);
     //     QNetworkProxy::setApplicationProxy(proxy_);

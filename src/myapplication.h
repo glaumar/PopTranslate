@@ -18,9 +18,10 @@ class MyApplication : public QApplication {
    private slots:
     void showPop(bool unuse);
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
+    bool setShortcut(const QList<QKeySequence> &shortcuts);
 
    private:
-    bool initGlobalShortcuts();
+    void initGlobalShortcuts();
     void initSystemTrayIcon();
     void initDBusInterface();
     void loadSettings();
@@ -29,5 +30,6 @@ class MyApplication : public QApplication {
     QSystemTrayIcon tray_;
     SettingWindow setting_window_;
     KSystemClipboard *clipboard_;
+    QAction *shortcut_act_;
 };
 #endif  // MYAPPLICATION_H

@@ -23,7 +23,9 @@ class DefaultSettings {
           proxy_port(8080),
           enable_auth(false),
           proxy_username(),
-          proxy_password() {}
+          proxy_password(),
+          shortcut_popup_main(Qt::META | Qt::Key_G),
+          shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G) {}
 
     QOnlineTranslator::Engine translate_engine;
     QOnlineTranslator::Language target_language_1;
@@ -38,6 +40,8 @@ class DefaultSettings {
     bool enable_auth;
     QString proxy_username;
     QString proxy_password;
+    QKeySequence shortcut_popup_main;
+    QKeySequence shortcut_popup_alt;
 
     inline const char* translate_engine_to_str() const {
         return enumValueToKey(translate_engine);
