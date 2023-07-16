@@ -186,7 +186,8 @@ void PopupDialog::initContextMenu() {
     action_source_text->setChecked(false);
 
     context_menu_.addAction(QIcon::fromTheme("settings-configure"),
-                            tr("Settings"));
+                            tr("Settings"),
+                            [this] { emit settingsActionTriggered(); });
 
     // translate_engine
     engine_menu_.setIcon(QIcon::fromTheme("search"));

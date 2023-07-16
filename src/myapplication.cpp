@@ -98,6 +98,7 @@ void MyApplication::initDBusInterface() {
 }
 
 void MyApplication::loadSettings() {
+    // Change settings for popupdialog when settings changed
     connect(&setting_window_,
             &SettingWindow::translateEngineChanged,
             &pop_,
@@ -129,6 +130,11 @@ void MyApplication::loadSettings() {
     pop_.setFont(setting_window_.font());
     pop_.setOpacity(setting_window_.opacity());
     pop_.enableBlur(setting_window_.isEnableBlur());
+
+    // Show setting window when PopupDialog contextmenu action "settings" triggered
+    connect(&pop_, &PopupDialog::settingsActionTriggered, [this]() {
+        setting_window_.show();
+    });
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

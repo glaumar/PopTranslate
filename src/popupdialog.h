@@ -32,6 +32,9 @@ class PopupDialog : public QDialog {
     void setOpacity(qreal opacity);
     void enableBlur(bool enable);
 
+   signals:
+    void settingsActionTriggered();
+
    private:
     bool eventFilter(QObject *filtered, QEvent *event) override;
     void initContextMenu();
