@@ -8,6 +8,7 @@ finish-args:
   - --socket=session-bus
   - --share=network
   - --device=dri
+  - --filesystem=xdg-config/fontconfig:ro
 build-options:
   build-args:
     - --share=network
@@ -28,3 +29,6 @@ modules:
           - build-dir
           - .flatpak-builder
           - .VSCodeCounter
+          - .flatpak
+          - _build
+          - io.github.glaumar.PopTranslate.flatpak
