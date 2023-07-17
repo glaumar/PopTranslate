@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
+find_package(Qt5 REQUIRED COMPONENTS Widgets LinguistTools REQUIRED)
 
 find_package(KF5GlobalAccel)
 find_package(KF5GuiAddons)
@@ -26,7 +26,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(QOnlineTranslator)
 
-set(TS_FILES poptranslate_zh_CN.ts)
+# generate translation files
+set(TS_FILES i18n/poptranslate_zh_CN.ts)
+qt_add_translation(QM_FILES ${TS_FILES})
+add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
 set(PROJECT_SOURCES
     src/main.cpp
@@ -41,8 +44,7 @@ set(PROJECT_SOURCES
 add_executable(poptranslate
     ${PROJECT_SOURCES}
 )
-
-qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+add_dependencies(poptranslate translations)
 
 target_link_libraries(poptranslate PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -58,3 +60,4 @@ install(TARGETS poptranslate DESTINATION bin)
 install(FILES data/io.github.glaumar.PopTranslate.desktop DESTINATION share/applications)
 install(FILES data/io.github.glaumar.PopTranslate.svg DESTINATION share/icons/hicolor/scalable/apps)
 install(FILES io.github.glaumar.PopTranslate.metainfo.xml DESTINATION share/metainfo)
+install(FILES ${QM_FILES} DESTINATION share/PopTranslate/i18n)

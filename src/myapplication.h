@@ -13,23 +13,26 @@ class MyApplication : public QApplication {
     Q_OBJECT
 
    public:
-    MyApplication(int &argc, char **argv);
+    MyApplication(int& argc, char** argv);
+    ~MyApplication();
 
    private slots:
     void showPop(bool unuse);
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
-    bool setShortcut(const QList<QKeySequence> &shortcuts);
+    bool setShortcut(const QList<QKeySequence>& shortcuts);
 
    private:
+    void initUiTranslator();
     void initGlobalShortcuts();
     void initSystemTrayIcon();
     void initDBusInterface();
     void loadSettings();
 
-    PopupDialog pop_;
-    QSystemTrayIcon tray_;
-    SettingWindow setting_window_;
-    KSystemClipboard *clipboard_;
-    QAction *shortcut_act_;
+    QTranslator *translator_;
+    PopupDialog* pop_;
+    QSystemTrayIcon* tray_;
+    SettingWindow* setting_window_;
+    KSystemClipboard* clipboard_;
+    QAction* shortcut_act_;
 };
 #endif  // MYAPPLICATION_H

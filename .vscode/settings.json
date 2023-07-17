@@ -30,7 +30,8 @@
         "locale": "cpp",
         "vector": "cpp",
         "qcombobox": "cpp",
-        "qsettings": "cpp"
+        "qsettings": "cpp",
+        "__locale": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
