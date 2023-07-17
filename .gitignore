@@ -82,3 +82,10 @@ build/
 .VSCodeCounter/
 io.github.glaumar.PopTranslate.flatpak
 PopTranslate.flatpak
+
+# pacman
+AUR/pkg
+AUR/src
+AUR/*.pkg.tar.*
+AUR/poptranslate-*
+AUR/PKGBUILD-namcap.log
