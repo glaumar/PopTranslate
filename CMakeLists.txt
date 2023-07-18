@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.6)
 
-project(PopTranslate VERSION 0.1 LANGUAGES CXX)
+project(PopTranslate VERSION 0.0.9 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -61,3 +61,6 @@ install(FILES data/io.github.glaumar.PopTranslate.desktop DESTINATION share/appl
 install(FILES data/io.github.glaumar.PopTranslate.svg DESTINATION share/icons/hicolor/scalable/apps)
 install(FILES io.github.glaumar.PopTranslate.metainfo.xml DESTINATION share/metainfo)
 install(FILES ${QM_FILES} DESTINATION share/PopTranslate/i18n)
+
+# CPack
+include(DEB/deb.cmake)
