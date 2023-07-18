@@ -22,7 +22,6 @@ paru -S poptranslate
 ```
 # 依赖
 - [CMake](https://cmake.org/) >= 3.5
-- [Extra CMake Modules](https://github.com/KDE/extra-cmake-modules)
 - [Qt](https://www.qt.io/) >= 5.15
 - [KDE Frameworks](https://api.kde.org/frameworks/index.html) >= 5.108 并至少包含以下模块:
     - KGlobalAccel
@@ -36,15 +35,42 @@ paru -S poptranslate
 - org.kde.Platform = "5.15-22.08"
 - org.kde.Sdk = "5.15-22.08"
 
-# 使用 Flatpak 本地编译并安装
+# 编译
 
-## 安装运行时和 SDK
+## CMake
+### 编译
+```bash
+cmake -B build -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+```
+
+### 生成 deb 包
+```bash
+cd build && cpack -C CPackConfig.cmake
+```
+
+## Flatpak
+
+### 安装运行时和 SDK
 ```bash
 flatpak install org.kde.Platform/x86_64/5.15-22.08
 flatpak install org.kde.Sdk/x86_64/5.15-22.08
 ```
 
-## 编译并安装
+### 编译 
 ```bash
-flatpak-builder build-dir io.github.glaumar.PopTranslate.yml --force-clean --user --install
+flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean
+```
+
+### 生成 flatpak 包
+```bash
+flatpak build-export export build_flatpak
+
+flatpak build-bundle export PopTranslate.flatpak io.github.glaumar.PopTranslate --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+```
+
+## 生成 pacman 包
+```bash
+git clone https://aur@aur.archlinux.org/poptranslate.git 
+cd poptranslate && makepkg -s
 ```

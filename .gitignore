@@ -74,14 +74,9 @@ CMakeLists.txt.user*
 
 # Flatpak
 .flatpak-builder/
-build-dir/
-.flatpak/
-_build/
-
-build/
-.VSCodeCounter/
-io.github.glaumar.PopTranslate.flatpak
-PopTranslate.flatpak
+build_flatpak
+export
+*PopTranslate.flatpak
 
 # pacman
 AUR/pkg
@@ -89,3 +84,6 @@ AUR/src
 AUR/*.pkg.tar.*
 AUR/poptranslate-*
 AUR/PKGBUILD-namcap.log
+
+build/
+.VSCodeCounter/

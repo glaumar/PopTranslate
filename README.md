@@ -16,8 +16,7 @@ GoldenDict, Crow Translate and other translation software are very useful, but d
 # Global Shortcuts
 `Meta + G` or `Meta + Ctrl + G` to the text selected by the mouse and display a popup
 
-
-# INSTALL
+# Installation
 ## Arch Linux (AUR)
 ```bash
 paru -S poptranslate
@@ -25,7 +24,6 @@ paru -S poptranslate
 
 # Dependencies
 - [CMake](https://cmake.org/) >= 3.5
-- [Extra CMake Modules](https://github.com/KDE/extra-cmake-modules)
 - [Qt](https://www.qt.io/) >= 5.15
 - [KDE Frameworks](https://api.kde.org/frameworks/index.html) >= 5.108 with at least the following modules:
     - KGlobalAccel
@@ -40,15 +38,42 @@ paru -S poptranslate
 - org.kde.Platform = "5.15-22.08"
 - org.kde.Sdk = "5.15-22.08"
 
-# Build and install locally using flatpak
+# Build
 
-## Install runtime and sdk
+## CMake
+### Build
+```bash
+cmake -B build -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+```
+
+### Generate deb package
+```bash
+cd build && cpack -C CPackConfig.cmake
+```
+
+## Flatpak
+
+### Install runtime and sdk
 ```bash
 flatpak install org.kde.Platform/x86_64/5.15-22.08
 flatpak install org.kde.Sdk/x86_64/5.15-22.08
 ```
 
-## Build and install
+### Build 
 ```bash
-flatpak-builder build-dir io.github.glaumar.PopTranslate.yml --force-clean --user --install
+flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean
+```
+
+### Generate flatpak package
+```bash
+flatpak build-export export build_flatpak
+
+flatpak build-bundle export PopTranslate.flatpak io.github.glaumar.PopTranslate --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+```
+
+## Generate pacman package
+```bash
+git clone https://aur@aur.archlinux.org/poptranslate.git 
+cd poptranslate && makepkg -s
 ```
