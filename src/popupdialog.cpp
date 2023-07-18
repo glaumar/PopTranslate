@@ -167,6 +167,7 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
 }
 
 void PopupDialog::initContextMenu() {
+    // Copy translation
     context_menu_.addAction(
         QIcon::fromTheme("edit-copy"),
         tr("Copy translation"),
@@ -176,6 +177,7 @@ void PopupDialog::initContextMenu() {
             clipboard->setText(ui->trans_text_edit->toPlainText());
         });
 
+    // Source Text
     QAction *action_source_text =
         context_menu_.addAction(QIcon::fromTheme("texture"), tr("Source Text"));
     action_source_text->setCheckable(true);
@@ -185,11 +187,24 @@ void PopupDialog::initContextMenu() {
     ui->src_plain_text_edit->setVisible(false);
     action_source_text->setChecked(false);
 
+    // Pin the window
+    QAction *action_pin_windows =
+        context_menu_.addAction(QIcon::fromTheme("window-pin"),
+                                tr("Pin the window"));
+    action_pin_windows->setCheckable(true);
+    connect(action_pin_windows, &QAction::triggered, this, [this](bool state) {
+        setNormalWindow(state);
+        hide();
+        show();
+    });
+    action_pin_windows->setChecked(false);
+
+    // Settings
     context_menu_.addAction(QIcon::fromTheme("settings-configure"),
                             tr("Settings"),
                             [this] { emit settingsActionTriggered(); });
 
-    // translate_engine
+    // Translate_engine
     engine_menu_.setIcon(QIcon::fromTheme("search"));
     engine_menu_.setTitle(tr("Translate Engine"));
     auto engine_group = new QActionGroup(&engine_menu_);
@@ -219,7 +234,7 @@ void PopupDialog::initContextMenu() {
     engine_menu_.addActions(engine_group->actions());
     context_menu_.addMenu(&engine_menu_);
 
-    // target_language
+    // Target Languages
     context_menu_.addSeparator();
     setTargetLanguages({setting_.target_language_1,
                         setting_.target_language_2,
@@ -244,7 +259,7 @@ void PopupDialog::initWaylandConnection() {
 }
 
 void PopupDialog::initTranslator() {
-    QObject::connect(&translator_, &QOnlineTranslator::finished, [this] {
+    connect(&translator_, &QOnlineTranslator::finished, [this] {
         if (translator_.error() == QOnlineTranslator::NoError) {
             qDebug() << tr("Translate Success: %1").arg(translator_.source());
             ui->trans_text_edit->setText(translator_.translation());
