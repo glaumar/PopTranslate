@@ -16,9 +16,10 @@
 #include "poptranslate_dbus.h"
 
 MyApplication::MyApplication(int &argc, char **argv)
-    : QApplication(argc, argv), clipboard_(KSystemClipboard::instance()) {
+    : QApplication(argc, argv) {
     setApplicationName("PopTranslate");
     setDesktopFileName("io.github.glaumar.PopTranslate.desktop");
+
     // Must install translator before create any ui
     initUiTranslator();
 
@@ -26,11 +27,11 @@ MyApplication::MyApplication(int &argc, char **argv)
     tray_ = new QSystemTrayIcon(nullptr);
     setting_window_ = new SettingWindow(nullptr);
 
+    initClipboard();
     initGlobalShortcuts();
     initSystemTrayIcon();
     initDBusInterface();
     loadSettings();
-    // pop_->setAsnormalWindow(true);
 }
 
 MyApplication::~MyApplication() {
@@ -66,15 +67,17 @@ void MyApplication::initGlobalShortcuts() {
     shortcut_act_ = new QAction(tr("translate selection"), this);
     shortcut_act_->setObjectName("io.github.glaumar.PopTranslate");
     setShortcut(setting_window_->shortcuts());
-    connect(shortcut_act_, &QAction::triggered, this, &MyApplication::showPop);
+    connect(shortcut_act_, &QAction::triggered, [this](bool unuse) {
+        Q_UNUSED(unuse);
+        this->showPop();
+    });
     connect(setting_window_,
             &SettingWindow::shortcutChanged,
             this,
             &MyApplication::setShortcut);
 }
 
-void MyApplication::showPop(bool unuse) {
-    Q_UNUSED(unuse);
+void MyApplication::showPop() {
     if (pop_->isVisible() && !pop_->isNormalWindow()) {
         pop_->hide();
         return;
@@ -116,7 +119,7 @@ void MyApplication::initDBusInterface() {
     connect(PopTranslateDBus::instance(),
             &PopTranslateDBus::receivedTranslateSelection,
             this,
-            [this]() { this->showPop(true); });
+            &MyApplication::showPop);
 
     connect(PopTranslateDBus::instance(),
             &PopTranslateDBus::receivedTranslate,
@@ -168,11 +171,24 @@ void MyApplication::loadSettings() {
     });
 
     // resize popuo window size
-    if (!setting_window_->popupWindowSize().isEmpty()){
+    if (!setting_window_->popupWindowSize().isEmpty()) {
         pop_->resize(setting_window_->popupWindowSize());
     }
 
     pop_->setSrcTextEditVisible(setting_window_->showSrcText());
+}
+
+void MyApplication::initClipboard() {
+    clipboard_ = KSystemClipboard::instance();
+    // auto translate when clipboard changed
+    connect(clipboard_,
+            &KSystemClipboard::changed,
+            [this](QClipboard::Mode mode) {
+                // only translate when popupdialog is visible
+                if (mode == QClipboard::Selection && pop_->isVisible()) {
+                    pop_->translate(clipboard_->text(QClipboard::Selection));
+                }
+            });
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

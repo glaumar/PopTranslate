@@ -1,7 +1,7 @@
 set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
 set(CPACK_DEBIAN_PACKAGE_VERSION ${PACKAGE_VERSION})
-set(CPACK_DEBIAN_PACKAGE_RELEASE 0)
+set(CPACK_DEBIAN_PACKAGE_RELEASE 1)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "glaumar <glaumar2018@outlook.com>")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/glaumar/PopTranslate")
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Translate the text selected by the mouse in wayland.")
