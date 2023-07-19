@@ -34,6 +34,10 @@ MyApplication::MyApplication(int &argc, char **argv)
 }
 
 MyApplication::~MyApplication() {
+    // save settings
+    setting_window_->setPopupWindowSize(pop_->size());
+    setting_window_->setShowSrcText(pop_->isSrcTextEditVisible());
+
     delete setting_window_;
     delete tray_;
     delete pop_;
@@ -162,6 +166,13 @@ void MyApplication::loadSettings() {
     connect(pop_, &PopupDialog::settingsActionTriggered, [this]() {
         setting_window_->show();
     });
+
+    // resize popuo window size
+    if (!setting_window_->popupWindowSize().isEmpty()){
+        pop_->resize(setting_window_->popupWindowSize());
+    }
+
+    pop_->setSrcTextEditVisible(setting_window_->showSrcText());
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

@@ -10,10 +10,8 @@
 #include <QDebug>
 #include <QGraphicsOpacityEffect>
 
-#include "ui_popupdialog.h"
-
 PopupDialog::PopupDialog(QWidget *parent)
-    : QDialog(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
+    : QDialog(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog){
     ui->setupUi(this);
     setNormalWindow(false);
 
@@ -54,8 +52,6 @@ void PopupDialog::retranslate() {
     const QString text = ui->src_plain_text_edit->toPlainText();
     translate(text);
 }
-
-bool PopupDialog::isNormalWindow() const { return flag_normal_window_; }
 
 void PopupDialog::setNormalWindow(bool enable) {
     if (enable) {
@@ -178,14 +174,20 @@ void PopupDialog::initContextMenu() {
         });
 
     // Source Text
-    QAction *action_source_text =
+    action_source_text_ =
         context_menu_.addAction(QIcon::fromTheme("texture"), tr("Source Text"));
-    action_source_text->setCheckable(true);
-    connect(action_source_text, &QAction::triggered, this, [this](bool state) {
+    action_source_text_->setCheckable(true);
+    connect(action_source_text_, &QAction::triggered, this, [this](bool state) {
+        if (state) {
+            QSize new_size(this->size().width(), this->size().height() * 2);
+            this->resize(new_size);
+        } else {
+            QSize new_size(this->size().width(), this->size().height() / 2);
+            this->resize(new_size);
+        }
         ui->src_plain_text_edit->setVisible(state);
     });
-    ui->src_plain_text_edit->setVisible(false);
-    action_source_text->setChecked(false);
+    setSrcTextEditVisible(false);
 
     // Pin the window
     QAction *action_pin_windows =

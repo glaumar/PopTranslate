@@ -149,7 +149,8 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("proxy_password", default_.proxy_password);
     setValueIfIsNull("shortcut_popup_main", default_.shortcut_popup_main);
     setValueIfIsNull("shortcut_popup_alt", default_.shortcut_popup_alt);
-    // emit settingLoaded();
+    setValueIfIsNull("popup_window_size", default_.popup_window_size);
+    setValueIfIsNull("show_src_text", default_.show_src_text);
 }
 
 void SettingWindow::initFont() {

@@ -10,6 +10,7 @@
 
 #include "defaultsettings.h"
 #include "qonlinetranslator.h"
+#include "ui_popupdialog.h"
 namespace Ui {
 class PopupDialog;
 }
@@ -21,8 +22,17 @@ class PopupDialog : public QDialog {
     explicit PopupDialog(QWidget *parent = nullptr);
     ~PopupDialog();
     bool event(QEvent *event) override;
-    bool isNormalWindow() const;
     void setNormalWindow(bool enable = false);
+
+    inline bool isNormalWindow() const { return flag_normal_window_; }
+    inline bool isSrcTextEditVisible() const {
+        return action_source_text_->isChecked();
+    }
+
+    inline void setSrcTextEditVisible(bool visible) {
+        ui->src_plain_text_edit->setVisible(visible);
+        action_source_text_->setChecked(visible);
+    }
    public slots:
     void translate(const QString &text);
     void retranslate();
@@ -48,6 +58,7 @@ class PopupDialog : public QDialog {
     DefaultSettings setting_;
     QMenu context_menu_;
     QMenu engine_menu_;
+    QAction *action_source_text_;
 };
 
 #endif  // POPUPDIALOG_H

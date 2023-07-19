@@ -25,7 +25,9 @@ class DefaultSettings {
           proxy_username(),
           proxy_password(),
           shortcut_popup_main(Qt::META | Qt::Key_G),
-          shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G) {}
+          shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G),
+          popup_window_size(512, 192),
+          show_src_text(false) {}
 
     QOnlineTranslator::Engine translate_engine;
     QOnlineTranslator::Language target_language_1;
@@ -42,6 +44,8 @@ class DefaultSettings {
     QString proxy_password;
     QKeySequence shortcut_popup_main;
     QKeySequence shortcut_popup_alt;
+    QSize popup_window_size;
+    bool show_src_text;
 
     inline const char* translate_engine_to_str() const {
         return enumValueToKey(translate_engine);

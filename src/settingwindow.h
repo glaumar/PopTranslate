@@ -50,6 +50,22 @@ class SettingWindow : public QWidget {
         return shortcuts;
     };
 
+    inline QSize popupWindowSize() const {
+        return settings_->value("popup_window_size").value<QSize>();
+    };
+
+    inline void setPopupWindowSize(QSize size) {
+        settings_->setValue("popup_window_size", size);
+    };
+
+    inline bool showSrcText() const {
+        return settings_->value("show_src_text").toBool();
+    }
+
+    inline void setShowSrcText(bool enable) {
+        settings_->setValue("show_src_text", enable);
+    }
+
    signals:
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);

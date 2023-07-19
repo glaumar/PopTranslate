@@ -47,7 +47,7 @@ add_executable(poptranslate
 add_dependencies(poptranslate translations)
 
 target_link_libraries(poptranslate PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt5::Widgets
     KF5::GlobalAccel
     KF5::GuiAddons
     KF5::WaylandClient

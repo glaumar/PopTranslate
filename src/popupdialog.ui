@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -58,7 +58,7 @@
       <bool>true</bool>
      </property>
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -83,7 +83,7 @@
    <item>
     <widget class="QTextEdit" name="trans_text_edit">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
