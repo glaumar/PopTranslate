@@ -22,6 +22,12 @@ GoldenDict, Crow Translate and other translation software are very useful, but d
 paru -S poptranslate
 ```
 
+## Kubuntu
+Get deb package from [release page](https://github.com/glaumar/PopTranslate/releases)
+
+## Other (Flatpak)
+Get flatpak package from [release page](https://github.com/glaumar/PopTranslate/releases)
+
 # Dependencies
 - [CMake](https://cmake.org/) >= 3.5
 - [Qt](https://www.qt.io/) >= 5.15

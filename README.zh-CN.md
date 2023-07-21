@@ -20,6 +20,12 @@ GoldenDict, Crow Translate等等翻译软件都很好用,但由于 wayland 协�
 ```bash
 paru -S poptranslate
 ```
+
+## Kubuntu
+从 [release page](https://github.com/glaumar/PopTranslate/releases) 获取 deb 包
+
+## 其他 (Flatpak)
+从 [release page](https://github.com/glaumar/PopTranslate/releases) 获取 flatpak 包
 # 依赖
 - [CMake](https://cmake.org/) >= 3.5
 - [Qt](https://www.qt.io/) >= 5.15
