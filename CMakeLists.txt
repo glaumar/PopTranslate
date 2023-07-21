@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-project(PopTranslate VERSION 0.0.9 LANGUAGES CXX)
+project(PopTranslate VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
