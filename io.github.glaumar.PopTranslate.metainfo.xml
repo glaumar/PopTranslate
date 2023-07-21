@@ -17,6 +17,9 @@
         </p>
     </description>
     <content_rating type="oars-1.1" />
+    <releases>
+        <release date="2023-07-21" version="0.1.0" />
+    </releases>
     <launchable type="desktop-id">io.github.glaumar.PopTranslate.desktop</launchable>
     <screenshots>
         <screenshot type="default">
