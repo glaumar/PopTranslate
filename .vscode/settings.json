@@ -31,7 +31,25 @@
         "vector": "cpp",
         "qcombobox": "cpp",
         "qsettings": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "istream": "cpp",
+        "mutex": "cpp",
+        "numeric": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp",
+        "qtglobal": "cpp",
+        "cstdint": "cpp",
+        "typeindex": "cpp",
+        "qwaylandseat": "cpp",
+        "qobject": "cpp",
+        "qwaylandclient": "cpp",
+        "qmimedata": "cpp",
+        "complex": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "span": "cpp",
+        "thread": "cpp",
+        "qguiapplication": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
@@ -40,6 +58,7 @@
         "**/node_modules/*/**": true,
         "**/.hg/store/**": true,
         ".flatpak/**": true,
-        "_build/**": true
+        "_build/**": true,
+        "build/**": true,
     }
 }

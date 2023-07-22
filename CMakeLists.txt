@@ -9,14 +9,18 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets LinguistTools REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS LinguistTools WaylandClient REQUIRED)
 
-find_package(KF5GlobalAccel)
-find_package(KF5GuiAddons)
-find_package(KF5Wayland)
-find_package(KF5WindowSystem)
-find_package(KF5WidgetsAddons)
-find_package(KF5XmlGui)
+find_package(ECM REQUIRED)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+find_package(Wayland REQUIRED)
+
+find_package(KF5GlobalAccel REQUIRED)
+find_package(KF5GuiAddons REQUIRED)
+find_package(KF5Wayland REQUIRED)
+find_package(KF5WindowSystem REQUIRED)
+find_package(KF5WidgetsAddons REQUIRED)
+find_package(KF5XmlGui REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -38,23 +42,27 @@ set(PROJECT_SOURCES
     src/poptranslate_dbus.cpp src/poptranslate_dbus.h
     src/settingwindow.cpp src/settingwindow.h src/settingwindow.ui
     src/defaultsettings.h
+    src/wayland_primary_selection.cpp src/wayland_primary_selection.h
     ${TS_FILES}
 )
+
+include_directories(${Qt5WaylandClient_PRIVATE_INCLUDE_DIRS})
 
 add_executable(poptranslate
     ${PROJECT_SOURCES}
 )
 add_dependencies(poptranslate translations)
 
-target_link_libraries(poptranslate PRIVATE
-    Qt5::Widgets
+target_link_libraries(poptranslate PUBLIC
     KF5::GlobalAccel
     KF5::GuiAddons
     KF5::WaylandClient
     KF5::WindowSystem
     KF5::WidgetsAddons
     KF5::XmlGui
-    QOnlineTranslator)
+    QOnlineTranslator
+    Wayland::Client
+    Qt5::WaylandClientPrivate)
 
 install(TARGETS poptranslate DESTINATION bin)
 install(FILES data/io.github.glaumar.PopTranslate.desktop DESTINATION share/applications)
