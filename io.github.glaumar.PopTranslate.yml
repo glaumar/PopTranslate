@@ -19,16 +19,11 @@ modules:
       - type: dir
         path: .
         skip:
-          - .gitignore
-          - .git
-          - io.github.glaumar.PopTranslate.yml
-          - .clang-format
-          - .vscode
           - CMakeLists.txt.user
           - build
-          - build-dir
+          - build-flatpak
           - .flatpak-builder
           - .VSCodeCounter
           - .flatpak
-          - _build
-          - io.github.glaumar.PopTranslate.flatpak
+          - PopTranslate.flatpak
+          - export

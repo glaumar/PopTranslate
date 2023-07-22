@@ -27,8 +27,9 @@ paru -S poptranslate
 ## 其他 (Flatpak)
 从 [release page](https://github.com/glaumar/PopTranslate/releases) 获取 flatpak 包
 # 依赖
-- [CMake](https://cmake.org/) >= 3.5
+- [CMake](https://cmake.org/) >= 3.26
 - [Qt](https://www.qt.io/) >= 5.15
+- [Extra CMake Modules](https://github.com/KDE/extra-cmake-modules)
 - [KDE Frameworks](https://api.kde.org/frameworks/index.html) >= 5.108 并至少包含以下模块:
     - KGlobalAccel
     - KGuiAddons
@@ -41,7 +42,7 @@ paru -S poptranslate
 - org.kde.Platform = "5.15-22.08"
 - org.kde.Sdk = "5.15-22.08"
 
-# 编译
+# 构建
 
 ## CMake
 ### 编译

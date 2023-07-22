@@ -29,8 +29,9 @@ Get deb package from [release page](https://github.com/glaumar/PopTranslate/rele
 Get flatpak package from [release page](https://github.com/glaumar/PopTranslate/releases)
 
 # Dependencies
-- [CMake](https://cmake.org/) >= 3.5
+- [CMake](https://cmake.org/) >= 3.26
 - [Qt](https://www.qt.io/) >= 5.15
+- [Extra CMake Modules](https://github.com/KDE/extra-cmake-modules)
 - [KDE Frameworks](https://api.kde.org/frameworks/index.html) >= 5.108 with at least the following modules:
     - KGlobalAccel
     - KGuiAddons
