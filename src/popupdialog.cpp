@@ -9,9 +9,10 @@
 #include <QClipboard>
 #include <QDebug>
 #include <QGraphicsOpacityEffect>
+#include <Qt>
 
 PopupDialog::PopupDialog(QWidget *parent)
-    : QDialog(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog){
+    : QDialog(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
     ui->setupUi(this);
     setNormalWindow(false);
 
@@ -20,6 +21,15 @@ PopupDialog::PopupDialog(QWidget *parent)
     setFont(setting_.font);
     initWaylandConnection();
     initTranslator();
+    initDictionaries();
+
+    // show first translate result
+    connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
+        if (index == 0) {
+            current_translate_result_ = translate_results_.cbegin();
+            ui->trans_text_edit->setText(*current_translate_result_);
+        }
+    });
 }
 
 PopupDialog::~PopupDialog() { delete ui; }
@@ -43,6 +53,11 @@ void PopupDialog::translate(const QString &text) {
     ui->src_plain_text_edit->setPlainText(text);
     ui->trans_text_edit->clear();
 
+    // clear last translate_results
+    translate_results_.clear();
+    current_translate_result_ = translate_results_.cend();
+
+    dicts_.lookupAsync(text);
     translator_.translate(text,
                           setting_.translate_engine,
                           setting_.target_language_1);
@@ -264,7 +279,8 @@ void PopupDialog::initTranslator() {
     connect(&translator_, &QOnlineTranslator::finished, [this] {
         if (translator_.error() == QOnlineTranslator::NoError) {
             qDebug() << tr("Translate Success: %1").arg(translator_.source());
-            ui->trans_text_edit->setText(translator_.translation());
+            translate_results_.append(translator_.translation());
+            emit translateResultsAvailable(translate_results_.size() - 1);
         } else {
             auto error_msg =
                 tr("Failed Translate: %1 (%2)")
@@ -276,4 +292,20 @@ void PopupDialog::initTranslator() {
             qWarning() << error_msg;
         }
     });
+}
+
+void PopupDialog::initDictionaries() {
+    dicts_.addDict(QString::fromStdString(
+        "dictionary/concise-enhanced.mdx"));  // TODO: delete
+
+    // lookup word in dictionaries
+    connect(
+        &dicts_,
+        &Dictionaries::found,
+        this,
+        [this](QString result) {
+            translate_results_.append(result);
+            emit translateResultsAvailable(translate_results_.size() - 1);
+        },
+        Qt::QueuedConnection);
 }

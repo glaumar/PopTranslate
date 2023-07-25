@@ -9,11 +9,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5 REQUIRED COMPONENTS LinguistTools WaylandClient REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS LinguistTools WaylandClient Concurrent REQUIRED)
 
-find_package(ECM REQUIRED)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
-find_package(Wayland REQUIRED)
+# find_package(ECM REQUIRED)
+# set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+# find_package(Wayland REQUIRED)
 
 find_package(KF5GlobalAccel REQUIRED)
 find_package(KF5GuiAddons REQUIRED)
@@ -30,6 +30,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(QOnlineTranslator)
 
+# mdict-cpp
+add_subdirectory(mdict-cpp)
+include_directories(mdict-cpp)
+
 # generate translation files
 set(TS_FILES i18n/poptranslate_zh_CN.ts)
 qt_add_translation(QM_FILES ${TS_FILES})
@@ -42,7 +46,8 @@ set(PROJECT_SOURCES
     src/poptranslate_dbus.cpp src/poptranslate_dbus.h
     src/settingwindow.cpp src/settingwindow.h src/settingwindow.ui
     src/defaultsettings.h
-    src/wayland_primary_selection.cpp src/wayland_primary_selection.h
+    src/dictionaries.cpp src/dictionaries.h
+    # src/wayland_primary_selection.cpp src/wayland_primary_selection.h
     ${TS_FILES}
 )
 
@@ -54,6 +59,7 @@ add_executable(poptranslate
 add_dependencies(poptranslate translations)
 
 target_link_libraries(poptranslate PUBLIC
+    Qt5::Concurrent
     KF5::GlobalAccel
     KF5::GuiAddons
     KF5::WaylandClient
@@ -61,8 +67,9 @@ target_link_libraries(poptranslate PUBLIC
     KF5::WidgetsAddons
     KF5::XmlGui
     QOnlineTranslator
-    Wayland::Client
-    Qt5::WaylandClientPrivate)
+    # Wayland::Client
+    # Qt5::WaylandClientPrivate
+    mdict)
 
 install(TARGETS poptranslate DESTINATION bin)
 install(FILES data/io.github.glaumar.PopTranslate.desktop DESTINATION share/applications)

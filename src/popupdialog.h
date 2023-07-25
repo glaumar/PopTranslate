@@ -6,9 +6,11 @@
 
 #include <QDebug>
 #include <QDialog>
+#include <QList>
 #include <QMenu>
 
 #include "defaultsettings.h"
+#include "dictionaries.h"
 #include "qonlinetranslator.h"
 #include "ui_popupdialog.h"
 namespace Ui {
@@ -44,12 +46,14 @@ class PopupDialog : public QDialog {
 
    signals:
     void settingsActionTriggered();
+    void translateResultsAvailable(int index);
 
    private:
     bool eventFilter(QObject *filtered, QEvent *event) override;
     void initContextMenu();
     void initWaylandConnection();
     void initTranslator();
+    void initDictionaries();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
@@ -59,6 +63,10 @@ class PopupDialog : public QDialog {
     QMenu context_menu_;
     QMenu engine_menu_;
     QAction *action_source_text_;
+    Dictionaries dicts_;
+    QList<QString> translate_results_;
+    QList<QString>::const_iterator current_translate_result_;
+    // std::atomic<bool> abort_lookup_;
 };
 
 #endif  // POPUPDIALOG_H
