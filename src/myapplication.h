@@ -19,7 +19,7 @@ class MyApplication : public QApplication {
    private slots:
     void showPop();
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
-    bool setShortcut(const QList<QKeySequence>& shortcuts);
+    bool setShortcut(const QKeySequence& seq);
 
    private:
     void initUiTranslator();
@@ -29,11 +29,11 @@ class MyApplication : public QApplication {
     void loadSettings();
     void initClipboard();
 
-    QTranslator *translator_; // init in initUiTranslator
+    QTranslator* translator_;  // init in initUiTranslator
     PopupDialog* pop_;
     QSystemTrayIcon* tray_;
     SettingWindow* setting_window_;
-    KSystemClipboard* clipboard_; // init in initClipboard
-    QAction* shortcut_act_; // init in initGlobalShortcuts
+    KSystemClipboard* clipboard_;  // init in initClipboard
+    QAction* shortcut_act_;        // init in initGlobalShortcuts
 };
 #endif  // MYAPPLICATION_H

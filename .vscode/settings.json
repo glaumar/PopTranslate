@@ -113,5 +113,11 @@
         ".flatpak/**": true,
         "_build/**": true,
         "build/**": true,
-    }
+    },
+    "VSCodeCounter.exclude": [
+        "**/.gitignore",
+        "**/.vscode/**",
+        "**/node_modules/**",
+        "mdict-cpp"
+    ]
 }

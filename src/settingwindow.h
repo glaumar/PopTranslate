@@ -42,12 +42,8 @@ class SettingWindow : public QWidget {
 
     inline QNetworkProxy proxy() const { return proxy_; };
 
-    inline QList<QKeySequence> shortcuts() const {
-        QList<QKeySequence> shortcuts;
-        shortcuts
-            << settings_->value("shortcut_popup_main").value<QKeySequence>()
-            << settings_->value("shortcut_popup_alt").value<QKeySequence>();
-        return shortcuts;
+    inline QKeySequence shortcuts() const {
+        return settings_->value("shortcut_popup_main").value<QKeySequence>();
     };
 
     inline QSize popupWindowSize() const {
@@ -72,7 +68,7 @@ class SettingWindow : public QWidget {
     void fontChanged(const QFont &font);
     void opacityChanged(qreal opacity);
     void triggerBlurEffect(bool enable);
-    void shortcutChanged(const QList<QKeySequence> &shortcuts);
+    void shortcutChanged(const QKeySequence &  seq);
 
    private:
     void initSettings();

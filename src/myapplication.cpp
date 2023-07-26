@@ -197,15 +197,16 @@ void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {
     setting_window_->setVisible(!is_visible);
 }
 
-bool MyApplication::setShortcut(const QList<QKeySequence> &shortcuts) {
+bool MyApplication::setShortcut(const QKeySequence &seq) {
     KGlobalAccel::self()->removeAllShortcuts(shortcut_act_);
-    bool ret = KGlobalAccel::setGlobalShortcut(shortcut_act_, shortcuts);
-    for (auto shortcut : shortcuts) {
-        if (shortcut.isEmpty()) continue;
+    bool ret = KGlobalAccel::setGlobalShortcut(shortcut_act_, seq);
+
+    if (seq.isEmpty()) {
+        qDebug() << tr("Unbind global shortcuts for translate selection");
+    } else {
         qDebug() << tr("Bind global shortcuts (%1) for translate selection %2")
-                        .arg(shortcut.toString(),
+                        .arg(seq.toString(),
                              ret ? tr("success") : tr("failed"));
     }
-
     return ret;
 }

@@ -25,7 +25,7 @@ class DefaultSettings {
           proxy_username(),
           proxy_password(),
           shortcut_popup_main(Qt::META | Qt::Key_G),
-          shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G),
+        //   shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G),
           popup_window_size(512, 192),
           show_src_text(false) {}
 
@@ -43,7 +43,7 @@ class DefaultSettings {
     QString proxy_username;
     QString proxy_password;
     QKeySequence shortcut_popup_main;
-    QKeySequence shortcut_popup_alt;
+    // QKeySequence shortcut_popup_alt;
     QSize popup_window_size;
     bool show_src_text;
 

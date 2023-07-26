@@ -148,7 +148,7 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("proxy_username", default_.proxy_username);
     setValueIfIsNull("proxy_password", default_.proxy_password);
     setValueIfIsNull("shortcut_popup_main", default_.shortcut_popup_main);
-    setValueIfIsNull("shortcut_popup_alt", default_.shortcut_popup_alt);
+    // setValueIfIsNull("shortcut_popup_alt", default_.shortcut_popup_alt);
     setValueIfIsNull("popup_window_size", default_.popup_window_size);
     setValueIfIsNull("show_src_text", default_.show_src_text);
 }
@@ -325,23 +325,17 @@ void SettingWindow::initProxy() {
 }
 
 void SettingWindow::initShortcut() {
-    auto shortcuts = this->shortcuts();
+    auto seq = this->shortcuts();
 
     // emit signal when shortcut changed
-    connect(ui->shortcut_kshortcutwidget,
-            &KShortcutWidget::shortcutChanged,
-            [this](const QList<QKeySequence> &shortcuts) {
-                settings_->setValue("shortcut_popup_main", shortcuts.at(0));
+    connect(ui->shortcut_kkeysequencewidget,
+            &KKeySequenceWidget::keySequenceChanged,
+            [this](const QKeySequence & seq) {
+                settings_->setValue("shortcut_popup_main", seq);
                 qDebug() << tr("Settings: Change main shortcut to %1")
-                                .arg(shortcuts.at(0).toString());
-                if (shortcuts.size() > 1) {
-                    settings_->setValue("shortcut_popup_alt", shortcuts.at(1));
-                    qDebug() << tr("Settings: Change alternate shortcut to %1")
-                                    .arg(shortcuts.at(1).toString());
-                }
-
-                emit shortcutChanged(shortcuts);
+                                .arg(seq.toString());
+                emit shortcutChanged(seq);
             });
 
-    ui->shortcut_kshortcutwidget->setShortcut(shortcuts);
+    ui->shortcut_kkeysequencewidget->setKeySequence(seq);
 }

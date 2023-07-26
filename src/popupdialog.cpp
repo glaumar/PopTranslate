@@ -9,7 +9,6 @@
 #include <QClipboard>
 #include <QDebug>
 #include <QGraphicsOpacityEffect>
-#include <Qt>
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QDialog(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
@@ -304,6 +303,11 @@ void PopupDialog::initDictionaries() {
         &Dictionaries::found,
         this,
         [this](QString result) {
+            QClipboard *clipboard = QApplication::clipboard();
+            qDebug() << "clipboard" << clipboard->text(QClipboard::Clipboard);
+            qDebug() << "selection" << clipboard->text(QClipboard::Selection);
+            qDebug() << "selection" << clipboard->text(QClipboard::FindBuffer);
+
             translate_results_.append(result);
             emit translateResultsAvailable(translate_results_.size() - 1);
         },
