@@ -1,5 +1,6 @@
 #include "settingwindow.h"
 
+#include <QFileDialog>
 #include <QMetaEnum>
 #include <QSharedPointer>
 
@@ -32,6 +33,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     initOpacityAndBlur();
     initProxy();
     initShortcut();
+    initDictionaries();
 }
 
 SettingWindow::~SettingWindow() {
@@ -151,6 +153,7 @@ void SettingWindow::initSettings() {
     // setValueIfIsNull("shortcut_popup_alt", default_.shortcut_popup_alt);
     setValueIfIsNull("popup_window_size", default_.popup_window_size);
     setValueIfIsNull("show_src_text", default_.show_src_text);
+    setValueIfIsNull("dictionaries", default_.dictionaries);
 }
 
 void SettingWindow::initFont() {
@@ -325,17 +328,46 @@ void SettingWindow::initProxy() {
 }
 
 void SettingWindow::initShortcut() {
-    auto seq = this->shortcuts();
-
     // emit signal when shortcut changed
     connect(ui->shortcut_kkeysequencewidget,
             &KKeySequenceWidget::keySequenceChanged,
-            [this](const QKeySequence & seq) {
+            [this](const QKeySequence &seq) {
                 settings_->setValue("shortcut_popup_main", seq);
                 qDebug() << tr("Settings: Change main shortcut to %1")
                                 .arg(seq.toString());
                 emit shortcutChanged(seq);
             });
 
-    ui->shortcut_kkeysequencewidget->setKeySequence(seq);
+    ui->shortcut_kkeysequencewidget->setKeySequence(this->shortcuts());
+}
+
+void SettingWindow::initDictionaries() {
+    auto *add_button = ui->dictionary_keditlistwidget->addButton();
+    add_button->setEnabled(true);
+    ui->dictionary_keditlistwidget->lineEdit()->setVisible(false);
+
+    // add dictionary files using filedialog
+    connect(add_button, &QPushButton::pressed, [this] {
+        static auto *dialog =
+            new QFileDialog(this, tr("Select Dictionary Files"));
+        dialog->setFileMode(QFileDialog::ExistingFiles);
+        dialog->setNameFilter(tr("MDict Files (*.mdx *.mdd)"));
+        dialog->setDirectory(QDir::homePath());
+        dialog->exec();
+        if (!dialog->selectedFiles().isEmpty()) {
+            ui->dictionary_keditlistwidget->insertStringList(
+                dialog->selectedFiles());
+        };
+    });
+
+    connect(ui->dictionary_keditlistwidget, &KEditListWidget::changed, [this] {
+        settings_->setValue("dictionaries",
+                            ui->dictionary_keditlistwidget->items());
+        emit dictionariesChanged(this->dictionaries());
+    });
+
+    auto dictionaries = this->dictionaries();
+    if (!dictionaries.isEmpty()) {
+        ui->dictionary_keditlistwidget->setItems(this->dictionaries());
+    }
 }

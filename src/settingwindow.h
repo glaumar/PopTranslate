@@ -62,6 +62,10 @@ class SettingWindow : public QWidget {
         settings_->setValue("show_src_text", enable);
     }
 
+    inline QStringList dictionaries() const {
+        return settings_->value("dictionaries").toStringList();
+    }
+
    signals:
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
@@ -69,6 +73,7 @@ class SettingWindow : public QWidget {
     void opacityChanged(qreal opacity);
     void triggerBlurEffect(bool enable);
     void shortcutChanged(const QKeySequence &  seq);
+    void dictionariesChanged(const QStringList &dictionaries);
 
    private:
     void initSettings();
@@ -78,19 +83,12 @@ class SettingWindow : public QWidget {
     void initOpacityAndBlur();
     void initProxy();
     void initShortcut();
-    // inline void enableProxy() {
-    //     settings_->setValue("enable_proxy", enable);
-    //     QNetworkProxy::setApplicationProxy(proxy_);
-
-    // };
+    void initDictionaries();
 
     template <class T>
     inline void setValueIfIsNull(const QString &key, const T value) {
         if (!settings_->contains(key)) {
             settings_->setValue(key, value);
-            // qDebug() << tr("Settings: Set %1 to default value: %2")
-            //                 .arg(key)
-            //                 .arg(value);
         }
     }
 
