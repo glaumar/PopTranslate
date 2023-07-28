@@ -32,6 +32,7 @@ MyApplication::MyApplication(int &argc, char **argv)
     initSystemTrayIcon();
     initDBusInterface();
     loadSettings();
+    loadDictionaries();
 }
 
 MyApplication::~MyApplication() {
@@ -176,6 +177,21 @@ void MyApplication::loadSettings() {
     }
 
     pop_->setSrcTextEditVisible(setting_window_->showSrcText());
+}
+
+void MyApplication::loadDictionaries() {
+    connect(setting_window_,
+            &SettingWindow::dictionariesChanged,
+            pop_,
+            &PopupDialog::setDictionaries);
+
+    connect(setting_window_,
+            &SettingWindow::dictionaryRemoved,
+            [this](const QString &dict) {
+                this->pop_->removeDictionaries({dict});
+            });
+
+    pop_->setDictionaries(setting_window_->dictionaries());
 }
 
 void MyApplication::initClipboard() {

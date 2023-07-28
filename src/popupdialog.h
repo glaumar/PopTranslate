@@ -43,6 +43,8 @@ class PopupDialog : public QDialog {
     void setFont(const QFont &font);
     void setOpacity(qreal opacity);
     void enableBlur(bool enable);
+    void setDictionaries(const QStringList &dicts);
+    void removeDictionaries(const QStringList &dicts);
 
    signals:
     void settingsActionTriggered();
@@ -66,7 +68,6 @@ class PopupDialog : public QDialog {
     Dictionaries dicts_;
     QList<QString> translate_results_;
     QList<QString>::const_iterator current_translate_result_;
-    // std::atomic<bool> abort_lookup_;
 };
 
 #endif  // POPUPDIALOG_H

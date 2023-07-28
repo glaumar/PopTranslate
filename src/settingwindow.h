@@ -74,6 +74,7 @@ class SettingWindow : public QWidget {
     void triggerBlurEffect(bool enable);
     void shortcutChanged(const QKeySequence &  seq);
     void dictionariesChanged(const QStringList &dictionaries);
+    void dictionaryRemoved(const QString &dictionary);
 
    private:
     void initSettings();

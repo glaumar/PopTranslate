@@ -3,6 +3,7 @@
 
 #include <QMetaEnum>
 #include <QOnlineTranslator>
+#include <QStringList>
 
 // get variable name as string, void(Variable) force compiler to check if
 // variable exists #define MACRO_VARIABLE_TO_STRING(Variable)
@@ -27,7 +28,8 @@ class DefaultSettings {
           shortcut_popup_main(Qt::META | Qt::Key_G),
         //   shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G),
           popup_window_size(512, 192),
-          show_src_text(false) {}
+          show_src_text(false),
+          dictionaries() {}
 
     QOnlineTranslator::Engine translate_engine;
     QOnlineTranslator::Language target_language_1;
@@ -46,6 +48,7 @@ class DefaultSettings {
     // QKeySequence shortcut_popup_alt;
     QSize popup_window_size;
     bool show_src_text;
+    QStringList dictionaries;
 
     inline const char* translate_engine_to_str() const {
         return enumValueToKey(translate_engine);

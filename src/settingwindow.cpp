@@ -351,20 +351,34 @@ void SettingWindow::initDictionaries() {
         static auto *dialog =
             new QFileDialog(this, tr("Select Dictionary Files"));
         dialog->setFileMode(QFileDialog::ExistingFiles);
-        dialog->setNameFilter(tr("MDict Files (*.mdx *.mdd)"));
+        dialog->setNameFilter(tr("MDict Files (*.mdx)"));
         dialog->setDirectory(QDir::homePath());
         dialog->exec();
         if (!dialog->selectedFiles().isEmpty()) {
             ui->dictionary_keditlistwidget->insertStringList(
                 dialog->selectedFiles());
         };
+        emit ui->dictionary_keditlistwidget->changed();
     });
 
     connect(ui->dictionary_keditlistwidget, &KEditListWidget::changed, [this] {
         settings_->setValue("dictionaries",
                             ui->dictionary_keditlistwidget->items());
+        qDebug() << tr("Settings: Change dictionaries : %1")
+                        .arg(ui->dictionary_keditlistwidget->items().join(" "));
         emit dictionariesChanged(this->dictionaries());
+        ui->dictionary_keditlistwidget->addButton()->setEnabled(true);
     });
+
+    connect(ui->dictionary_keditlistwidget,
+            &KEditListWidget::removed,
+            [this](const QString &item) {
+                settings_->setValue("dictionaries",
+                                    ui->dictionary_keditlistwidget->items());
+                qDebug() << tr("Settings: Remove dictionaries : %1").arg(item);
+                emit dictionaryRemoved(item);
+                ui->dictionary_keditlistwidget->addButton()->setEnabled(true);
+            });
 
     auto dictionaries = this->dictionaries();
     if (!dictionaries.isEmpty()) {

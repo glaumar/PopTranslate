@@ -134,6 +134,14 @@ void PopupDialog::setOpacity(qreal opacity) {
 
 void PopupDialog::enableBlur(bool enable) { setting_.enable_blur = enable; }
 
+void PopupDialog::setDictionaries(const QStringList &dicts) {
+    dicts_.addDicts(dicts);
+}
+
+void PopupDialog::removeDictionaries(const QStringList &dicts) {
+    dicts_.removeDicts(dicts);
+}
+
 bool PopupDialog::event(QEvent *event) {
     // show menu
     if (event->type() == QEvent::ContextMenu) {
@@ -294,20 +302,12 @@ void PopupDialog::initTranslator() {
 }
 
 void PopupDialog::initDictionaries() {
-    dicts_.addDict(QString::fromStdString(
-        "dictionary/concise-enhanced.mdx"));  // TODO: delete
-
     // lookup word in dictionaries
     connect(
         &dicts_,
         &Dictionaries::found,
         this,
         [this](QString result) {
-            QClipboard *clipboard = QApplication::clipboard();
-            qDebug() << "clipboard" << clipboard->text(QClipboard::Clipboard);
-            qDebug() << "selection" << clipboard->text(QClipboard::Selection);
-            qDebug() << "selection" << clipboard->text(QClipboard::FindBuffer);
-
             translate_results_.append(result);
             emit translateResultsAvailable(translate_results_.size() - 1);
         },

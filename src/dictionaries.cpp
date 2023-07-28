@@ -28,6 +28,7 @@ void Dictionaries::addDicts(const QList<QString>& filenames) {
     for (auto& filename : filenames) {
         addDict(filename);
     }
+    dict_names_ = filenames;
 }
 
 void Dictionaries::removeDict(const QString& filename) {
@@ -36,9 +37,9 @@ void Dictionaries::removeDict(const QString& filename) {
     }
 
     dicts_.remove(filename);
-    for (auto& dict_name : dict_names_) {
-        if (dict_name == filename) {
-            dict_names_.removeOne(dict_name);
+    for (int i = 0; i < dict_names_.size(); i++) {
+        if (dict_names_[i] == filename) {
+            dict_names_.removeAt(i);
             break;
         }
     }

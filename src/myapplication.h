@@ -27,6 +27,7 @@ class MyApplication : public QApplication {
     void initSystemTrayIcon();
     void initDBusInterface();
     void loadSettings();
+    void loadDictionaries();
     void initClipboard();
 
     QTranslator* translator_;  // init in initUiTranslator
