@@ -370,15 +370,15 @@ void SettingWindow::initDictionaries() {
         ui->dictionary_keditlistwidget->addButton()->setEnabled(true);
     });
 
-    connect(ui->dictionary_keditlistwidget,
-            &KEditListWidget::removed,
-            [this](const QString &item) {
-                settings_->setValue("dictionaries",
-                                    ui->dictionary_keditlistwidget->items());
-                qDebug() << tr("Settings: Remove dictionaries : %1").arg(item);
-                emit dictionaryRemoved(item);
-                ui->dictionary_keditlistwidget->addButton()->setEnabled(true);
-            });
+    // connect(ui->dictionary_keditlistwidget,
+    //         &KEditListWidget::removed,
+    //         [this](const QString &item) {
+    //             settings_->setValue("dictionaries",
+    //                                 ui->dictionary_keditlistwidget->items());
+    //             qDebug() << tr("Settings: Remove dictionaries : %1").arg(item);
+    //             emit dictionaryRemoved(item);
+    //             ui->dictionary_keditlistwidget->addButton()->setEnabled(true);
+    //         });
 
     auto dictionaries = this->dictionaries();
     if (!dictionaries.isEmpty()) {

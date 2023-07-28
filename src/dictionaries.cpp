@@ -24,10 +24,20 @@ void Dictionaries::addDict(const QString& filename) {
     dicts_.insert(filename, md_p);
     dict_names_.append(filename);
 }
-void Dictionaries::addDicts(const QList<QString>& filenames) {
+
+void Dictionaries::addDicts(const QStringList& filenames) {
     for (auto& filename : filenames) {
         addDict(filename);
     }
+}
+
+void Dictionaries::setDicts(const QStringList& filenames) {
+    QSet<QString> old_set(dict_names_.begin(), dict_names_.end());
+    QSet<QString> new_set(filenames.begin(), filenames.end());
+    auto diff = old_set - new_set;
+
+    removeDicts(diff.values());
+    addDicts(filenames);
     dict_names_ = filenames;
 }
 
@@ -44,15 +54,15 @@ void Dictionaries::removeDict(const QString& filename) {
         }
     }
 }
-void Dictionaries::removeDicts(const QList<QString>& filenames) {
+void Dictionaries::removeDicts(const QStringList& filenames) {
     for (auto& filename : filenames) {
         removeDict(filename);
     }
 }
 
-QList<QString> Dictionaries::lookup(const QString& word) {
+QStringList Dictionaries::lookup(const QString& word) {
     qDebug() << "lookup:" << word;
-    QList<QString> results;
+    QStringList results;
     for (auto& dict_name : dict_names_) {
         qDebug() << "dict_name:" << dict_name;
         auto dict = dicts_.value(dict_name);

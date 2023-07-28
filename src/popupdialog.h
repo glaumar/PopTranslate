@@ -44,7 +44,7 @@ class PopupDialog : public QDialog {
     void setOpacity(qreal opacity);
     void enableBlur(bool enable);
     void setDictionaries(const QStringList &dicts);
-    void removeDictionaries(const QStringList &dicts);
+    // void removeDictionaries(const QStringList &dicts);
 
    signals:
     void settingsActionTriggered();

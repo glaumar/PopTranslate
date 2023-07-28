@@ -135,12 +135,12 @@ void PopupDialog::setOpacity(qreal opacity) {
 void PopupDialog::enableBlur(bool enable) { setting_.enable_blur = enable; }
 
 void PopupDialog::setDictionaries(const QStringList &dicts) {
-    dicts_.addDicts(dicts);
+    dicts_.setDicts(dicts);
 }
 
-void PopupDialog::removeDictionaries(const QStringList &dicts) {
-    dicts_.removeDicts(dicts);
-}
+// void PopupDialog::removeDictionaries(const QStringList &dicts) {
+//     dicts_.removeDicts(dicts);
+// }
 
 bool PopupDialog::event(QEvent *event) {
     // show menu

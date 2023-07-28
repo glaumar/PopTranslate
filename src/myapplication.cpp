@@ -185,11 +185,11 @@ void MyApplication::loadDictionaries() {
             pop_,
             &PopupDialog::setDictionaries);
 
-    connect(setting_window_,
-            &SettingWindow::dictionaryRemoved,
-            [this](const QString &dict) {
-                this->pop_->removeDictionaries({dict});
-            });
+    // connect(setting_window_,
+    //         &SettingWindow::dictionaryRemoved,
+    //         [this](const QString &dict) {
+    //             this->pop_->removeDictionaries({dict});
+    //         });
 
     pop_->setDictionaries(setting_window_->dictionaries());
 }
