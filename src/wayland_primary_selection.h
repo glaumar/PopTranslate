@@ -1,5 +1,4 @@
-#ifndef WAYLAND_PRIMARY_SELECTION_H
-#define WAYLAND_PRIMARY_SELECTION_H
+#pragma once
 
 #include <QtWaylandClient/private/wayland-wp-primary-selection-unstable-v1-client-protocol.h>
 #include <wayland-client.h>
@@ -75,5 +74,3 @@ class WaylandPrimarySelection : public QObject {
     QString selection_;
     // QMimeData mime_date_;
 };
-
-#endif  // WAYLAND_PRIMARY_SELECTION_H

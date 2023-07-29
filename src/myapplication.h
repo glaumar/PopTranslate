@@ -1,5 +1,4 @@
-#ifndef MYAPPLICATION_H
-#define MYAPPLICATION_H
+#pragma once
 
 #include <ksystemclipboard.h>
 
@@ -37,4 +36,4 @@ class MyApplication : public QApplication {
     KSystemClipboard* clipboard_;  // init in initClipboard
     QAction* shortcut_act_;        // init in initGlobalShortcuts
 };
-#endif  // MYAPPLICATION_H
+

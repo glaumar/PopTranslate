@@ -1,5 +1,4 @@
-#ifndef SettingWindow_H
-#define SettingWindow_H
+#pragma once
 
 #include <QComboBox>
 #include <QNetworkProxy>
@@ -115,5 +114,3 @@ class SettingWindow : public QWidget {
     const DefaultSettings default_;
     QNetworkProxy proxy_;
 };
-
-#endif  // SettingWindow_H

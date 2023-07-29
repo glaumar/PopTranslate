@@ -1,5 +1,4 @@
-#ifndef POPUPDIALOG_H
-#define POPUPDIALOG_H
+#pragma once
 
 #include <KWayland/Client/blur.h>
 #include <KWayland/Client/plasmashell.h>
@@ -78,5 +77,3 @@ class PopupDialog : public QDialog {
     QVector<QPair<QString,QString>> translate_results_;
     int result_index_;
 };
-
-#endif  // POPUPDIALOG_H

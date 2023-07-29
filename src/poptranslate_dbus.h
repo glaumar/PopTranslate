@@ -1,5 +1,4 @@
-#ifndef POPTRANSLATE_DBUS_H
-#define POPTRANSLATE_DBUS_H
+#pragma once
 
 #include <QObject>
 #include <QString>
@@ -31,5 +30,3 @@ class PopTranslateDBus : public QObject {
    private:
     explicit PopTranslateDBus(QObject* parent = nullptr);
 };
-
-#endif  // POPTRANSLATE_DBUS_H

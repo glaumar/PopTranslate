@@ -1,5 +1,4 @@
-#ifndef DICTIONARIES_H
-#define DICTIONARIES_H
+#pragma once
 
 #include <QVector>
 #include <QMap>
@@ -32,5 +31,3 @@ class Dictionaries : public QObject {
     QMap<QString, QSharedPointer<mdict::Mdict>> dicts_;
     QStringList dict_names_;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef DEFAULTSETTINGS_H
-#define DEFAULTSETTINGS_H
+#pragma once
 
 #include <QMetaEnum>
 #include <QOnlineTranslator>
@@ -71,5 +70,3 @@ class DefaultSettings {
         return QMetaEnum::fromType<T>().valueToKey(value);
     }
 };
-
-#endif  // DEFAULTSETTINGS_H
