@@ -102,7 +102,10 @@
         "__verbose_abort": "cpp",
         "queue": "cpp",
         "forward_list": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "future": "cpp",
+        "valarray": "cpp",
+        "stack": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
@@ -119,5 +122,6 @@
         "**/.vscode/**",
         "**/node_modules/**",
         "mdict-cpp"
-    ]
+    ],
+    "cmake.automaticReconfigure": false
 }

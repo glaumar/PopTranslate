@@ -1,7 +1,7 @@
 #ifndef DICTIONARIES_H
 #define DICTIONARIES_H
 
-#include <QList>
+#include <QVector>
 #include <QMap>
 #include <QSharedPointer>
 #include <QStringList>
@@ -19,15 +19,16 @@ class Dictionaries : public QObject {
     void setDicts(const QStringList& filenames);
     void removeDict(const QString& filename);
     void removeDicts(const QStringList& filenames);
-    QStringList lookup(const QString& word);
+    QVector<QPair<QString,QString>> lookup(const QString& word);
     void lookupAsync(const QString& word);
     void abortLookup();
    signals:
     // void finished(QStringList results);
     // emit every time a search result is found in a dictionary
-    void found(QString result);
+    void found(QPair<QString,QString> result);
 
    private:
+    bool fileCheck(const QString& filename);
     QMap<QString, QSharedPointer<mdict::Mdict>> dicts_;
     QStringList dict_names_;
 };

@@ -21,12 +21,13 @@ PopupDialog::PopupDialog(QWidget *parent)
     initWaylandConnection();
     initTranslator();
     initDictionaries();
+    initToolbar();
 
     // show first translate result
     connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
         if (index == 0) {
-            current_translate_result_ = translate_results_.cbegin();
-            ui->trans_text_edit->setText(*current_translate_result_);
+            result_index_ = index;
+            showTranslateResult(translate_results_.at(result_index_));
         }
     });
 }
@@ -54,7 +55,8 @@ void PopupDialog::translate(const QString &text) {
 
     // clear last translate_results
     translate_results_.clear();
-    current_translate_result_ = translate_results_.cend();
+    result_index_ = -1;
+    ui->title_label->setText("PopTranslate");
 
     dicts_.lookupAsync(text);
     translator_.translate(text,
@@ -286,7 +288,9 @@ void PopupDialog::initTranslator() {
     connect(&translator_, &QOnlineTranslator::finished, [this] {
         if (translator_.error() == QOnlineTranslator::NoError) {
             qDebug() << tr("Translate Success: %1").arg(translator_.source());
-            translate_results_.append(translator_.translation());
+            QPair<QString, QString> result(setting_.translate_engine_to_str(),
+                                           translator_.translation());
+            translate_results_.append(result);
             emit translateResultsAvailable(translate_results_.size() - 1);
         } else {
             auto error_msg =
@@ -307,9 +311,26 @@ void PopupDialog::initDictionaries() {
         &dicts_,
         &Dictionaries::found,
         this,
-        [this](QString result) {
+        [this](QPair<QString,QString> result) {
             translate_results_.append(result);
             emit translateResultsAvailable(translate_results_.size() - 1);
         },
         Qt::QueuedConnection);
+}
+
+void PopupDialog::initToolbar() {
+    connect(ui->prev_toolbutton, &QToolButton::clicked, [this] {
+        if (result_index_ > 0) {
+            result_index_--;
+            showTranslateResult(translate_results_.at(result_index_));
+        }
+    });
+
+    connect(ui->next_toolbutton, &QToolButton::clicked, [this] {
+        if (result_index_ >= 0 &&
+            result_index_ < translate_results_.size() - 1) {
+            result_index_++;
+            showTranslateResult(translate_results_.at(result_index_));
+        }
+    });
 }
