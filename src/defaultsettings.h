@@ -26,7 +26,7 @@ class DefaultSettings {
           proxy_password(),
           shortcut_popup_main(Qt::META | Qt::Key_G),
         //   shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G),
-          popup_window_size(512, 192),
+          popup_window_size(512, 384),
           show_src_text(false),
           dictionaries() {}
 

@@ -210,6 +210,7 @@ void PopupDialog::initContextMenu() {
             this->resize(new_size);
         }
         ui->src_plain_text_edit->setVisible(state);
+        ui->horizon_line->setVisible(state);
     });
     setSrcTextEditVisible(false);
 

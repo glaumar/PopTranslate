@@ -105,7 +105,8 @@
         "regex": "cpp",
         "future": "cpp",
         "valarray": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "qpicture": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
