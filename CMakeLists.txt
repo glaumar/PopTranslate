@@ -48,6 +48,7 @@ set(PROJECT_SOURCES
     src/defaultsettings.h
     src/dictionaries.cpp src/dictionaries.h
     # src/wayland_primary_selection.cpp src/wayland_primary_selection.h
+    src/screengrabber.h src/screengrabber.cpp
     ${TS_FILES}
 )
 
