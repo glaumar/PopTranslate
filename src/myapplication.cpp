@@ -17,8 +17,9 @@
 
 MyApplication::MyApplication(int &argc, char **argv)
     : QApplication(argc, argv) {
-    setApplicationName("PopTranslate");
-    setDesktopFileName("io.github.glaumar.PopTranslate.desktop");
+    setApplicationName(QStringLiteral("PopTranslate"));
+    setDesktopFileName(
+        QStringLiteral("io.github.glaumar.PopTranslate.desktop"));
 
     // Must install translator before create any ui
     initUiTranslator();
@@ -33,6 +34,7 @@ MyApplication::MyApplication(int &argc, char **argv)
     initDBusInterface();
     loadSettings();
     loadDictionaries();
+    initOcr();
 }
 
 MyApplication::~MyApplication() {
@@ -44,6 +46,8 @@ MyApplication::~MyApplication() {
     delete tray_;
     delete pop_;
     delete translator_;
+    delete grabber_;
+    delete cropper_;
 }
 
 void MyApplication::initUiTranslator() {
@@ -89,10 +93,17 @@ void MyApplication::showPop() {
 
 void MyApplication::initSystemTrayIcon() {
     tray_->setToolTip(tr("PopTranslate"));
-    tray_->setIcon(QIcon::fromTheme("io.github.glaumar.PopTranslate"));
+    tray_->setIcon(
+        QIcon::fromTheme(QStringLiteral("io.github.glaumar.PopTranslate")));
 
     // set systemtray menu
     QMenu *menu = new QMenu(setting_window_);
+
+    menu->addAction(
+        QIcon::fromTheme("preferences-system-windows-effect-screenshot"),
+        tr("Select screen area"),
+        this,
+        [this]() { grabber_->grabFullScreen(); });
 
     menu->addAction(QIcon::fromTheme("settings-configure"),
                     tr("Settings"),
@@ -205,6 +216,15 @@ void MyApplication::initClipboard() {
                     pop_->translate(clipboard_->text(QClipboard::Selection));
                 }
             });
+}
+
+void MyApplication::initOcr() {
+    grabber_ = new ScreenGrabber(nullptr);
+    cropper_ = new ImageCropper(nullptr);
+    connect(grabber_,
+            &ScreenGrabber::screenshotReady,
+            cropper_,
+            &ImageCropper::cropImage);
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

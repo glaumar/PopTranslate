@@ -106,7 +106,8 @@
         "future": "cpp",
         "valarray": "cpp",
         "stack": "cpp",
-        "qpicture": "cpp"
+        "qpicture": "cpp",
+        "qlabel": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

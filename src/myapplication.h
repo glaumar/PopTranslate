@@ -5,7 +5,9 @@
 #include <QApplication>
 #include <QSystemTrayIcon>
 
+#include "imagecropper.h"
 #include "popupdialog.h"
+#include "screengrabber.h"
 #include "settingwindow.h"
 
 class MyApplication : public QApplication {
@@ -28,6 +30,7 @@ class MyApplication : public QApplication {
     void loadSettings();
     void loadDictionaries();
     void initClipboard();
+    void initOcr();
 
     QTranslator* translator_;  // init in initUiTranslator
     PopupDialog* pop_;
@@ -35,5 +38,6 @@ class MyApplication : public QApplication {
     SettingWindow* setting_window_;
     KSystemClipboard* clipboard_;  // init in initClipboard
     QAction* shortcut_act_;        // init in initGlobalShortcuts
+    ScreenGrabber *grabber_;  
+    ImageCropper *cropper_;
 };
-

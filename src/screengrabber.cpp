@@ -3,6 +3,7 @@
 #include <QDBusInterface>
 #include <QDBusPendingReply>
 #include <QDebug>
+#include <QUrl>
 
 ScreenGrabber::ScreenGrabber(QObject *parent)
     : QObject(parent),
@@ -39,7 +40,8 @@ void ScreenGrabber::grabFullScreen() {
 
 void ScreenGrabber::onResponse(uint32_t response, QVariantMap results) {
     if (!response) {
-        QString filename = results["uri"].value<QString>();
+        QString filename = results["uri"].value<QUrl>().toLocalFile();
+        qDebug() << tr("Take screenshot : %1").arg(filename);
         emit screenshotReady(QPixmap(filename));
     } else {
         qCritical() << tr("Error: take screenshot failed");
