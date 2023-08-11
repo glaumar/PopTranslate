@@ -4,10 +4,9 @@
 #include <KWayland/Client/plasmashell.h>
 
 #include <QDebug>
-#include <QDialog>
-#include <QVector>
 #include <QMenu>
 #include <QPair>
+#include <QVector>
 
 #include "defaultsettings.h"
 #include "dictionaries.h"
@@ -17,7 +16,7 @@ namespace Ui {
 class PopupDialog;
 }
 
-class PopupDialog : public QDialog {
+class PopupDialog : public QWidget {
     Q_OBJECT
 
    public:
@@ -59,11 +58,10 @@ class PopupDialog : public QDialog {
     void initDictionaries();
     void initToolbar();
 
-    inline void showTranslateResult(const QPair<QString,QString>& result)
-    {
-            auto &[s_text, t_text] = result;
-            ui->title_label->setText(s_text);
-            ui->trans_text_edit->setText(t_text);
+    inline void showTranslateResult(const QPair<QString, QString> &result) {
+        auto &[s_text, t_text] = result;
+        ui->title_label->setText(s_text);
+        ui->trans_text_edit->setText(t_text);
     }
 
     bool flag_normal_window_;
@@ -75,6 +73,6 @@ class PopupDialog : public QDialog {
     QMenu engine_menu_;
     QAction *action_source_text_;
     Dictionaries dicts_;
-    QVector<QPair<QString,QString>> translate_results_;
+    QVector<QPair<QString, QString>> translate_results_;
     int result_index_;
 };

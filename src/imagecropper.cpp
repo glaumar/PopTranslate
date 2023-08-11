@@ -31,7 +31,6 @@ void ImageCropper::mouseMoveEvent(QMouseEvent *event) {
 void ImageCropper::mouseReleaseEvent(QMouseEvent *event) {
     this->hide();
     emit imageCropped(pixmap()->copy(crop_rect_));
-
     dragging_ = false;
     crop_rect_ = QRect();
 }

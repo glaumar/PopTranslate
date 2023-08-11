@@ -11,7 +11,7 @@
 #include <QGraphicsOpacityEffect>
 
 PopupDialog::PopupDialog(QWidget *parent)
-    : QDialog(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
+    : QWidget(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
     ui->setupUi(this);
     setNormalWindow(false);
 
@@ -154,7 +154,7 @@ bool PopupDialog::event(QEvent *event) {
     // hide window
     if (!isNormalWindow() && event->type() == QEvent::Leave &&
         context_menu_.isHidden()) {
-        KWindowEffects::enableBlurBehind(this->windowHandle(), false);
+        // KWindowEffects::enableBlurBehind(this->windowHandle(), false);
         this->hide();
         translator_.abort();
         return true;
@@ -164,15 +164,19 @@ bool PopupDialog::event(QEvent *event) {
         this->windowHandle()->installEventFilter(this);
     }
 
-    return QDialog::event(event);
+    return QWidget::event(event);
 }
 
 bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
     // show window under mouse cursor on wayland
     const bool ret = QObject::eventFilter(filtered, event);
     auto pop_window = qobject_cast<QWindow *>(filtered);
-    if (pop_window && event->type() == QEvent::Expose &&
-        pop_window->isVisible()) {
+
+    if (pop_window && event->type() == QEvent::Expose) {
+        if (!pop_window->isVisible()) {
+            pop_window->setVisible(true);
+        }
+
         auto surface = KWayland::Client::Surface::fromWindow(pop_window);
         auto plasmaSurface = plasmashell_->createSurface(surface, pop_window);
 
@@ -312,7 +316,7 @@ void PopupDialog::initDictionaries() {
         &dicts_,
         &Dictionaries::found,
         this,
-        [this](QPair<QString,QString> result) {
+        [this](QPair<QString, QString> result) {
             translate_results_.append(result);
             emit translateResultsAvailable(translate_results_.size() - 1);
         },

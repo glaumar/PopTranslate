@@ -225,6 +225,14 @@ void MyApplication::initOcr() {
             &ScreenGrabber::screenshotReady,
             cropper_,
             &ImageCropper::cropImage);
+    connect(cropper_, &ImageCropper::imageCropped, [this](QPixmap img) {
+        ocr_.recognize(img.toImage());
+    });
+    connect(&ocr_, &Ocr::recognized, [this](const QString &text) {
+        qDebug() << text;
+        this->pop_->show();
+        this->pop_->translate(text);
+    });
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

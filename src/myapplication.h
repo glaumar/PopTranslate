@@ -6,6 +6,7 @@
 #include <QSystemTrayIcon>
 
 #include "imagecropper.h"
+#include "ocr.h"
 #include "popupdialog.h"
 #include "screengrabber.h"
 #include "settingwindow.h"
@@ -38,6 +39,7 @@ class MyApplication : public QApplication {
     SettingWindow* setting_window_;
     KSystemClipboard* clipboard_;  // init in initClipboard
     QAction* shortcut_act_;        // init in initGlobalShortcuts
-    ScreenGrabber *grabber_;  
-    ImageCropper *cropper_;
+    ScreenGrabber* grabber_;
+    ImageCropper* cropper_;
+    Ocr ocr_;
 };

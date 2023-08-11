@@ -9,12 +9,13 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
+
 find_package(Qt5 REQUIRED COMPONENTS LinguistTools WaylandClient Concurrent REQUIRED)
 
 # find_package(ECM REQUIRED)
 # set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 # find_package(Wayland REQUIRED)
-
 find_package(KF5GlobalAccel REQUIRED)
 find_package(KF5GuiAddons REQUIRED)
 find_package(KF5Wayland REQUIRED)
@@ -22,6 +23,12 @@ find_package(KF5WindowSystem REQUIRED)
 find_package(KF5WidgetsAddons REQUIRED)
 find_package(KF5XmlGui REQUIRED)
 
+# Find Tesseract and Leptonica libraries using PkgConfig
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(Tesseract REQUIRED tesseract)
+pkg_check_modules(Leptonica REQUIRED lept)
+
+# QOnlineTranslator
 include(FetchContent)
 FetchContent_Declare(
     QOnlineTranslator
@@ -49,17 +56,20 @@ set(PROJECT_SOURCES
     src/dictionaries.cpp src/dictionaries.h
     # src/wayland_primary_selection.cpp src/wayland_primary_selection.h
     src/screengrabber.h src/screengrabber.cpp
+    src/imagecropper.h src/imagecropper.cpp
+    src/ocr.h src/ocr.cpp
     ${TS_FILES}
 )
 
-include_directories(${Qt5WaylandClient_PRIVATE_INCLUDE_DIRS})
-
+# include_directories(${Qt5WaylandClient_PRIVATE_INCLUDE_DIRS})
 add_executable(poptranslate
     ${PROJECT_SOURCES}
 )
 add_dependencies(poptranslate translations)
 
-target_link_libraries(poptranslate PUBLIC
+target_include_directories(poptranslate PRIVATE ${Tesseract_INCLUDE_DIRS} ${Leptonica_INCLUDE_DIRS})
+
+target_link_libraries(poptranslate PRIVATE
     Qt5::Concurrent
     KF5::GlobalAccel
     KF5::GuiAddons
@@ -70,6 +80,8 @@ target_link_libraries(poptranslate PUBLIC
     QOnlineTranslator
     # Wayland::Client
     # Qt5::WaylandClientPrivate
+    ${Tesseract_LIBRARIES}
+    ${Leptonica_LIBRARIES}
     mdict)
 
 install(TARGETS poptranslate DESTINATION bin)

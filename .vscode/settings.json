@@ -107,7 +107,13 @@
         "valarray": "cpp",
         "stack": "cpp",
         "qpicture": "cpp",
-        "qlabel": "cpp"
+        "qlabel": "cpp",
+        "qsharedpointer": "cpp",
+        "qtranslator": "cpp",
+        "qsystemtrayicon": "cpp",
+        "qgraphicsopacityeffect": "cpp",
+        "codecvt": "cpp",
+        "stdfloat": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
@@ -125,5 +131,9 @@
         "**/node_modules/**",
         "mdict-cpp"
     ],
-    "cmake.automaticReconfigure": false
+    "cmake.automaticReconfigure": true,
+    "cmake.buildTask": false,
+    "copyrightInserter.license": "gpl3",
+    "cmake.configureSettings": {},
+    "cmake.generator": "Unix Makefiles"
 }
