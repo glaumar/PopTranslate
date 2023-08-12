@@ -221,18 +221,19 @@ void MyApplication::initClipboard() {
 void MyApplication::initOcr() {
     grabber_ = new ScreenGrabber(nullptr);
     cropper_ = new ImageCropper(nullptr);
+    ocr_.init("eng", "", {});
     connect(grabber_,
             &ScreenGrabber::screenshotReady,
             cropper_,
             &ImageCropper::cropImage);
     connect(cropper_, &ImageCropper::imageCropped, [this](QPixmap img) {
-        ocr_.recognize(img.toImage());
+        ocr_.recognize(img);
     });
-    connect(&ocr_, &Ocr::recognized, [this](const QString &text) {
+    connect(&ocr_, &Ocr::recognized, this,[this](const QString &text) {
         qDebug() << text;
         this->pop_->show();
         this->pop_->translate(text);
-    });
+    },Qt::QueuedConnection);
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {
