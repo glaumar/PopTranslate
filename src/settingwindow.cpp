@@ -4,6 +4,7 @@
 #include <QMetaEnum>
 #include <QSharedPointer>
 
+#include "langcode2name.h"
 #include "ui_settingwindow.h"
 
 SettingWindow::SettingWindow(QWidget *parent)
@@ -34,11 +35,25 @@ SettingWindow::SettingWindow(QWidget *parent)
     initProxy();
     initShortcut();
     initDictionaries();
+    initOcrLanguages();
 }
 
 SettingWindow::~SettingWindow() {
     settings_->sync();
     delete ui;
+}
+
+void SettingWindow::setAvailableOcrLanguages(const QStringList &ocr_languages) {
+    auto ocr_languages_copy = ocr_languages;
+    QStringList ocr_languages_enabled;
+    // Enable all ocr languages that load from settings
+    for (const auto &language_code : ocr_languages_enable_.keys()) {
+        if (ocr_languages_copy.removeAll(language_code) > 0) {
+            ocr_languages_enable_[language_code]->setEnabled(true);
+        }
+    }
+    addOcrLanguageToUi(ocr_languages_copy);
+    emit ocrLanguagesChanged(this->ocrLanguages());
 }
 
 void SettingWindow::initTranslateEngineComboBox() {
@@ -154,6 +169,7 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("popup_window_size", default_.popup_window_size);
     setValueIfIsNull("show_src_text", default_.show_src_text);
     setValueIfIsNull("dictionaries", default_.dictionaries);
+    setValueIfIsNull("ocr_languages", default_.ocr_languages);
 }
 
 void SettingWindow::initFont() {
@@ -375,8 +391,8 @@ void SettingWindow::initDictionaries() {
     //         [this](const QString &item) {
     //             settings_->setValue("dictionaries",
     //                                 ui->dictionary_keditlistwidget->items());
-    //             qDebug() << tr("Settings: Remove dictionaries : %1").arg(item);
-    //             emit dictionaryRemoved(item);
+    //             qDebug() << tr("Settings: Remove dictionaries :
+    //             %1").arg(item); emit dictionaryRemoved(item);
     //             ui->dictionary_keditlistwidget->addButton()->setEnabled(true);
     //         });
 
@@ -384,4 +400,46 @@ void SettingWindow::initDictionaries() {
     if (!dictionaries.isEmpty()) {
         ui->dictionary_keditlistwidget->setItems(this->dictionaries());
     }
+}
+
+void SettingWindow::initOcrLanguages() {
+    auto layout = ui->ocr_languages_layout;
+    layout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+    // checkbox disable until ocr languages available (setAvailableOcrLanguages)
+    ocr_languages_enable_ =
+        addOcrLanguageToUi(this->ocrLanguages(), true, false);
+}
+
+QMap<QString, QCheckBox *> SettingWindow::addOcrLanguageToUi(
+    QStringList ocr_languages,
+    bool is_checked,
+    bool is_enabled) {
+    QMap<QString, QCheckBox *> result;
+    for (const auto language_code : ocr_languages) {
+        QString language_name = LangCode2Name(language_code);
+        auto checkbox =
+            new QCheckBox(QString("%1 (%2)").arg(language_name, language_code),
+                          this);
+        checkbox->setChecked(is_checked);
+        checkbox->setEnabled(is_enabled);
+
+        result[language_code] = checkbox;
+        connect(checkbox,
+                &QCheckBox::stateChanged,
+                [this, language_code](int state) {
+                    QStringList orc_languages = this->ocrLanguages();
+                    if (state == Qt::Checked) {
+                        orc_languages.append(language_code);
+                    } else {
+                        orc_languages.removeOne(language_code);
+                    }
+                    settings_->setValue("ocr_languages", orc_languages);
+                    emit ocrLanguagesChanged(orc_languages);
+                });
+
+        ui->ocr_languages_layout->addWidget(checkbox);
+    }
+
+    return result;
 }

@@ -221,7 +221,7 @@ void MyApplication::initClipboard() {
 void MyApplication::initOcr() {
     grabber_ = new ScreenGrabber(nullptr);
     cropper_ = new ImageCropper(nullptr);
-    ocr_.init("eng", "", {});
+
     connect(grabber_,
             &ScreenGrabber::screenshotReady,
             cropper_,
@@ -229,11 +229,25 @@ void MyApplication::initOcr() {
     connect(cropper_, &ImageCropper::imageCropped, [this](QPixmap img) {
         ocr_.recognize(img);
     });
-    connect(&ocr_, &Ocr::recognized, this,[this](const QString &text) {
-        qDebug() << text;
-        this->pop_->show();
-        this->pop_->translate(text);
-    },Qt::QueuedConnection);
+    connect(
+        &ocr_,
+        &Ocr::recognized,
+        this,
+        [this](const QString &text) {
+            qDebug() << text;
+            this->pop_->show();
+            this->pop_->translate(text);
+        },
+        Qt::QueuedConnection);
+    connect(setting_window_,
+            &SettingWindow::ocrLanguagesChanged,
+            &ocr_,
+            [this](const QStringList &languages) {
+                this->ocr_.init(languages.join("+").toLocal8Bit(), "", {});
+            });
+
+    ocr_.init("eng", "", {});
+    setting_window_->setAvailableOcrLanguages(ocr_.availableLanguages());
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

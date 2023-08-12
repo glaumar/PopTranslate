@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QNetworkProxy>
 #include <QSettings>
@@ -65,15 +66,23 @@ class SettingWindow : public QWidget {
         return settings_->value("dictionaries").toStringList();
     }
 
+    inline QStringList ocrLanguages() const {
+        return settings_->value("ocr_languages").toStringList();
+    }
+
+   public slots:
+    void setAvailableOcrLanguages(const QStringList &ocr_languages);
+
    signals:
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
     void fontChanged(const QFont &font);
     void opacityChanged(qreal opacity);
     void triggerBlurEffect(bool enable);
-    void shortcutChanged(const QKeySequence &  seq);
+    void shortcutChanged(const QKeySequence &seq);
     void dictionariesChanged(const QStringList &dictionaries);
     // void dictionaryRemoved(const QString &dictionary);
+    void ocrLanguagesChanged(const QStringList &ocr_languages);
 
    private:
     void initSettings();
@@ -84,6 +93,10 @@ class SettingWindow : public QWidget {
     void initProxy();
     void initShortcut();
     void initDictionaries();
+    void initOcrLanguages();
+    QMap<QString, QCheckBox *> addOcrLanguageToUi(QStringList ocr_languages,
+                                                  bool is_checked = false,
+                                                  bool is_enabled = true);
 
     template <class T>
     inline void setValueIfIsNull(const QString &key, const T value) {
@@ -113,4 +126,5 @@ class SettingWindow : public QWidget {
     QVector<QOnlineTranslator::Language> target_languages_;
     const DefaultSettings default_;
     QNetworkProxy proxy_;
+    QMap<QString, QCheckBox *> ocr_languages_enable_;
 };

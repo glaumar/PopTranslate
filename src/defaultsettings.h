@@ -28,7 +28,8 @@ class DefaultSettings {
         //   shortcut_popup_alt(Qt::CTRL | Qt::META | Qt::Key_G),
           popup_window_size(512, 384),
           show_src_text(false),
-          dictionaries() {}
+          dictionaries(),
+          ocr_languages("eng") {}
 
     QOnlineTranslator::Engine translate_engine;
     QOnlineTranslator::Language target_language_1;
@@ -48,6 +49,7 @@ class DefaultSettings {
     QSize popup_window_size;
     bool show_src_text;
     QStringList dictionaries;
+    QStringList ocr_languages;
 
     inline const char* translate_engine_to_str() const {
         return enumValueToKey(translate_engine);
