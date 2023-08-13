@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.25)
 
-project(PopTranslate VERSION 0.1.0 LANGUAGES CXX)
+project(PopTranslate VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
 
-find_package(Qt5 REQUIRED COMPONENTS LinguistTools WaylandClient Concurrent REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS LinguistTools Concurrent REQUIRED)
 
 # find_package(ECM REQUIRED)
 # set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
