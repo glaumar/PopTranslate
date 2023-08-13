@@ -54,10 +54,12 @@ set(PROJECT_SOURCES
     src/settingwindow.cpp src/settingwindow.h src/settingwindow.ui
     src/defaultsettings.h
     src/dictionaries.cpp src/dictionaries.h
+
     # src/wayland_primary_selection.cpp src/wayland_primary_selection.h
     src/screengrabber.h src/screengrabber.cpp
     src/imagecropper.h src/imagecropper.cpp
     src/ocr.h src/ocr.cpp
+    src/langcode2name.h src/langcode2name.cpp
     ${TS_FILES}
 )
 
@@ -78,6 +80,7 @@ target_link_libraries(poptranslate PRIVATE
     KF5::WidgetsAddons
     KF5::XmlGui
     QOnlineTranslator
+
     # Wayland::Client
     # Qt5::WaylandClientPrivate
     ${Tesseract_LIBRARIES}

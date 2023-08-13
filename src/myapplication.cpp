@@ -253,7 +253,6 @@ void MyApplication::initOcr() {
         &Ocr::recognized,
         this,
         [this](const QString &text) {
-            qDebug() << text;
             this->pop_->show();
             this->pop_->translate(text);
         },

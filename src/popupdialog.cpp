@@ -44,11 +44,11 @@ void PopupDialog::translate(const QString &text) {
         translator_.abort();
     }
 
-    qDebug()
-        << tr("Translate: Engine: %1, Target language: %2, Source text: %3")
-               .arg(DefaultSettings::enumValueToKey(setting_.translate_engine),
-                    DefaultSettings::enumValueToKey(setting_.target_language_1),
-                    text);
+    qDebug() << tr("Translate: Engine: %1, Target language: %2")
+                    .arg(DefaultSettings::enumValueToKey(
+                             setting_.translate_engine),
+                         DefaultSettings::enumValueToKey(
+                             setting_.target_language_1));
 
     ui->src_plain_text_edit->setPlainText(text);
     ui->trans_text_edit->clear();
@@ -84,8 +84,8 @@ void PopupDialog::setNormalWindow(bool enable) {
 }
 
 void PopupDialog::setTranslateEngine(QOnlineTranslator::Engine engine) {
-    qDebug() << tr("Translate: Change translate engine: %1")
-                    .arg(DefaultSettings::enumValueToKey(engine));
+    // qDebug() << tr("Translate: Change translate engine: %1")
+    //                 .arg(DefaultSettings::enumValueToKey(engine));
     setting_.translate_engine = engine;
     engine_menu_.actions().at(engine)->setChecked(true);
 }
@@ -111,8 +111,8 @@ void PopupDialog::setTargetLanguages(
             setting_.target_language_1 = lang;
             retranslate();
         });
-        qDebug() << tr("Translate: Add target language to context menu: %1")
-                        .arg(DefaultSettings::enumValueToKey(lang));
+        // qDebug() << tr("Translate: Add target language to context menu: %1")
+        //                 .arg(DefaultSettings::enumValueToKey(lang));
     }
 
     setting_.target_language_1 = languages.at(0);
@@ -292,15 +292,14 @@ void PopupDialog::initWaylandConnection() {
 void PopupDialog::initTranslator() {
     connect(&translator_, &QOnlineTranslator::finished, [this] {
         if (translator_.error() == QOnlineTranslator::NoError) {
-            qDebug() << tr("Translate Success: %1").arg(translator_.source());
+            qDebug() << tr("Translate Success");
             QPair<QString, QString> result(setting_.translate_engine_to_str(),
                                            translator_.translation());
             translate_results_.append(result);
             emit translateResultsAvailable(translate_results_.size() - 1);
         } else {
             auto error_msg =
-                tr("Failed Translate: %1 (%2)")
-                    .arg(translator_.errorString(), translator_.source());
+                tr("Failed Translate: %1").arg(translator_.errorString());
             if (this->isVisible() &&
                 translator_.errorString() != QString("Operation canceled")) {
                 ui->trans_text_edit->setText(error_msg);
