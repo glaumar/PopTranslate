@@ -20,6 +20,8 @@ class ImageCropper : public QLabel {
     void paintEvent(QPaintEvent *event) override;
 
    private:
-    QRect crop_rect_;
+    QRect getRect();
+    QPoint start_;
+    QPoint end_;
     bool dragging_;
 };

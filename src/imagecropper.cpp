@@ -4,9 +4,9 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPixmap>
 
-ImageCropper::ImageCropper(QLabel *parent)
-    : QLabel(parent), crop_rect_(), dragging_(false) {
+ImageCropper::ImageCropper(QLabel *parent) : QLabel(parent), dragging_(false) {
     setWindowFlags(Qt::FramelessWindowHint);
     setWindowState(Qt::WindowFullScreen);
 }
@@ -17,22 +17,23 @@ void ImageCropper::cropImage(const QPixmap &img) {
 }
 
 void ImageCropper::mousePressEvent(QMouseEvent *event) {
-    crop_rect_.setTopLeft(event->pos());
+    start_ = event->pos();
     dragging_ = true;
 }
 
 void ImageCropper::mouseMoveEvent(QMouseEvent *event) {
     if (dragging_) {
-        crop_rect_.setBottomRight(event->pos());
+        end_ = event->pos();
         this->update();
     }
 }
 
 void ImageCropper::mouseReleaseEvent(QMouseEvent *event) {
     this->hide();
-    emit imageCropped(pixmap()->copy(crop_rect_));
+    QPixmap pix = pixmap(Qt::ReturnByValue).copy(getRect());
+    emit imageCropped(pix);
     dragging_ = false;
-    crop_rect_ = QRect();
+    start_ = end_ = QPoint();
 }
 
 void ImageCropper::paintEvent(QPaintEvent *event) {
@@ -44,11 +45,19 @@ void ImageCropper::paintEvent(QPaintEvent *event) {
 
     QPainterPath crop_area;
     crop_area.setFillRule(Qt::WindingFill);
-    crop_area.addRect(crop_rect_);
+    crop_area.addRect(getRect());
 
     QPainterPath end_path = border.subtracted(crop_area);
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillPath(end_path, QColor(0, 0, 0, 100));
+}
+
+QRect ImageCropper::getRect() {
+    int x = start_.x() < end_.x() ? start_.x() : end_.x();
+    int y = start_.y() < end_.y() ? start_.y() : end_.y();
+    int width = abs(start_.x() - end_.x());
+    int height = abs(start_.y() - end_.y());
+    return QRect(x, y, width, height);
 }
