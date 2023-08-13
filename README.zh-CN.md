@@ -38,6 +38,9 @@ paru -S poptranslate
     - KWidgetsAddons
     - KXmlGui
 - [QOnlineTranslator](https://github.com/crow-translate/QOnlineTranslator) - 提供 Google, Yandex 和 Bing 的翻译 API
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) >= 5.0.0
+- [tessdata](https://github.com/tesseract-ocr/tessdata) 
+
 ## Flatpak 运行时和 SDK
 - org.kde.Platform = "5.15-22.08"
 - org.kde.Sdk = "5.15-22.08"
@@ -48,7 +51,7 @@ paru -S poptranslate
 ### 编译
 ```bash
 cmake -B build -DCMAKE_INSTALL_PREFIX=/usr
-cmake --build build
+cmake --build build --target poptranslate
 ```
 
 ### 生成 deb 包

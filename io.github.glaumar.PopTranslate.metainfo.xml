@@ -13,11 +13,13 @@
 
     <description>
         <p>
-            Translate mouse selected text and show result on a pop up window, support wayland only.
+            Translate mouse selected text and show result on a pop up window, support plasma wayland
+            only.
         </p>
     </description>
     <content_rating type="oars-1.1" />
     <releases>
+        <release date="2023-08-13" version="0.2.0" />
         <release date="2023-07-21" version="0.1.0" />
     </releases>
     <launchable type="desktop-id">io.github.glaumar.PopTranslate.desktop</launchable>

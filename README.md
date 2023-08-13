@@ -40,6 +40,9 @@ Get flatpak package from [release page](https://github.com/glaumar/PopTranslate/
     - KWidgetsAddons
     - KXmlGui
 - [QOnlineTranslator](https://github.com/crow-translate/QOnlineTranslator) - provides free usage of Google, Yandex and Bing translate API
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) >= 5.0.0
+- [tessdata](https://github.com/tesseract-ocr/tessdata) 
+
 
 ## Flatpak Runtime and SDK
 - org.kde.Platform = "5.15-22.08"
@@ -51,7 +54,7 @@ Get flatpak package from [release page](https://github.com/glaumar/PopTranslate/
 ### Build
 ```bash
 cmake -B build -DCMAKE_INSTALL_PREFIX=/usr
-cmake --build build
+cmake --build build --target poptranslate
 ```
 
 ### Generate deb package
