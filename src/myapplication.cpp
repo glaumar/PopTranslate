@@ -69,17 +69,36 @@ void MyApplication::initUiTranslator() {
 }
 
 void MyApplication::initGlobalShortcuts() {
-    shortcut_act_ = new QAction(tr("translate selection"), this);
-    shortcut_act_->setObjectName("io.github.glaumar.PopTranslate");
-    setShortcut(setting_window_->shortcuts());
-    connect(shortcut_act_, &QAction::triggered, [this](bool unuse) {
+    auto obj_name_base = QString("io.github.glaumar.PopTranslate.%1");
+
+    translate_selection_act_ = new QAction(tr("Translate selection"), this);
+    translate_selection_act_->setObjectName(
+        obj_name_base.arg("translate_selection"));
+    setShortcut(translate_selection_act_,
+                setting_window_->TranslateSelectionShortcut());
+    connect(translate_selection_act_, &QAction::triggered, [this](bool unuse) {
         Q_UNUSED(unuse);
         this->showPop();
     });
     connect(setting_window_,
-            &SettingWindow::shortcutChanged,
+            &SettingWindow::TranslateSelectionShortcutChanged,
             this,
-            &MyApplication::setShortcut);
+            [this](const QKeySequence &seq) {
+                this->setShortcut(translate_selection_act_, seq);
+            });
+
+    ocr_act_ = new QAction(tr("Translate selected area"), this);
+    ocr_act_->setObjectName(obj_name_base.arg("ocr"));
+    setShortcut(ocr_act_, setting_window_->OcrShortcut());
+    connect(ocr_act_, &QAction::triggered, [this](bool unuse) {
+        Q_UNUSED(unuse);
+        this->grabber_->grabFullScreen();
+    });
+    connect(
+        setting_window_,
+        &SettingWindow::OcrShortcutChanged,
+        this,
+        [this](const QKeySequence &seq) { this->setShortcut(ocr_act_, seq); });
 }
 
 void MyApplication::showPop() {
@@ -256,14 +275,15 @@ void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {
     setting_window_->setVisible(!is_visible);
 }
 
-bool MyApplication::setShortcut(const QKeySequence &seq) {
-    KGlobalAccel::self()->removeAllShortcuts(shortcut_act_);
-    bool ret = KGlobalAccel::setGlobalShortcut(shortcut_act_, seq);
+bool MyApplication::setShortcut(QAction *act, const QKeySequence &seq) {
+    KGlobalAccel::self()->removeAllShortcuts(act);
+    bool ret = KGlobalAccel::setGlobalShortcut(act, seq);
+    // bool ret = KGlobalAccel::self()->setGlobalShortcut(act, {seq});
 
     if (seq.isEmpty()) {
-        qDebug() << tr("Unbind global shortcuts for translate selection");
+        qDebug() << tr("Unbind global shortcuts");
     } else {
-        qDebug() << tr("Bind global shortcuts (%1) for translate selection %2")
+        qDebug() << tr("Bind global shortcuts (%1) %2")
                         .arg(seq.toString(),
                              ret ? tr("success") : tr("failed"));
     }

@@ -42,8 +42,12 @@ class SettingWindow : public QWidget {
 
     inline QNetworkProxy proxy() const { return proxy_; };
 
-    inline QKeySequence shortcuts() const {
+    inline QKeySequence TranslateSelectionShortcut() const {
         return settings_->value("shortcut_popup_main").value<QKeySequence>();
+    };
+
+    inline QKeySequence OcrShortcut() const {
+        return settings_->value("ocr_shortcut").value<QKeySequence>();
     };
 
     inline QSize popupWindowSize() const {
@@ -79,7 +83,8 @@ class SettingWindow : public QWidget {
     void fontChanged(const QFont &font);
     void opacityChanged(qreal opacity);
     void triggerBlurEffect(bool enable);
-    void shortcutChanged(const QKeySequence &seq);
+    void TranslateSelectionShortcutChanged(const QKeySequence &seq);
+    void OcrShortcutChanged(const QKeySequence &seq);
     void dictionariesChanged(const QStringList &dictionaries);
     // void dictionaryRemoved(const QString &dictionary);
     void ocrLanguagesChanged(const QStringList &ocr_languages);

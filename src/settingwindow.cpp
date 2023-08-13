@@ -165,7 +165,7 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("proxy_username", default_.proxy_username);
     setValueIfIsNull("proxy_password", default_.proxy_password);
     setValueIfIsNull("shortcut_popup_main", default_.shortcut_popup_main);
-    // setValueIfIsNull("shortcut_popup_alt", default_.shortcut_popup_alt);
+    setValueIfIsNull("ocr_shortcut", default_.ocr_shortcut);
     setValueIfIsNull("popup_window_size", default_.popup_window_size);
     setValueIfIsNull("show_src_text", default_.show_src_text);
     setValueIfIsNull("dictionaries", default_.dictionaries);
@@ -345,16 +345,26 @@ void SettingWindow::initProxy() {
 
 void SettingWindow::initShortcut() {
     // emit signal when shortcut changed
-    connect(ui->shortcut_kkeysequencewidget,
+    connect(ui->translate_selection_kkeysequencewidget,
             &KKeySequenceWidget::keySequenceChanged,
             [this](const QKeySequence &seq) {
                 settings_->setValue("shortcut_popup_main", seq);
                 qDebug() << tr("Settings: Change main shortcut to %1")
                                 .arg(seq.toString());
-                emit shortcutChanged(seq);
+                emit TranslateSelectionShortcutChanged(seq);
             });
+    ui->translate_selection_kkeysequencewidget->setKeySequence(this->TranslateSelectionShortcut());
 
-    ui->shortcut_kkeysequencewidget->setKeySequence(this->shortcuts());
+    connect(ui->ocr_kkeysequencewidget,
+        &KKeySequenceWidget::keySequenceChanged,
+        [this](const QKeySequence &seq) {
+            settings_->setValue("ocr_shortcut", seq);
+            qDebug() << tr("Settings: Change ocr shortcut to %1")
+                .arg(seq.toString());
+            emit OcrShortcutChanged(seq);
+        });
+    
+    ui->ocr_kkeysequencewidget->setKeySequence(this->OcrShortcut());
 }
 
 void SettingWindow::initDictionaries() {
