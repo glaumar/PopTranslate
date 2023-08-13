@@ -1,0 +1,31 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "flatpak build",
+			"command": "flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean",
+			"group": "build",
+		},
+		{
+			"type": "shell",
+			"label": "flatpak install",
+			"command": "flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean --install --user",
+			"group": "build",
+		},
+		{
+			"type": "shell",
+			"label": "flatpak export",
+			"command": "flatpak build-export export build_flatpak && flatpak build-bundle export PopTranslate.flatpak io.github.glaumar.PopTranslate --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo",
+			"group": "none",
+			"dependsOn": "flatpak build"
+		},
+		{
+			"type": "shell",
+			"label": "Generate deb package",
+			"command": "cd build && cpack -C CPackConfig.cmake",
+			"group": "none",
+			"dependsOn": "CMake: build"
+		}
+	]
+}

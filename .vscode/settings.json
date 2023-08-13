@@ -113,7 +113,13 @@
         "qsystemtrayicon": "cpp",
         "qgraphicsopacityeffect": "cpp",
         "codecvt": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "qstandardpaths": "cpp",
+        "qfuture": "cpp",
+        "qstring": "cpp",
+        "source_location": "cpp",
+        "qmetaenum": "cpp",
+        "*.inc": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
@@ -135,5 +141,14 @@
     "cmake.buildTask": false,
     "copyrightInserter.license": "gpl3",
     "cmake.configureSettings": {},
-    "cmake.generator": "Unix Makefiles"
+    "cmake.generator": "Unix Makefiles",
+    "devdocs-adapter.docsets": [
+        "c",
+        "cpp",
+        "javascript",
+        "lua~5.4",
+        "python~3.11",
+        "qt~5.15",
+        "rust"
+    ]
 }

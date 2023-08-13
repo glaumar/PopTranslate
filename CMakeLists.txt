@@ -13,9 +13,6 @@ set(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
 
 find_package(Qt5 REQUIRED COMPONENTS LinguistTools Concurrent REQUIRED)
 
-# find_package(ECM REQUIRED)
-# set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
-# find_package(Wayland REQUIRED)
 find_package(KF5GlobalAccel REQUIRED)
 find_package(KF5GuiAddons REQUIRED)
 find_package(KF5Wayland REQUIRED)
@@ -54,8 +51,6 @@ set(PROJECT_SOURCES
     src/settingwindow.cpp src/settingwindow.h src/settingwindow.ui
     src/defaultsettings.h
     src/dictionaries.cpp src/dictionaries.h
-
-    # src/wayland_primary_selection.cpp src/wayland_primary_selection.h
     src/screengrabber.h src/screengrabber.cpp
     src/imagecropper.h src/imagecropper.cpp
     src/ocr.h src/ocr.cpp
@@ -63,7 +58,6 @@ set(PROJECT_SOURCES
     ${TS_FILES}
 )
 
-# include_directories(${Qt5WaylandClient_PRIVATE_INCLUDE_DIRS})
 add_executable(poptranslate
     ${PROJECT_SOURCES}
 )
@@ -80,9 +74,6 @@ target_link_libraries(poptranslate PRIVATE
     KF5::WidgetsAddons
     KF5::XmlGui
     QOnlineTranslator
-
-    # Wayland::Client
-    # Qt5::WaylandClientPrivate
     ${Tesseract_LIBRARIES}
     ${Leptonica_LIBRARIES}
     mdict)
