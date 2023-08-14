@@ -188,12 +188,19 @@ void MyApplication::loadSettings() {
             pop_,
             &PopupDialog::enableBlur);
 
+    connect(setting_window_,
+            &SettingWindow::triggerAutoCopyTranslation,
+            pop_,
+            &PopupDialog::enableAutoCopyTranslation);
+
     // load settings for popupdialog
     pop_->setTranslateEngine(setting_window_->translateEngine());
     pop_->setTargetLanguages(setting_window_->targetLanguages());
     pop_->setFont(setting_window_->font());
     pop_->setOpacity(setting_window_->opacity());
     pop_->enableBlur(setting_window_->isEnableBlur());
+    pop_->enableAutoCopyTranslation(
+        setting_window_->isEnableAutoCopyTranslation());
 
     // Show setting window when PopupDialog contextmenu action "settings"
     // triggered
@@ -201,7 +208,7 @@ void MyApplication::loadSettings() {
         setting_window_->show();
     });
 
-    // resize popuo window size
+    // resize popup window size
     if (!setting_window_->popupWindowSize().isEmpty()) {
         pop_->resize(setting_window_->popupWindowSize());
     }

@@ -32,6 +32,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     initTargetLanguageComboBox();
     initFont();
     initOpacityAndBlur();
+    initAutoCopyTranslation();
     initProxy();
     initShortcut();
     initDictionaries();
@@ -158,6 +159,8 @@ void SettingWindow::initSettings() {
     setValueIfIsNull("font", default_.font);
     setValueIfIsNull("opacity", default_.opacity);
     setValueIfIsNull("enable_blur", default_.enable_blur);
+    setValueIfIsNull("enable_auto_copy_translation",
+                     default_.enable_auto_copy_translation);
     setValueIfIsNull("enable_proxy", default_.enable_proxy);
     setValueIfIsNull("proxy_hostname", default_.proxy_hostname);
     setValueIfIsNull("proxy_port", default_.proxy_port);
@@ -190,9 +193,6 @@ void SettingWindow::initFont() {
 }
 
 void SettingWindow::initOpacityAndBlur() {
-    auto opacity = settings_->value("opacity").value<qreal>();
-    auto enable_blur = settings_->value("enable_blur").value<bool>();
-
     // emit signal when opacity changed
     connect(ui->opacity_slider, &QSlider::valueChanged, [this](int value) {
         qreal opacity = static_cast<qreal>(value) / 100;
@@ -209,8 +209,27 @@ void SettingWindow::initOpacityAndBlur() {
         qDebug() << tr("Settings: Change blur effect to %1").arg(enable_blur);
     });
 
-    ui->opacity_slider->setValue(static_cast<int>(opacity * 100));
-    ui->blur_checkbox->setChecked(enable_blur);
+    ui->opacity_slider->setValue(static_cast<int>(opacity() * 100));
+    ui->blur_checkbox->setChecked(isEnableBlur());
+}
+
+void SettingWindow::initAutoCopyTranslation() {
+    // emit signal when auto copy translation changed
+    connect(ui->auto_copy_translation_checkbox,
+            &QCheckBox::stateChanged,
+            [this](int state) {
+                auto enable_auto_copy_translation = state == Qt::Checked;
+                settings_->setValue("enable_auto_copy_translation",
+                                    enable_auto_copy_translation);
+                emit triggerAutoCopyTranslation(enable_auto_copy_translation);
+                qDebug() << tr("Settings: %1 auto copy translation")
+                                .arg(enable_auto_copy_translation
+                                         ? tr("Enable")
+                                         : tr("Disable"));
+            });
+
+    ui->auto_copy_translation_checkbox->setChecked(
+        isEnableAutoCopyTranslation());
 }
 
 void SettingWindow::initProxy() {
@@ -353,17 +372,18 @@ void SettingWindow::initShortcut() {
                                 .arg(seq.toString());
                 emit TranslateSelectionShortcutChanged(seq);
             });
-    ui->translate_selection_kkeysequencewidget->setKeySequence(this->TranslateSelectionShortcut());
+    ui->translate_selection_kkeysequencewidget->setKeySequence(
+        this->TranslateSelectionShortcut());
 
     connect(ui->ocr_kkeysequencewidget,
-        &KKeySequenceWidget::keySequenceChanged,
-        [this](const QKeySequence &seq) {
-            settings_->setValue("ocr_shortcut", seq);
-            qDebug() << tr("Settings: Change ocr shortcut to %1")
-                .arg(seq.toString());
-            emit OcrShortcutChanged(seq);
-        });
-    
+            &KKeySequenceWidget::keySequenceChanged,
+            [this](const QKeySequence &seq) {
+                settings_->setValue("ocr_shortcut", seq);
+                qDebug() << tr("Settings: Change ocr shortcut to %1")
+                                .arg(seq.toString());
+                emit OcrShortcutChanged(seq);
+            });
+
     ui->ocr_kkeysequencewidget->setKeySequence(this->OcrShortcut());
 }
 

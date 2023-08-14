@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>563</width>
-    <height>521</height>
+    <width>597</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -45,7 +45,7 @@
        <property name="formAlignment">
         <set>Qt::AlignHCenter|Qt::AlignTop</set>
        </property>
-       <item row="0" column="0">
+       <item row="0" column="1">
         <widget class="QWidget" name="general_settings" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -103,14 +103,14 @@
           <item row="3" column="1">
            <widget class="QComboBox" name="translate_lang_combobox_3"/>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="font_label">
             <property name="text">
              <string>Font :</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="5" column="1">
            <widget class="KFontRequester" name="font_kfontrequester">
             <property name="enabled">
              <bool>true</bool>
@@ -126,7 +126,7 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="opacity_label">
             <property name="text">
              <string>Opacity :</string>
@@ -136,7 +136,7 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="7" column="1">
            <widget class="QSlider" name="opacity_slider">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -179,7 +179,7 @@
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="8" column="0">
            <widget class="QLabel" name="blur_lable">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -192,32 +192,46 @@
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="8" column="1">
            <widget class="QCheckBox" name="blur_checkbox">
             <property name="text">
              <string>Enable</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
-           <widget class="QLabel" name="label">
+          <item row="10" column="0">
+           <widget class="QLabel" name="translate_selection_label">
             <property name="text">
              <string>Translate Selection :</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
+          <item row="10" column="1">
            <widget class="KKeySequenceWidget" name="translate_selection_kkeysequencewidget"/>
           </item>
-          <item row="10" column="0">
-           <widget class="QLabel" name="label_2">
+          <item row="11" column="0">
+           <widget class="QLabel" name="ocr_label">
             <property name="text">
              <string>OCR :</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
+          <item row="11" column="1">
            <widget class="KKeySequenceWidget" name="ocr_kkeysequencewidget"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="auto_copy_translation_label">
+            <property name="text">
+             <string>Auto Copy Translation :</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QCheckBox" name="auto_copy_translation_checkbox">
+            <property name="text">
+             <string>Enable</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -276,8 +290,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>543</width>
-            <height>463</height>
+            <width>577</width>
+            <height>510</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="ocr_languages_layout">

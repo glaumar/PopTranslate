@@ -40,6 +40,10 @@ class SettingWindow : public QWidget {
         return settings_->value("enable_blur").toBool();
     };
 
+    inline bool isEnableAutoCopyTranslation() const {
+        return settings_->value("enable_auto_copy_translation").toBool();
+    };
+
     inline QNetworkProxy proxy() const { return proxy_; };
 
     inline QKeySequence TranslateSelectionShortcut() const {
@@ -83,6 +87,7 @@ class SettingWindow : public QWidget {
     void fontChanged(const QFont &font);
     void opacityChanged(qreal opacity);
     void triggerBlurEffect(bool enable);
+    void triggerAutoCopyTranslation(bool enable);
     void TranslateSelectionShortcutChanged(const QKeySequence &seq);
     void OcrShortcutChanged(const QKeySequence &seq);
     void dictionariesChanged(const QStringList &dictionaries);
@@ -95,6 +100,7 @@ class SettingWindow : public QWidget {
     void initTargetLanguageComboBox();
     void initFont();
     void initOpacityAndBlur();
+    void initAutoCopyTranslation();
     void initProxy();
     void initShortcut();
     void initDictionaries();

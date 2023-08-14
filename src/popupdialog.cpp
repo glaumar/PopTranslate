@@ -6,7 +6,6 @@
 #include <KWindowSystem/kwindowsystem.h>
 
 #include <KWindowEffects>
-#include <QClipboard>
 #include <QDebug>
 #include <QGraphicsOpacityEffect>
 
@@ -28,6 +27,13 @@ PopupDialog::PopupDialog(QWidget *parent)
         if (index == 0) {
             result_index_ = index;
             showTranslateResult(translate_results_.at(result_index_));
+        }
+    });
+
+    // auto copy translation
+    connect(ui->trans_text_edit, &QTextEdit::textChanged, this, [this] {
+        if (setting_.enable_auto_copy_translation) {
+            copyTranslation();
         }
     });
 }
@@ -136,6 +142,10 @@ void PopupDialog::setOpacity(qreal opacity) {
 
 void PopupDialog::enableBlur(bool enable) { setting_.enable_blur = enable; }
 
+void PopupDialog::enableAutoCopyTranslation(bool enable) {
+    setting_.enable_auto_copy_translation = enable;
+}
+
 void PopupDialog::setDictionaries(const QStringList &dicts) {
     dicts_.setDicts(dicts);
 }
@@ -192,14 +202,10 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
 
 void PopupDialog::initContextMenu() {
     // Copy translation
-    context_menu_.addAction(
-        QIcon::fromTheme("edit-copy"),
-        tr("Copy translation"),
-        this,
-        [this] {
-            QClipboard *clipboard = QApplication::clipboard();
-            clipboard->setText(ui->trans_text_edit->toPlainText());
-        });
+    context_menu_.addAction(QIcon::fromTheme("edit-copy"),
+                            tr("Copy translation"),
+                            this,
+                            &PopupDialog::copyTranslation);
 
     // Source Text
     action_source_text_ =

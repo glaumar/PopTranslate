@@ -3,6 +3,7 @@
 #include <KWayland/Client/blur.h>
 #include <KWayland/Client/plasmashell.h>
 
+#include <QClipboard>
 #include <QDebug>
 #include <QMenu>
 #include <QPair>
@@ -45,10 +46,30 @@ class PopupDialog : public QWidget {
     void enableBlur(bool enable);
     void setDictionaries(const QStringList &dicts);
     // void removeDictionaries(const QStringList &dicts);
+    void enableAutoCopyTranslation(bool enable);
+
+    inline QString sourceText() const {
+        return ui->src_plain_text_edit->toPlainText();
+    }
+
+    inline QString translationText() const {
+        return ui->trans_text_edit->toPlainText();
+    }
 
    signals:
     void settingsActionTriggered();
     void translateResultsAvailable(int index);
+
+   private slots:
+    inline void copySourceText() const {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(sourceText());
+    }
+
+    inline void copyTranslation() const {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(translationText());
+    }
 
    private:
     bool eventFilter(QObject *filtered, QEvent *event) override;
