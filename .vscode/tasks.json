@@ -2,40 +2,49 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"type": "cmake",
+			"label": "CMake: build",
+			"command": "build",
+			"targets": [
+				"poptranslate"
+			],
+			"group": "build",
+			"problemMatcher": [],
+		},
+		{
 			"type": "shell",
-			"label": "flatpak build",
+			"label": "Flatpak Build",
 			"command": "flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean",
 			"group": "build"
 		},
 		{
 			"type": "shell",
-			"label": "flatpak install",
+			"label": "Flatpak Install",
 			"command": "flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean --install --user",
 			"group": "build"
 		},
 		{
 			"type": "shell",
-			"label": "flatpak export",
+			"label": "Flatpak Export",
 			"command": "flatpak build-export export build_flatpak && flatpak build-bundle export PopTranslate.flatpak io.github.glaumar.PopTranslate --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo",
 			"group": "none",
-			"dependsOn": "flatpak build",
-			"problemMatcher": []
+			"dependsOn": "Flatpak Build"
 		},
 		{
 			"type": "shell",
-			"label": "Generate deb package",
+			"label": "Generate DEB Package",
 			"command": "cd build && cpack -C CPackConfig.cmake",
 			"group": "none",
 			"dependsOn": "CMake: build"
 		},
 		{
 			"type": "shell",
-			"label": "Generate AUR package",
+			"label": "Generate AUR Package",
 			"command": "makepkg --clean -f && makepkg --printsrcinfo > .SRCINFO",
 			"options": {
 				"cwd": "${workspaceFolder}/AUR"
 			},
-			"group": "build",
+			"group": "build"
 		},
 		{
 			"type": "shell",
@@ -50,11 +59,11 @@
 				"focus": true,
 				"panel": "shared"
 			},
-			"group": "build",
+			"group": "build"
 		},
 		{
 			"type": "shell",
-			"label": "AUR Install",
+			"label": "AUR Package Install",
 			"command": "sudo pacman -U poptranslate-git-*.pkg.tar.zst",
 			"options": {
 				"cwd": "${workspaceFolder}/AUR"
@@ -65,7 +74,17 @@
 				"focus": true,
 				"panel": "shared"
 			},
-			"group": "build",
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "Update Translation",
+			"command": "lupdate src -ts i18n/poptranslate_zh_CN.ts",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "none",
+			"problemMatcher": []
 		}
 	]
 }
