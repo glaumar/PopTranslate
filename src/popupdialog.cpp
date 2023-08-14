@@ -201,6 +201,12 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
 }
 
 void PopupDialog::initContextMenu() {
+    // Copy Source Text
+    context_menu_.addAction(QIcon::fromTheme("edit-copy"),
+                            tr("Copy source text"),
+                            this,
+                            &PopupDialog::copySourceText);
+
     // Copy translation
     context_menu_.addAction(QIcon::fromTheme("edit-copy"),
                             tr("Copy translation"),
