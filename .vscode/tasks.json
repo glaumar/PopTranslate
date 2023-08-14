@@ -5,20 +5,21 @@
 			"type": "shell",
 			"label": "flatpak build",
 			"command": "flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean",
-			"group": "build",
+			"group": "build"
 		},
 		{
 			"type": "shell",
 			"label": "flatpak install",
 			"command": "flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean --install --user",
-			"group": "build",
+			"group": "build"
 		},
 		{
 			"type": "shell",
 			"label": "flatpak export",
 			"command": "flatpak build-export export build_flatpak && flatpak build-bundle export PopTranslate.flatpak io.github.glaumar.PopTranslate --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo",
 			"group": "none",
-			"dependsOn": "flatpak build"
+			"dependsOn": "flatpak build",
+			"problemMatcher": []
 		},
 		{
 			"type": "shell",
@@ -26,6 +27,45 @@
 			"command": "cd build && cpack -C CPackConfig.cmake",
 			"group": "none",
 			"dependsOn": "CMake: build"
+		},
+		{
+			"type": "shell",
+			"label": "Generate AUR package",
+			"command": "makepkg --clean -f && makepkg --printsrcinfo > .SRCINFO",
+			"options": {
+				"cwd": "${workspaceFolder}/AUR"
+			},
+			"group": "build",
+		},
+		{
+			"type": "shell",
+			"label": "ArchLinux Clean Environment Build",
+			"command": "extra-x86_64-build",
+			"options": {
+				"cwd": "${workspaceFolder}/AUR"
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared"
+			},
+			"group": "build",
+		},
+		{
+			"type": "shell",
+			"label": "AUR Install",
+			"command": "sudo pacman -U poptranslate-git-*.pkg.tar.zst",
+			"options": {
+				"cwd": "${workspaceFolder}/AUR"
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared"
+			},
+			"group": "build",
 		}
 	]
 }

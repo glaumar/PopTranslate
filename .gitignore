@@ -88,3 +88,4 @@ AUR/PKGBUILD-namcap.log
 build/
 .VSCodeCounter/
 dictionary/
+*.deb
