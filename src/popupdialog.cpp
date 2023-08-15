@@ -136,24 +136,29 @@ void PopupDialog::setOpacity(qreal opacity) {
     setting_.opacity = opacity;
 
     QPalette pal = QPalette();
-    QColor color = palette().color(QWidget::backgroundRole());
-    color.setAlpha(static_cast<int>(opacity * 255));
-    pal.setColor(QPalette::Window, color);
+    QColor background_olor = palette().color(QWidget::backgroundRole());
+    background_olor.setAlpha(static_cast<int>(opacity * 255));
+    pal.setColor(QPalette::Window, background_olor);
     setPalette(pal);
 
-    auto opacity_effect_trans = new QGraphicsOpacityEffect(this);
-    opacity_effect_trans->setOpacity(opacity);
-    ui->trans_text_edit->setGraphicsEffect(opacity_effect_trans);
-
-    auto opacity_effect_src = new QGraphicsOpacityEffect(this);
-    opacity_effect_src->setOpacity(opacity);
-    ui->src_plain_text_edit->setGraphicsEffect(opacity_effect_src);
+    QPalette pal_edit = QPalette();
+    background_olor.setAlpha(0);
+    pal_edit.setColor(QPalette::Base, background_olor);
+    ui->trans_text_edit->setPalette(pal_edit);
+    ui->src_plain_text_edit->setPalette(pal_edit);
 }
 
 void PopupDialog::enableBlur(bool enable) { setting_.enable_blur = enable; }
 
 void PopupDialog::enableAutoCopyTranslation(bool enable) {
     setting_.enable_auto_copy_translation = enable;
+}
+
+void PopupDialog::showTranslateResult(const QPair<QString, QString> &result) {
+    auto &[s_text, t_text] = result;
+    ui->title_label->setText(s_text);
+    auto plain_text = QTextDocumentFragment::fromHtml(t_text).toPlainText();
+    ui->trans_text_edit->setText(plain_text);
 }
 
 void PopupDialog::setDictionaries(const QStringList &dicts) {
@@ -235,8 +240,7 @@ void PopupDialog::initContextMenu() {
             QSize new_size(this->size().width(), this->size().height() / 2);
             this->resize(new_size);
         }
-        ui->src_plain_text_edit->setVisible(state);
-        // ui->horizon_line->setVisible(state);
+        setSrcTextEditVisible(state);
     });
     setSrcTextEditVisible(false);
 

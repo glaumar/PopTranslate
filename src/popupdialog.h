@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QPair>
+#include <QTextDocumentFragment>
 #include <QVector>
 
 #include "defaultsettings.h"
@@ -33,7 +34,7 @@ class PopupDialog : public QWidget {
 
     inline void setSrcTextEditVisible(bool visible) {
         ui->src_plain_text_edit->setVisible(visible);
-        // ui->horizon_line->setVisible(visible);
+        ui->horizon_line->setVisible(visible);
         action_source_text_->setChecked(visible);
     }
    public slots:
@@ -47,6 +48,7 @@ class PopupDialog : public QWidget {
     void setDictionaries(const QStringList &dicts);
     // void removeDictionaries(const QStringList &dicts);
     void enableAutoCopyTranslation(bool enable);
+    void showTranslateResult(const QPair<QString, QString> &result);
 
     inline QString sourceText() const {
         return ui->src_plain_text_edit->toPlainText();
@@ -78,12 +80,6 @@ class PopupDialog : public QWidget {
     void initTranslator();
     void initDictionaries();
     void initToolbar();
-
-    inline void showTranslateResult(const QPair<QString, QString> &result) {
-        auto &[s_text, t_text] = result;
-        ui->title_label->setText(s_text);
-        ui->trans_text_edit->setText(t_text);
-    }
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
