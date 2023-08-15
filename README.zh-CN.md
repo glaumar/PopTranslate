@@ -13,8 +13,9 @@ GoldenDict, Crow Translate等等翻译软件都很好用,但由于 wayland 协�
 ![](./screeshots/Screenshot3.png)
 
 # 全局快捷键
-`Meta + G` or `Meta + Ctrl + G` 翻译鼠标选中的文本并显示弹出窗口
+`Meta + G` 翻译鼠标选中的文本
 
+`Meta + Ctrl + G` OCR识别截屏中的文本并翻译
 # 安装
 ## Arch Linux (AUR)
 ```bash

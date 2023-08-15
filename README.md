@@ -14,7 +14,10 @@ GoldenDict, Crow Translate and other translation software are very useful, but d
 ![](./screeshots/Screenshot3.png)
 
 # Global Shortcuts
-`Meta + G` or `Meta + Ctrl + G` to translate the text selected by the mouse and display a popup window.
+
+`Meta + G` to translate the text selected by the mouse
+
+`Meta + Ctrl + G` recognizes and translates the text in the screenshot
 
 # Installation
 ## Arch Linux (AUR)
