@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QVector>
 #include <QMap>
 #include <QSharedPointer>
 #include <QStringList>
+#include <QVector>
 
 #include "mdict.h"
 
@@ -18,13 +18,13 @@ class Dictionaries : public QObject {
     void setDicts(const QStringList& filenames);
     void removeDict(const QString& filename);
     void removeDicts(const QStringList& filenames);
-    QVector<QPair<QString,QString>> lookup(const QString& word);
+    QVector<QPair<QString, QString>> lookup(const QString& word);
     void lookupAsync(const QString& word);
     void abortLookup();
    signals:
     // void finished(QStringList results);
     // emit every time a search result is found in a dictionary
-    void found(QPair<QString,QString> result);
+    void found(QPair<QString, QString> result);
 
    private:
     bool fileCheck(const QString& filename);

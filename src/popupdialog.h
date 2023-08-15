@@ -33,7 +33,7 @@ class PopupDialog : public QWidget {
 
     inline void setSrcTextEditVisible(bool visible) {
         ui->src_plain_text_edit->setVisible(visible);
-        ui->horizon_line->setVisible(visible);
+        // ui->horizon_line->setVisible(visible);
         action_source_text_->setChecked(visible);
     }
    public slots:

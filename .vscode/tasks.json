@@ -13,6 +13,16 @@
 		},
 		{
 			"type": "shell",
+			"label": "Run poptranslate",
+			"command": "build/poptranslate",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": "CMake: build"
+		},
+		{
+			"type": "shell",
 			"label": "Flatpak Build",
 			"command": "flatpak-builder build_flatpak  io.github.glaumar.PopTranslate.yml --force-clean",
 			"group": "build"
@@ -85,6 +95,15 @@
 			},
 			"group": "none",
 			"problemMatcher": []
+		},
+		{
+			"label": "Format C/C++ Code",
+			"type": "shell",
+			"command": "clang-format -i *.h *.cpp",
+			"options": {
+				"cwd": "${workspaceFolder}/src"
+			},
+			"group": "none",
 		}
 	]
 }

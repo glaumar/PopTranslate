@@ -119,7 +119,8 @@
         "qstring": "cpp",
         "source_location": "cpp",
         "qmetaenum": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "kwindoweffects": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

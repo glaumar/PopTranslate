@@ -151,7 +151,7 @@
              </size>
             </property>
             <property name="maximum">
-             <number>99</number>
+             <number>100</number>
             </property>
             <property name="singleStep">
              <number>1</number>
@@ -290,8 +290,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>577</width>
-            <height>510</height>
+            <width>100</width>
+            <height>30</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="ocr_languages_layout">

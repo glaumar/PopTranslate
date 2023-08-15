@@ -68,9 +68,9 @@ void Dictionaries::removeDicts(const QStringList& filenames) {
     }
 }
 
-QVector<QPair<QString,QString>> Dictionaries::lookup(const QString& word) {
+QVector<QPair<QString, QString>> Dictionaries::lookup(const QString& word) {
     qDebug() << "lookup:" << word;
-    QVector<QPair<QString,QString>> results;
+    QVector<QPair<QString, QString>> results;
     for (auto& dict_name : dict_names_) {
         qDebug() << "dict_name:" << dict_name;
         auto dict = dicts_.value(dict_name);
@@ -78,9 +78,8 @@ QVector<QPair<QString,QString>> Dictionaries::lookup(const QString& word) {
         if (result != "") {
             qDebug() << "found:" << QString::fromStdString(result);
             auto dict_basename = QFileInfo(dict_name).baseName();
-            QPair<QString, QString> result_pair(
-                        dict_basename,
-                        QString::fromStdString(result));
+            QPair<QString, QString> result_pair(dict_basename,
+                                                QString::fromStdString(result));
             emit found(result_pair);
             results.append(result_pair);
         }

@@ -134,10 +134,20 @@ void PopupDialog::setFont(const QFont &font) {
 
 void PopupDialog::setOpacity(qreal opacity) {
     setting_.opacity = opacity;
-    auto opacity_effect = new QGraphicsOpacityEffect(this);
-    opacity_effect->setOpacity(opacity);
-    this->setGraphicsEffect(opacity_effect);
-    this->setAutoFillBackground(true);
+
+    QPalette pal = QPalette();
+    QColor color = palette().color(QWidget::backgroundRole());
+    color.setAlpha(static_cast<int>(opacity * 255));
+    pal.setColor(QPalette::Window, color);
+    setPalette(pal);
+
+    auto opacity_effect_trans = new QGraphicsOpacityEffect(this);
+    opacity_effect_trans->setOpacity(opacity);
+    ui->trans_text_edit->setGraphicsEffect(opacity_effect_trans);
+
+    auto opacity_effect_src = new QGraphicsOpacityEffect(this);
+    opacity_effect_src->setOpacity(opacity);
+    ui->src_plain_text_edit->setGraphicsEffect(opacity_effect_src);
 }
 
 void PopupDialog::enableBlur(bool enable) { setting_.enable_blur = enable; }
@@ -226,7 +236,7 @@ void PopupDialog::initContextMenu() {
             this->resize(new_size);
         }
         ui->src_plain_text_edit->setVisible(state);
-        ui->horizon_line->setVisible(state);
+        // ui->horizon_line->setVisible(state);
     });
     setSrcTextEditVisible(false);
 

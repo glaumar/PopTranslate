@@ -37,9 +37,9 @@ class MyApplication : public QApplication {
     PopupDialog* pop_;
     QSystemTrayIcon* tray_;
     SettingWindow* setting_window_;
-    KSystemClipboard* clipboard_;  // init in initClipboard
-    QAction* translate_selection_act_;        // init in initGlobalShortcuts
-    QAction* ocr_act_;        // init in initGlobalShortcuts
+    KSystemClipboard* clipboard_;       // init in initClipboard
+    QAction* translate_selection_act_;  // init in initGlobalShortcuts
+    QAction* ocr_act_;                  // init in initGlobalShortcuts
     ScreenGrabber* grabber_;
     ImageCropper* cropper_;
     Ocr ocr_;
