@@ -172,9 +172,9 @@ void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
     const int x = event->pos().x();
     const int window_width = this->width();
     const qreal trigger_area = 0.15;
-    if (x < window_width * trigger_area) {
+    if (x < window_width * trigger_area && hasPrevResult()) {
         btn_prev_->show();
-    } else if (x > window_width * (1 - trigger_area)) {
+    } else if (x > window_width * (1 - trigger_area) && hasNextResult()) {
         btn_next_->show();
     } else {
         btn_prev_->hide();
@@ -345,7 +345,11 @@ void PopupDialog::initTranslator() {
                 tr("Failed Translate: %1").arg(translator_.errorString());
             if (this->isVisible() &&
                 translator_.errorString() != QString("Operation canceled")) {
-                ui->trans_text_edit->setText(error_msg);
+                QPair<QString, QString> result(
+                    setting_.translate_engine_to_str(),
+                    error_msg);
+                translate_results_.append(result);
+                emit translateResultsAvailable(translate_results_.size() - 1);
             }
             qWarning() << error_msg;
         }
@@ -400,6 +404,9 @@ void PopupDialog::initFloatButton() {
             result_index_--;
             showTranslateResult(translate_results_.at(result_index_));
         }
+        if (!hasPrevResult()) {
+            btn_prev_->hide();
+        }
     });
 
     connect(btn_next_, &QPushButton::clicked, [this] {
@@ -407,6 +414,9 @@ void PopupDialog::initFloatButton() {
             result_index_ < translate_results_.size() - 1) {
             result_index_++;
             showTranslateResult(translate_results_.at(result_index_));
+        }
+        if (!hasNextResult()) {
+            btn_next_->hide();
         }
     });
 

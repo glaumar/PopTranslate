@@ -50,6 +50,12 @@ class PopupDialog : public QWidget {
     void enableAutoCopyTranslation(bool enable);
     void showTranslateResult(const QPair<QString, QString> &result);
 
+    inline bool hasNextResult() const {
+        return result_index_ >= 0 &&
+               result_index_ < translate_results_.size() - 1;
+    }
+    inline bool hasPrevResult() const { return result_index_ > 0; }
+
     inline QString sourceText() const {
         return ui->src_plain_text_edit->toPlainText();
     }
@@ -65,6 +71,7 @@ class PopupDialog : public QWidget {
    protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     bool event(QEvent *event) override;
+    bool eventFilter(QObject *filtered, QEvent *event) override;
 
    private slots:
     inline void copySourceText() const {
@@ -78,7 +85,6 @@ class PopupDialog : public QWidget {
     }
 
    private:
-    bool eventFilter(QObject *filtered, QEvent *event) override;
     void initContextMenu();
     void initWaylandConnection();
     void initTranslator();
