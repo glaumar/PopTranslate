@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QPair>
+#include <QPushButton>
 #include <QTextDocumentFragment>
 #include <QVector>
 
@@ -24,7 +25,6 @@ class PopupDialog : public QWidget {
    public:
     explicit PopupDialog(QWidget *parent = nullptr);
     ~PopupDialog();
-    bool event(QEvent *event) override;
     void setNormalWindow(bool enable = false);
 
     inline bool isNormalWindow() const { return flag_normal_window_; }
@@ -62,6 +62,10 @@ class PopupDialog : public QWidget {
     void settingsActionTriggered();
     void translateResultsAvailable(int index);
 
+   protected:
+    void mouseMoveEvent(QMouseEvent *event) override;
+    bool event(QEvent *event) override;
+
    private slots:
     inline void copySourceText() const {
         QClipboard *clipboard = QApplication::clipboard();
@@ -79,7 +83,7 @@ class PopupDialog : public QWidget {
     void initWaylandConnection();
     void initTranslator();
     void initDictionaries();
-    void initToolbar();
+    void initFloatButton();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
@@ -92,4 +96,6 @@ class PopupDialog : public QWidget {
     Dictionaries dicts_;
     QVector<QPair<QString, QString>> translate_results_;
     int result_index_;
+    QPushButton *btn_prev_;
+    QPushButton *btn_next_;
 };

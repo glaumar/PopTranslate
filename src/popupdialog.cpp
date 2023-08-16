@@ -7,7 +7,6 @@
 
 #include <KWindowEffects>
 #include <QDebug>
-#include <QGraphicsOpacityEffect>
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
@@ -20,7 +19,7 @@ PopupDialog::PopupDialog(QWidget *parent)
     initWaylandConnection();
     initTranslator();
     initDictionaries();
-    initToolbar();
+    initFloatButton();
 
     // show first translate result
     connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
@@ -135,15 +134,15 @@ void PopupDialog::setFont(const QFont &font) {
 void PopupDialog::setOpacity(qreal opacity) {
     setting_.opacity = opacity;
 
-    QPalette pal = QPalette();
-    QColor background_olor = palette().color(QWidget::backgroundRole());
-    background_olor.setAlpha(static_cast<int>(opacity * 255));
-    pal.setColor(QPalette::Window, background_olor);
+    QPalette pal = palette();
+    QColor background_color = pal.color(QWidget::backgroundRole());
+    background_color.setAlpha(static_cast<int>(opacity * 255));
+    pal.setColor(QPalette::Window, background_color);
     setPalette(pal);
 
-    QPalette pal_edit = QPalette();
-    background_olor.setAlpha(0);
-    pal_edit.setColor(QPalette::Base, background_olor);
+    QPalette pal_edit = ui->trans_text_edit->palette();
+    background_color.setAlpha(0);
+    pal_edit.setColor(QPalette::Base, background_color);
     ui->trans_text_edit->setPalette(pal_edit);
     ui->src_plain_text_edit->setPalette(pal_edit);
 }
@@ -168,6 +167,20 @@ void PopupDialog::setDictionaries(const QStringList &dicts) {
 // void PopupDialog::removeDictionaries(const QStringList &dicts) {
 //     dicts_.removeDicts(dicts);
 // }
+void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
+    // Show prev/next button when the mouse is close to the window edge
+    const int x = event->pos().x();
+    const int window_width = this->width();
+    const qreal trigger_area = 0.15;
+    if (x < window_width * trigger_area) {
+        btn_prev_->show();
+    } else if (x > window_width * (1 - trigger_area)) {
+        btn_next_->show();
+    } else {
+        btn_prev_->hide();
+        btn_next_->hide();
+    }
+}
 
 bool PopupDialog::event(QEvent *event) {
     // show menu
@@ -181,8 +194,13 @@ bool PopupDialog::event(QEvent *event) {
         context_menu_.isHidden()) {
         // KWindowEffects::enableBlurBehind(this->windowHandle(), false);
         this->hide();
-        translator_.abort();
         return true;
+    }
+
+    if (event->type() == QEvent::Hide) {
+        translator_.abort();
+        btn_prev_->hide();
+        btn_next_->hide();
     }
 
     if (event->type() == QEvent::Show) {
@@ -218,13 +236,13 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
 void PopupDialog::initContextMenu() {
     // Copy Source Text
     context_menu_.addAction(QIcon::fromTheme("edit-copy"),
-                            tr("Copy source text"),
+                            tr("Copy Source Text"),
                             this,
                             &PopupDialog::copySourceText);
 
     // Copy translation
     context_menu_.addAction(QIcon::fromTheme("edit-copy"),
-                            tr("Copy translation"),
+                            tr("Copy Translation"),
                             this,
                             &PopupDialog::copyTranslation);
 
@@ -246,8 +264,7 @@ void PopupDialog::initContextMenu() {
 
     // Pin the window
     QAction *action_pin_windows =
-        context_menu_.addAction(QIcon::fromTheme("window-pin"),
-                                tr("Pin the window"));
+        context_menu_.addAction(QIcon::fromTheme("window-pin"), tr("Pin"));
     action_pin_windows->setCheckable(true);
     connect(action_pin_windows, &QAction::triggered, this, [this](bool state) {
         setNormalWindow(state);
@@ -348,19 +365,62 @@ void PopupDialog::initDictionaries() {
         Qt::QueuedConnection);
 }
 
-void PopupDialog::initToolbar() {
-    connect(ui->prev_toolbutton, &QToolButton::clicked, [this] {
+void PopupDialog::initFloatButton() {
+    btn_prev_ = new QPushButton(QIcon::fromTheme("go-previous"), "", this);
+    btn_next_ = new QPushButton(QIcon::fromTheme("go-next"), "", this);
+
+    btn_prev_->setIconSize(QSize(64, 64));
+    btn_next_->setIconSize(QSize(64, 64));
+
+    btn_prev_->setFixedSize(96, 96);
+    btn_next_->setFixedSize(96, 96);
+
+    auto old_bg_color = palette().color(QWidget::backgroundRole());
+    auto new_bg_color = QColor::fromHsv(old_bg_color.hue() - 50,
+                                        old_bg_color.saturation(),
+                                        old_bg_color.value());
+
+    QString style_template(
+        "QPushButton {background-color: rgba(%1, %2, %3, 50); border: none; "
+        "border-radius: 48;}"
+        "QPushButton:hover { background-color: rgba(%1, %2, %3, 150); }"
+        "QPushButton:pressed { background-color: rgba(%1, %2, %3, 100); }");
+
+    auto style = style_template.arg(new_bg_color.red())
+                     .arg(new_bg_color.green())
+                     .arg(new_bg_color.blue());
+
+    qDebug() << style;
+
+    btn_prev_->setStyleSheet(style);
+    btn_next_->setStyleSheet(style);
+
+    connect(btn_prev_, &QPushButton::clicked, [this] {
         if (result_index_ > 0) {
             result_index_--;
             showTranslateResult(translate_results_.at(result_index_));
         }
     });
 
-    connect(ui->next_toolbutton, &QToolButton::clicked, [this] {
+    connect(btn_next_, &QPushButton::clicked, [this] {
         if (result_index_ >= 0 &&
             result_index_ < translate_results_.size() - 1) {
             result_index_++;
             showTranslateResult(translate_results_.at(result_index_));
         }
     });
+
+    btn_prev_->hide();
+    btn_next_->hide();
+
+    QHBoxLayout *layout = new QHBoxLayout(ui->trans_text_edit);
+    layout->addWidget(btn_prev_);
+    layout->addWidget(btn_next_);
+    layout->setAlignment(btn_prev_, Qt::AlignLeft);
+    layout->setAlignment(btn_next_, Qt::AlignRight);
+
+    // If mouse tracking is switched on, mouse move events occur even if no
+    // mouse button is pressed
+    setMouseTracking(true);
+    ui->trans_text_edit->setMouseTracking(true);
 }
