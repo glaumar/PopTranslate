@@ -45,7 +45,14 @@ void Dictionaries::setDicts(const QStringList& filenames) {
 
     removeDicts(diff.values());
     addDicts(filenames);
+
     dict_names_ = filenames;
+    QMutableStringListIterator it(dict_names_);
+    while (it.hasNext()) {
+        if (!dicts_.contains(it.next())) {
+            it.remove();
+        }
+    };
 }
 
 void Dictionaries::removeDict(const QString& filename) {
@@ -92,6 +99,7 @@ void Dictionaries::lookupAsync(const QString& word) {
         [this](const QString& word) -> void {
             for (auto& dict_name : dict_names_) {
                 auto dict = dicts_.value(dict_name);
+                qDebug() << "lookupAsync:" << word << "dict_name:" << dict_name;
                 auto result = dict->lookup(word.toStdString());
                 if (result != "") {
                     auto dict_basename = QFileInfo(dict_name).baseName();

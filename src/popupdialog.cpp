@@ -68,6 +68,7 @@ void PopupDialog::translate(const QString &text) {
     translate_results_.clear();
     result_index_ = -1;
     ui->title_label->setText("PopTranslate");
+    indicator_->clear();
 
     dicts_.lookupAsync(text);
     translator_.translate(text,
