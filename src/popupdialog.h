@@ -13,8 +13,10 @@
 
 #include "defaultsettings.h"
 #include "dictionaries.h"
+#include "pageindicator.h"
 #include "qonlinetranslator.h"
 #include "ui_popupdialog.h"
+
 namespace Ui {
 class PopupDialog;
 }
@@ -90,6 +92,7 @@ class PopupDialog : public QWidget {
     void initTranslator();
     void initDictionaries();
     void initFloatButton();
+    void initPageIndicator();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
@@ -104,4 +107,5 @@ class PopupDialog : public QWidget {
     int result_index_;
     QPushButton *btn_prev_;
     QPushButton *btn_next_;
+    PageIndicator *indicator_;
 };

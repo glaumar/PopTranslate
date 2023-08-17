@@ -55,6 +55,7 @@ set(PROJECT_SOURCES
     src/imagecropper.h src/imagecropper.cpp
     src/ocr.h src/ocr.cpp
     src/langcode2name.h src/langcode2name.cpp
+    src/pageindicator.h src/pageindicator.cpp src/pageindicator.ui
     ${TS_FILES}
 )
 

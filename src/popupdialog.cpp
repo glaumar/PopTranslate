@@ -9,7 +9,12 @@
 #include <QDebug>
 
 PopupDialog::PopupDialog(QWidget *parent)
-    : QWidget(parent), plasmashell_(nullptr), ui(new Ui::PopupDialog) {
+    : QWidget(parent),
+      plasmashell_(nullptr),
+      ui(new Ui::PopupDialog),
+      indicator_(new PageIndicator(this)),
+      btn_prev_(new QPushButton(QIcon::fromTheme("go-previous"), "", this)),
+      btn_next_(new QPushButton(QIcon::fromTheme("go-next"), "", this)) {
     ui->setupUi(this);
     setNormalWindow(false);
 
@@ -20,6 +25,7 @@ PopupDialog::PopupDialog(QWidget *parent)
     initTranslator();
     initDictionaries();
     initFloatButton();
+    initPageIndicator();
 
     // show first translate result
     connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
@@ -201,6 +207,7 @@ bool PopupDialog::event(QEvent *event) {
         translator_.abort();
         btn_prev_->hide();
         btn_next_->hide();
+        indicator_->clear();
     }
 
     if (event->type() == QEvent::Show) {
@@ -370,9 +377,6 @@ void PopupDialog::initDictionaries() {
 }
 
 void PopupDialog::initFloatButton() {
-    btn_prev_ = new QPushButton(QIcon::fromTheme("go-previous"), "", this);
-    btn_next_ = new QPushButton(QIcon::fromTheme("go-next"), "", this);
-
     btn_prev_->setIconSize(QSize(64, 64));
     btn_next_->setIconSize(QSize(64, 64));
 
@@ -393,8 +397,6 @@ void PopupDialog::initFloatButton() {
     auto style = style_template.arg(new_bg_color.red())
                      .arg(new_bg_color.green())
                      .arg(new_bg_color.blue());
-
-    qDebug() << style;
 
     btn_prev_->setStyleSheet(style);
     btn_next_->setStyleSheet(style);
@@ -433,4 +435,27 @@ void PopupDialog::initFloatButton() {
     // mouse button is pressed
     setMouseTracking(true);
     ui->trans_text_edit->setMouseTracking(true);
+}
+
+void PopupDialog::initPageIndicator() {
+    indicator_->initPages(0);
+    ui->tools_widget->layout()->addWidget(indicator_);
+    ui->tools_widget->layout()->setAlignment(indicator_,
+                                             Qt::AlignRight | Qt::AlignHCenter);
+
+    connect(btn_prev_, &QPushButton::clicked, [this] {
+        indicator_->prevPage();
+    });
+
+    connect(btn_next_, &QPushButton::clicked, [this] {
+        indicator_->nextPage();
+    });
+
+    connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
+        if (index == 0) {
+            indicator_->initPages(1);
+        } else {
+            indicator_->addPages(1);
+        }
+    });
 }
