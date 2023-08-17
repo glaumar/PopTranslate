@@ -81,6 +81,9 @@
         <property name="text">
          <string>PopTranslate</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>

@@ -54,6 +54,7 @@ void PageIndicator::addPages(int n) {
         labels_.append(label);
     }
 }
+
 void PageIndicator::nextPage() {
     if (labels_.isEmpty()) {
         return;

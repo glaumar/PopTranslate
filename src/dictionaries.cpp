@@ -99,7 +99,6 @@ void Dictionaries::lookupAsync(const QString& word) {
         [this](const QString& word) -> void {
             for (auto& dict_name : dict_names_) {
                 auto dict = dicts_.value(dict_name);
-                qDebug() << "lookupAsync:" << word << "dict_name:" << dict_name;
                 auto result = dict->lookup(word.toStdString());
                 if (result != "") {
                     auto dict_basename = QFileInfo(dict_name).baseName();

@@ -48,7 +48,6 @@ class PopupDialog : public QWidget {
     void setOpacity(qreal opacity);
     void enableBlur(bool enable);
     void setDictionaries(const QStringList &dicts);
-    // void removeDictionaries(const QStringList &dicts);
     void enableAutoCopyTranslation(bool enable);
     void showTranslateResult(const QPair<QString, QString> &result);
 

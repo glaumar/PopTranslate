@@ -7,6 +7,7 @@
 
 #include <KWindowEffects>
 #include <QDebug>
+#include <QFontMetrics>
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent),
@@ -162,7 +163,18 @@ void PopupDialog::enableAutoCopyTranslation(bool enable) {
 
 void PopupDialog::showTranslateResult(const QPair<QString, QString> &result) {
     auto &[s_text, t_text] = result;
-    ui->title_label->setText(s_text);
+
+    QFontMetrics metrics(ui->title_label->font());
+    QString str = s_text;
+    if (metrics.horizontalAdvance(s_text) > ui->title_label->width()) {
+        QString str =
+            QFontMetrics(ui->title_label->font())
+                .elidedText(s_text, Qt::ElideRight, ui->title_label->width());
+        ui->title_label->setText(str);
+    } else {
+        ui->title_label->setText(s_text);
+    }
+
     auto plain_text = QTextDocumentFragment::fromHtml(t_text).toPlainText();
     ui->trans_text_edit->setText(plain_text);
 }
@@ -171,9 +183,6 @@ void PopupDialog::setDictionaries(const QStringList &dicts) {
     dicts_.setDicts(dicts);
 }
 
-// void PopupDialog::removeDictionaries(const QStringList &dicts) {
-//     dicts_.removeDicts(dicts);
-// }
 void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
     // Show prev/next button when the mouse is close to the window edge
     const int x = event->pos().x();
@@ -443,6 +452,12 @@ void PopupDialog::initPageIndicator() {
     ui->tools_widget->layout()->addWidget(indicator_);
     ui->tools_widget->layout()->setAlignment(indicator_,
                                              Qt::AlignRight | Qt::AlignHCenter);
+
+    auto hlayout = dynamic_cast<QHBoxLayout*>(ui->tools_widget->layout());
+    hlayout->setStretchFactor(indicator_, 1);
+    hlayout->setStretchFactor(ui->title_label, 3);
+    
+    
 
     connect(btn_prev_, &QPushButton::clicked, [this] {
         indicator_->prevPage();

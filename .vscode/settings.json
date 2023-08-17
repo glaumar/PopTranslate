@@ -120,7 +120,8 @@
         "source_location": "cpp",
         "qmetaenum": "cpp",
         "*.inc": "cpp",
-        "kwindoweffects": "cpp"
+        "kwindoweffects": "cpp",
+        "strstream": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
