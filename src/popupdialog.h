@@ -11,6 +11,7 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QSequentialAnimationGroup>
+#include <QStateMachine>
 #include <QTextDocumentFragment>
 #include <QVector>
 
@@ -71,6 +72,7 @@ class PopupDialog : public QWidget {
    signals:
     void settingsActionTriggered();
     void translateResultsAvailable(int index);
+    void cleared();
 
    protected:
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -94,10 +96,14 @@ class PopupDialog : public QWidget {
     void initTranslator();
     void initDictionaries();
     void initFloatButton();
+    void showFloatButton(QPoint cursor_pos);
     void initPageIndicator();
     void initAnimation();
+    void setEffectAnimation(QWidget *widget);
     void startAnimationPrev();
     void startAnimationNext();
+    void initStateMachine();
+    void clear();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
@@ -120,4 +126,6 @@ class PopupDialog : public QWidget {
     QParallelAnimationGroup *animation_group1_;
     QParallelAnimationGroup *animation_group2_;
     QSequentialAnimationGroup *animation_group_all_;
+    int animation_duration_;
+    QStateMachine result_state_machine_;
 };

@@ -8,6 +8,7 @@
 #include <KWindowEffects>
 #include <QDebug>
 #include <QFontMetrics>
+#include <QGraphicsOpacityEffect>
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent),
@@ -28,19 +29,13 @@ PopupDialog::PopupDialog(QWidget *parent)
     initFloatButton();
     initPageIndicator();
     initAnimation();
+    initStateMachine();
 
     // show first translate result
     connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
         if (index == 0) {
             result_index_ = index;
             showTranslateResult(translate_results_.at(result_index_));
-        }
-    });
-
-    // auto copy translation
-    connect(ui->trans_text_edit, &QTextEdit::textChanged, this, [this] {
-        if (setting_.enable_auto_copy_translation) {
-            copyTranslation();
         }
     });
 }
@@ -62,15 +57,8 @@ void PopupDialog::translate(const QString &text) {
                              setting_.translate_engine),
                          DefaultSettings::enumValueToKey(
                              setting_.target_language_1));
-
+    clear();
     ui->src_plain_text_edit->setPlainText(text);
-    ui->trans_text_edit->clear();
-
-    // clear last translate_results
-    translate_results_.clear();
-    result_index_ = -1;
-    ui->title_label->setText("PopTranslate");
-    indicator_->clear();
 
     dicts_.lookupAsync(text);
     translator_.translate(text,
@@ -185,18 +173,7 @@ void PopupDialog::setDictionaries(const QStringList &dicts) {
 }
 
 void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
-    // Show prev/next button when the mouse is close to the window edge
-    const int x = event->pos().x();
-    const int window_width = this->width();
-    const qreal trigger_area = 0.15;
-    if (x < window_width * trigger_area && hasPrevResult()) {
-        btn_prev_->show();
-    } else if (x > window_width * (1 - trigger_area) && hasNextResult()) {
-        btn_next_->show();
-    } else {
-        btn_prev_->hide();
-        btn_next_->hide();
-    }
+    showFloatButton(event->pos());
 }
 
 bool PopupDialog::event(QEvent *event) {
@@ -207,10 +184,13 @@ bool PopupDialog::event(QEvent *event) {
     }
 
     // hide window
-    if (!isNormalWindow() && event->type() == QEvent::Leave &&
-        context_menu_.isHidden()) {
-        // KWindowEffects::enableBlurBehind(this->windowHandle(), false);
-        this->hide();
+    if (event->type() == QEvent::Leave && context_menu_.isHidden()) {
+        if (isNormalWindow()) {
+            btn_next_->hide();
+            btn_prev_->hide();
+        } else {
+            this->hide();
+        }
         return true;
     }
 
@@ -218,10 +198,10 @@ bool PopupDialog::event(QEvent *event) {
         translator_.abort();
         btn_prev_->hide();
         btn_next_->hide();
-        indicator_->clear();
     }
 
     if (event->type() == QEvent::Show) {
+        clear();
         this->windowHandle()->installEventFilter(this);
     }
 
@@ -418,28 +398,28 @@ void PopupDialog::initFloatButton() {
     btn_prev_->setStyleSheet(style);
     btn_next_->setStyleSheet(style);
 
-    connect(btn_prev_, &QPushButton::clicked, [this] {
-        if (result_index_ > 0) {
-            result_index_--;
-            startAnimationPrev();
-            showTranslateResult(translate_results_.at(result_index_));
-        }
-        if (!hasPrevResult()) {
-            btn_prev_->hide();
-        }
-    });
+    // connect(btn_prev_, &QPushButton::clicked, [this] {
+    //     if (result_index_ > 0) {
+    //         result_index_--;
+    //         startAnimationPrev();
+    //         // showTranslateResult(translate_results_.at(result_index_));
+    //     }
+    //     if (!hasPrevResult()) {
+    //         btn_prev_->hide();
+    //     }
+    // });
 
-    connect(btn_next_, &QPushButton::clicked, [this] {
-        if (result_index_ >= 0 &&
-            result_index_ < translate_results_.size() - 1) {
-            result_index_++;
-            startAnimationNext();
-            showTranslateResult(translate_results_.at(result_index_));
-        }
-        if (!hasNextResult()) {
-            btn_next_->hide();
-        }
-    });
+    // connect(btn_next_, &QPushButton::clicked, [this] {
+    //     if (result_index_ >= 0 &&
+    //         result_index_ < translate_results_.size() - 1) {
+    //         result_index_++;
+    //         startAnimationNext();
+    //         // showTranslateResult(translate_results_.at(result_index_));
+    //     }
+    //     if (!hasNextResult()) {
+    //         btn_next_->hide();
+    //     }
+    // });
 
     btn_prev_->hide();
     btn_next_->hide();
@@ -456,6 +436,23 @@ void PopupDialog::initFloatButton() {
     ui->trans_text_edit->setMouseTracking(true);
 }
 
+void PopupDialog::showFloatButton(QPoint cursor_pos) {
+    // Show prev/next button when the mouse is close to the window edge
+    int x = cursor_pos.x();
+    const int window_width = this->width();
+    const qreal trigger_area = 0.15;
+    if (x < window_width * trigger_area && hasPrevResult() &&
+        this->underMouse()) {
+        btn_prev_->show();
+    } else if (x > window_width * (1 - trigger_area) && hasNextResult() &&
+               this->underMouse()) {
+        btn_next_->show();
+    } else {
+        btn_prev_->hide();
+        btn_next_->hide();
+    }
+}
+
 void PopupDialog::initPageIndicator() {
     indicator_->initPages(0);
     ui->tools_widget->layout()->addWidget(indicator_);
@@ -465,6 +462,7 @@ void PopupDialog::initPageIndicator() {
     auto hlayout = dynamic_cast<QHBoxLayout *>(ui->tools_widget->layout());
     hlayout->setStretchFactor(indicator_, 1);
     hlayout->setStretchFactor(ui->title_label, 3);
+    hlayout->setStretchFactor(ui->pronounce_button, 1);
 
     connect(btn_prev_, &QPushButton::clicked, [this] {
         indicator_->prevPage();
@@ -484,6 +482,7 @@ void PopupDialog::initPageIndicator() {
 }
 
 void PopupDialog::initAnimation() {
+    animation_duration_ = 150;
     animation_title_1_ =
         new QPropertyAnimation(ui->title_label, "geometry", this);
     animation_title_2_ =
@@ -503,23 +502,45 @@ void PopupDialog::initAnimation() {
     animation_group2_->addAnimation(animation_translation_2_);
     animation_group_all_->addAnimation(animation_group1_);
     animation_group_all_->addAnimation(animation_group2_);
+
+    setEffectAnimation(ui->title_label);
+    setEffectAnimation(ui->trans_text_edit);
+}
+
+void PopupDialog::setEffectAnimation(QWidget *w) {
+    // Fade in and out effect
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect(this);
+    w->setGraphicsEffect(effect);
+    QPropertyAnimation *animation_effects_1 =
+        new QPropertyAnimation(effect, "opacity");
+    animation_effects_1->setDuration(animation_duration_);
+    animation_effects_1->setStartValue(1.0);
+    animation_effects_1->setEndValue(0.0);
+
+    QPropertyAnimation *animation_effects_2 =
+        new QPropertyAnimation(effect, "opacity");
+    animation_effects_2->setDuration(animation_duration_);
+    animation_effects_2->setStartValue(0.0);
+    animation_effects_2->setEndValue(1.0);
+
+    animation_group1_->addAnimation(animation_effects_1);
+    animation_group2_->addAnimation(animation_effects_2);
 }
 
 void PopupDialog::startAnimationNext() {
     QRect origin, origin_left, origin_right;
-    int duration = 200;
 
     origin = origin_left = origin_right = ui->title_label->geometry();
-    origin_left.moveRight(-1);
-    origin_right.moveLeft(ui->title_label->width() * 0.5);
+    origin_left.moveRight(origin.x() + origin.width() * 0.7);
+    origin_right.moveLeft(origin.x() + origin.width() * 0.3);
 
     animation_title_1_->setStartValue(origin);
     animation_title_1_->setEndValue(origin_left);
-    animation_title_1_->setDuration(duration);
+    animation_title_1_->setDuration(animation_duration_);
 
     animation_title_2_->setStartValue(origin_right);
     animation_title_2_->setEndValue(origin);
-    animation_title_2_->setDuration(duration);
+    animation_title_2_->setDuration(animation_duration_);
 
     origin = origin_left = origin_right = ui->trans_text_edit->geometry();
     origin_left.moveRight(-1);
@@ -527,29 +548,28 @@ void PopupDialog::startAnimationNext() {
 
     animation_translation_1_->setStartValue(origin);
     animation_translation_1_->setEndValue(origin_left);
-    animation_translation_1_->setDuration(duration);
+    animation_translation_1_->setDuration(animation_duration_);
 
     animation_translation_2_->setStartValue(origin_right);
     animation_translation_2_->setEndValue(origin);
-    animation_translation_2_->setDuration(duration);
+    animation_translation_2_->setDuration(animation_duration_);
 
     animation_group_all_->start();
 }
 
 void PopupDialog::startAnimationPrev() {
     QRect origin, origin_left, origin_right;
-    int duration = 200;
     origin = origin_left = origin_right = ui->title_label->geometry();
-    origin_left.moveRight(-1);
-    origin_right.moveLeft(ui->title_label->width() * 0.5);
+    origin_left.moveRight(origin.x() + origin.width() * 0.7);
+    origin_right.moveLeft(origin.x() + origin.width() * 0.3);
 
     animation_title_1_->setStartValue(origin);
     animation_title_1_->setEndValue(origin_right);
-    animation_title_1_->setDuration(duration);
+    animation_title_1_->setDuration(animation_duration_);
 
     animation_title_2_->setStartValue(origin_left);
     animation_title_2_->setEndValue(origin);
-    animation_title_2_->setDuration(duration);
+    animation_title_2_->setDuration(animation_duration_);
 
     origin = origin_left = origin_right = ui->trans_text_edit->geometry();
     origin_left.moveRight(-1);
@@ -557,11 +577,95 @@ void PopupDialog::startAnimationPrev() {
 
     animation_translation_1_->setStartValue(origin);
     animation_translation_1_->setEndValue(origin_right);
-    animation_translation_1_->setDuration(duration);
+    animation_translation_1_->setDuration(animation_duration_);
 
     animation_translation_2_->setStartValue(origin_left);
     animation_translation_2_->setEndValue(origin);
-    animation_translation_2_->setDuration(duration);
+    animation_translation_2_->setDuration(animation_duration_);
 
     animation_group_all_->start();
+}
+
+void PopupDialog::initStateMachine() {
+    QState *resultUnavailable = new QState();
+    QState *resultAvailable = new QState();
+    QState *requestNextResult = new QState();
+    QState *requestPrevResult = new QState();
+    QState *readyShowResult = new QState();
+
+    result_state_machine_.addState(resultUnavailable);
+    result_state_machine_.addState(resultAvailable);
+    result_state_machine_.addState(requestNextResult);
+    result_state_machine_.addState(requestPrevResult);
+    result_state_machine_.addState(readyShowResult);
+
+    result_state_machine_.setInitialState(resultUnavailable);
+
+    resultUnavailable->addTransition(this,
+                                     &PopupDialog::translateResultsAvailable,
+                                     resultAvailable);
+
+    resultAvailable->addTransition(btn_prev_,
+                                   &QPushButton::clicked,
+                                   requestPrevResult);
+
+    resultAvailable->addTransition(btn_next_,
+                                   &QPushButton::clicked,
+                                   requestNextResult);
+
+    requestNextResult->addTransition(animation_group1_,
+                                     &QAbstractAnimation::finished,
+                                     readyShowResult);
+
+    requestPrevResult->addTransition(animation_group1_,
+                                     &QAbstractAnimation::finished,
+                                     readyShowResult);
+
+    readyShowResult->addTransition(animation_group2_,
+                                   &QAbstractAnimation::finished,
+                                   resultAvailable);
+
+    readyShowResult->addTransition(this,
+                                   &PopupDialog::cleared,
+                                   resultUnavailable);
+
+    connect(requestNextResult, &QState::entered, [this] {
+        if (hasNextResult()) {
+            result_index_++;
+            btn_next_->hide();
+            startAnimationNext();
+        }
+    });
+
+    connect(requestPrevResult, &QState::entered, [this] {
+        if (hasPrevResult()) {
+            result_index_--;
+            btn_prev_->hide();
+            startAnimationPrev();
+        }
+    });
+
+    connect(readyShowResult, &QState::entered, [this] {
+        showTranslateResult(translate_results_.at(result_index_));
+        showFloatButton(QCursor::pos());
+
+        // auto copy translation
+        if (setting_.enable_auto_copy_translation) {
+            copyTranslation();
+        }
+    });
+
+    result_state_machine_.start();
+}
+
+void PopupDialog::clear() {
+    ui->title_label->setText("PopTranslate");
+    ui->trans_text_edit->clear();
+    ui->src_plain_text_edit->clear();
+
+    translate_results_.clear();
+    result_index_ = -1;
+    indicator_->clear();
+
+    emit cleared();
 }
