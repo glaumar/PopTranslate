@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QPainter>
+#include <QPropertyAnimation>
 
 #include "ui_pageindicator.h"
 

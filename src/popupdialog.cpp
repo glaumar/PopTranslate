@@ -27,6 +27,7 @@ PopupDialog::PopupDialog(QWidget *parent)
     initDictionaries();
     initFloatButton();
     initPageIndicator();
+    initAnimation();
 
     // show first translate result
     connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
@@ -165,8 +166,8 @@ void PopupDialog::showTranslateResult(const QPair<QString, QString> &result) {
     auto &[s_text, t_text] = result;
 
     QFontMetrics metrics(ui->title_label->font());
-    QString str = s_text;
     if (metrics.horizontalAdvance(s_text) > ui->title_label->width()) {
+        // s_text is too long, so it is truncated
         QString str =
             QFontMetrics(ui->title_label->font())
                 .elidedText(s_text, Qt::ElideRight, ui->title_label->width());
@@ -240,11 +241,17 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
         auto surface = KWayland::Client::Surface::fromWindow(pop_window);
         auto plasmaSurface = plasmashell_->createSurface(surface, pop_window);
 
+        // this->setWindowFlags(Qt::Window );
+        // KWindowSystem::setType(pop_window->winId(), NET::WindowType::Normal);
+        // KWindowSystem::setState(pop_window->winId(), NET::KeepAbove);
+
         // blur window Behind
         KWindowEffects::enableBlurBehind(pop_window, setting_.enable_blur);
         plasmaSurface->openUnderCursor();
         plasmaSurface->setSkipTaskbar(!isNormalWindow());
         plasmaSurface->setSkipSwitcher(!isNormalWindow());
+        // plasmaSurface->setRole(KWayland::Client::PlasmaShellSurface::Role::Panel);
+        // plasmaSurface->setPanelBehavior(KWayland::Client::PlasmaShellSurface::PanelBehavior::AlwaysVisible);
         pop_window->removeEventFilter(this);
     }
     return ret;
@@ -414,6 +421,7 @@ void PopupDialog::initFloatButton() {
     connect(btn_prev_, &QPushButton::clicked, [this] {
         if (result_index_ > 0) {
             result_index_--;
+            startAnimationPrev();
             showTranslateResult(translate_results_.at(result_index_));
         }
         if (!hasPrevResult()) {
@@ -425,6 +433,7 @@ void PopupDialog::initFloatButton() {
         if (result_index_ >= 0 &&
             result_index_ < translate_results_.size() - 1) {
             result_index_++;
+            startAnimationNext();
             showTranslateResult(translate_results_.at(result_index_));
         }
         if (!hasNextResult()) {
@@ -453,11 +462,9 @@ void PopupDialog::initPageIndicator() {
     ui->tools_widget->layout()->setAlignment(indicator_,
                                              Qt::AlignRight | Qt::AlignHCenter);
 
-    auto hlayout = dynamic_cast<QHBoxLayout*>(ui->tools_widget->layout());
+    auto hlayout = dynamic_cast<QHBoxLayout *>(ui->tools_widget->layout());
     hlayout->setStretchFactor(indicator_, 1);
     hlayout->setStretchFactor(ui->title_label, 3);
-    
-    
 
     connect(btn_prev_, &QPushButton::clicked, [this] {
         indicator_->prevPage();
@@ -474,4 +481,87 @@ void PopupDialog::initPageIndicator() {
             indicator_->addPages(1);
         }
     });
+}
+
+void PopupDialog::initAnimation() {
+    animation_title_1_ =
+        new QPropertyAnimation(ui->title_label, "geometry", this);
+    animation_title_2_ =
+        new QPropertyAnimation(ui->title_label, "geometry", this);
+    animation_translation_1_ =
+        new QPropertyAnimation(ui->trans_text_edit, "geometry", this);
+    animation_translation_2_ =
+        new QPropertyAnimation(ui->trans_text_edit, "geometry", this);
+
+    animation_group_all_ = new QSequentialAnimationGroup(this);
+    animation_group1_ = new QParallelAnimationGroup(this);
+    animation_group2_ = new QParallelAnimationGroup(this);
+
+    animation_group1_->addAnimation(animation_title_1_);
+    animation_group1_->addAnimation(animation_translation_1_);
+    animation_group2_->addAnimation(animation_title_2_);
+    animation_group2_->addAnimation(animation_translation_2_);
+    animation_group_all_->addAnimation(animation_group1_);
+    animation_group_all_->addAnimation(animation_group2_);
+}
+
+void PopupDialog::startAnimationNext() {
+    QRect origin, origin_left, origin_right;
+    int duration = 200;
+
+    origin = origin_left = origin_right = ui->title_label->geometry();
+    origin_left.moveRight(-1);
+    origin_right.moveLeft(ui->title_label->width() * 0.5);
+
+    animation_title_1_->setStartValue(origin);
+    animation_title_1_->setEndValue(origin_left);
+    animation_title_1_->setDuration(duration);
+
+    animation_title_2_->setStartValue(origin_right);
+    animation_title_2_->setEndValue(origin);
+    animation_title_2_->setDuration(duration);
+
+    origin = origin_left = origin_right = ui->trans_text_edit->geometry();
+    origin_left.moveRight(-1);
+    origin_right.moveLeft(ui->trans_text_edit->width());
+
+    animation_translation_1_->setStartValue(origin);
+    animation_translation_1_->setEndValue(origin_left);
+    animation_translation_1_->setDuration(duration);
+
+    animation_translation_2_->setStartValue(origin_right);
+    animation_translation_2_->setEndValue(origin);
+    animation_translation_2_->setDuration(duration);
+
+    animation_group_all_->start();
+}
+
+void PopupDialog::startAnimationPrev() {
+    QRect origin, origin_left, origin_right;
+    int duration = 200;
+    origin = origin_left = origin_right = ui->title_label->geometry();
+    origin_left.moveRight(-1);
+    origin_right.moveLeft(ui->title_label->width() * 0.5);
+
+    animation_title_1_->setStartValue(origin);
+    animation_title_1_->setEndValue(origin_right);
+    animation_title_1_->setDuration(duration);
+
+    animation_title_2_->setStartValue(origin_left);
+    animation_title_2_->setEndValue(origin);
+    animation_title_2_->setDuration(duration);
+
+    origin = origin_left = origin_right = ui->trans_text_edit->geometry();
+    origin_left.moveRight(-1);
+    origin_right.moveLeft(ui->trans_text_edit->width());
+
+    animation_translation_1_->setStartValue(origin);
+    animation_translation_1_->setEndValue(origin_right);
+    animation_translation_1_->setDuration(duration);
+
+    animation_translation_2_->setStartValue(origin_left);
+    animation_translation_2_->setEndValue(origin);
+    animation_translation_2_->setDuration(duration);
+
+    animation_group_all_->start();
 }

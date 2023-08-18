@@ -7,7 +7,10 @@
 #include <QDebug>
 #include <QMenu>
 #include <QPair>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QPushButton>
+#include <QSequentialAnimationGroup>
 #include <QTextDocumentFragment>
 #include <QVector>
 
@@ -92,6 +95,9 @@ class PopupDialog : public QWidget {
     void initDictionaries();
     void initFloatButton();
     void initPageIndicator();
+    void initAnimation();
+    void startAnimationPrev();
+    void startAnimationNext();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
@@ -107,4 +113,11 @@ class PopupDialog : public QWidget {
     QPushButton *btn_prev_;
     QPushButton *btn_next_;
     PageIndicator *indicator_;
+    QPropertyAnimation *animation_title_1_;
+    QPropertyAnimation *animation_title_2_;
+    QPropertyAnimation *animation_translation_1_;
+    QPropertyAnimation *animation_translation_2_;
+    QParallelAnimationGroup *animation_group1_;
+    QParallelAnimationGroup *animation_group2_;
+    QSequentialAnimationGroup *animation_group_all_;
 };

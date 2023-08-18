@@ -121,7 +121,13 @@
         "qmetaenum": "cpp",
         "*.inc": "cpp",
         "kwindoweffects": "cpp",
-        "strstream": "cpp"
+        "strstream": "cpp",
+        "qpropertyanimation": "cpp",
+        "qfontmetrics": "cpp",
+        "qparallelanimationgroup": "cpp",
+        "qtextdocumentfragment": "cpp",
+        "qpushbutton": "cpp",
+        "qsequentialanimationgroup": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
