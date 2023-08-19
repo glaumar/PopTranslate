@@ -5,6 +5,7 @@
 
 #include <QClipboard>
 #include <QDebug>
+#include <QMediaPlayer>
 #include <QMenu>
 #include <QPair>
 #include <QParallelAnimationGroup>
@@ -103,12 +104,15 @@ class PopupDialog : public QWidget {
     void startAnimationPrev();
     void startAnimationNext();
     void initStateMachine();
+    void initTts();
+    void speakText(const QString &text, QOnlineTranslator::Language lang);
     void clear();
 
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
     Ui::PopupDialog *ui;
     QOnlineTranslator translator_;
+    QMediaPlayer *player_;
     DefaultSettings setting_;
     QMenu context_menu_;
     QMenu engine_menu_;
@@ -128,4 +132,5 @@ class PopupDialog : public QWidget {
     QSequentialAnimationGroup *animation_group_all_;
     int animation_duration_;
     QStateMachine result_state_machine_;
+    bool speak_after_translate_;
 };

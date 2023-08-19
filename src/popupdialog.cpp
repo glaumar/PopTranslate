@@ -9,6 +9,8 @@
 #include <QDebug>
 #include <QFontMetrics>
 #include <QGraphicsOpacityEffect>
+#include <QMediaPlaylist>
+#include <QOnlineTts>
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent),
@@ -20,7 +22,9 @@ PopupDialog::PopupDialog(QWidget *parent)
       animation_duration_(150),
       animation_group_all_(new QSequentialAnimationGroup(this)),
       animation_group1_(new QParallelAnimationGroup(this)),
-      animation_group2_(new QParallelAnimationGroup(this)) {
+      animation_group2_(new QParallelAnimationGroup(this)),
+      player_(new QMediaPlayer(this)),
+      speak_after_translate_(false) {
     ui->setupUi(this);
     setNormalWindow(false);
 
@@ -34,6 +38,7 @@ PopupDialog::PopupDialog(QWidget *parent)
     initPageIndicator();
     initAnimation();
     initStateMachine();
+    initTts();
 
     // show first translate result
     connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
@@ -200,12 +205,12 @@ bool PopupDialog::event(QEvent *event) {
 
     if (event->type() == QEvent::Hide) {
         translator_.abort();
+        player_->stop();
         btn_prev_->hide();
         btn_next_->hide();
     }
 
     if (event->type() == QEvent::Show) {
-        clear();
         this->windowHandle()->installEventFilter(this);
     }
 
@@ -384,46 +389,14 @@ void PopupDialog::initFloatButton() {
     btn_prev_->setFixedSize(96, 96);
     btn_next_->setFixedSize(96, 96);
 
-    auto old_bg_color = palette().color(QWidget::backgroundRole());
-    auto new_bg_color = QColor::fromHsv(old_bg_color.hue() - 50,
-                                        old_bg_color.saturation(),
-                                        old_bg_color.value());
-
-    QString style_template(
-        "QPushButton {background-color: rgba(%1, %2, %3, 50); border: none; "
+    QString style(
+        "QPushButton {background-color: palette(Button); border: none;"
         "border-radius: 48;}"
-        "QPushButton:hover { background-color: rgba(%1, %2, %3, 150); }"
-        "QPushButton:pressed { background-color: rgba(%1, %2, %3, 100); }");
-
-    auto style = style_template.arg(new_bg_color.red())
-                     .arg(new_bg_color.green())
-                     .arg(new_bg_color.blue());
+        "QPushButton:hover { background-color: palette(Midlight); }"
+        "QPushButton:pressed { background-color: palette(Highlight); }");
 
     btn_prev_->setStyleSheet(style);
     btn_next_->setStyleSheet(style);
-
-    // connect(btn_prev_, &QPushButton::clicked, [this] {
-    //     if (result_index_ > 0) {
-    //         result_index_--;
-    //         startAnimationPrev();
-    //         // showTranslateResult(translate_results_.at(result_index_));
-    //     }
-    //     if (!hasPrevResult()) {
-    //         btn_prev_->hide();
-    //     }
-    // });
-
-    // connect(btn_next_, &QPushButton::clicked, [this] {
-    //     if (result_index_ >= 0 &&
-    //         result_index_ < translate_results_.size() - 1) {
-    //         result_index_++;
-    //         startAnimationNext();
-    //         // showTranslateResult(translate_results_.at(result_index_));
-    //     }
-    //     if (!hasNextResult()) {
-    //         btn_next_->hide();
-    //     }
-    // });
 
     btn_prev_->hide();
     btn_next_->hide();
@@ -656,6 +629,54 @@ void PopupDialog::initStateMachine() {
     });
 
     result_state_machine_.start();
+}
+
+void PopupDialog::initTts() {
+    QMediaPlaylist *playlist = new QMediaPlaylist(player_);
+    player_->setPlaylist(playlist);
+
+    connect(ui->pronounce_button, &QToolButton::clicked, [this](bool checked) {
+        Q_UNUSED(checked);
+        if (translator_.sourceLanguage() == QOnlineTranslator::Auto &&
+            translator_.isRunning()) {
+            // The language may not have been recognized yet, set this flag and
+            // wait for the QOnlineTranslator::finished signal to try again
+            speak_after_translate_ = true;
+        } else {
+            speakText(sourceText(), translator_.sourceLanguage());
+        }
+    });
+
+    connect(&translator_, &QOnlineTranslator::finished, [this] {
+        if (translator_.error() == QOnlineTranslator::NoError) {
+            if (speak_after_translate_) {
+                speakText(sourceText(), translator_.sourceLanguage());
+                speak_after_translate_ = false;
+            }
+        }
+    });
+}
+
+void PopupDialog::speakText(const QString &text,
+                            QOnlineTranslator::Language lang) {
+    QOnlineTts tts;
+    auto engine = setting_.translate_engine;
+    if (engine != QOnlineTranslator::Engine::Google &&
+        engine != QOnlineTranslator::Engine::Yandex) {
+        engine = QOnlineTranslator::Engine::Google;
+    }
+
+    tts.generateUrls(text, engine, lang);
+
+    if (tts.error() != QOnlineTts::NoError) {
+        qWarning() << tr("TTS: %1").arg(tts.errorString());
+        return;
+    }
+
+    auto playlist = player_->playlist();
+    playlist->clear();
+    playlist->addMedia(tts.media());
+    player_->play();
 }
 
 void PopupDialog::clear() {
