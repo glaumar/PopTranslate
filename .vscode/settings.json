@@ -127,7 +127,8 @@
         "qparallelanimationgroup": "cpp",
         "qtextdocumentfragment": "cpp",
         "qpushbutton": "cpp",
-        "qsequentialanimationgroup": "cpp"
+        "qsequentialanimationgroup": "cpp",
+        "qstatemachine": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

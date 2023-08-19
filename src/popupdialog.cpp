@@ -16,7 +16,11 @@ PopupDialog::PopupDialog(QWidget *parent)
       ui(new Ui::PopupDialog),
       indicator_(new PageIndicator(this)),
       btn_prev_(new QPushButton(QIcon::fromTheme("go-previous"), "", this)),
-      btn_next_(new QPushButton(QIcon::fromTheme("go-next"), "", this)) {
+      btn_next_(new QPushButton(QIcon::fromTheme("go-next"), "", this)),
+      animation_duration_(150),
+      animation_group_all_(new QSequentialAnimationGroup(this)),
+      animation_group1_(new QParallelAnimationGroup(this)),
+      animation_group2_(new QParallelAnimationGroup(this)) {
     ui->setupUi(this);
     setNormalWindow(false);
 
@@ -455,6 +459,7 @@ void PopupDialog::showFloatButton(QPoint cursor_pos) {
 
 void PopupDialog::initPageIndicator() {
     indicator_->initPages(0);
+    indicator_->setAnimationDuration(animation_duration_);
     ui->tools_widget->layout()->addWidget(indicator_);
     ui->tools_widget->layout()->setAlignment(indicator_,
                                              Qt::AlignRight | Qt::AlignHCenter);
@@ -482,7 +487,6 @@ void PopupDialog::initPageIndicator() {
 }
 
 void PopupDialog::initAnimation() {
-    animation_duration_ = 150;
     animation_title_1_ =
         new QPropertyAnimation(ui->title_label, "geometry", this);
     animation_title_2_ =
@@ -491,10 +495,6 @@ void PopupDialog::initAnimation() {
         new QPropertyAnimation(ui->trans_text_edit, "geometry", this);
     animation_translation_2_ =
         new QPropertyAnimation(ui->trans_text_edit, "geometry", this);
-
-    animation_group_all_ = new QSequentialAnimationGroup(this);
-    animation_group1_ = new QParallelAnimationGroup(this);
-    animation_group2_ = new QParallelAnimationGroup(this);
 
     animation_group1_->addAnimation(animation_title_1_);
     animation_group1_->addAnimation(animation_translation_1_);

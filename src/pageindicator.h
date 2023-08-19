@@ -21,11 +21,17 @@ class PageIndicator : public QWidget {
         pixmap_inactive_ = pixmap;
     }
 
+    inline void setAnimationDuration(int duration) {
+        animation_duration_ = duration;
+    }
+
     void initPages(int total, int current = 1);
     void addPages(int n = 1);
     void nextPage();
     void prevPage();
     void clear();
+    void startAnimationNext(QSize active_size, QSize inactive_size);
+    void startAnimationPrev(QSize active_size, QSize inactive_size);
 
    private:
     QPixmap defaultActivePixmap(qreal ratio = 1) const;
@@ -36,4 +42,5 @@ class PageIndicator : public QWidget {
     QPixmap pixmap_inactive_;
     QVector<QLabel *> labels_;
     int index_;
+    int animation_duration_;
 };

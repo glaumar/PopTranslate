@@ -7,7 +7,11 @@
 #include "ui_pageindicator.h"
 
 PageIndicator::PageIndicator(QWidget *parent)
-    : QWidget(parent), ui(new Ui::PageIndicator()), index_(-1), labels_() {
+    : QWidget(parent),
+      ui(new Ui::PageIndicator()),
+      index_(-1),
+      labels_(),
+      animation_duration_(150) {
     ui->setupUi(this);
 
     pixmap_active_ = defaultActivePixmap();
@@ -49,7 +53,7 @@ void PageIndicator::initPages(int total, int current) {
 
 void PageIndicator::addPages(int n) {
     for (int i = 0; i < n; ++i) {
-        auto label = new QLabel(this);
+        auto label = new QLabel(nullptr);
         label->setPixmap(pixmap_inactive_);
         ui->horizontalLayout->addWidget(label);
         labels_.append(label);
@@ -57,45 +61,45 @@ void PageIndicator::addPages(int n) {
 }
 
 void PageIndicator::nextPage() {
-    if (labels_.isEmpty()) {
+    if (labels_.isEmpty() || index_ >= labels_.size() - 1) {
         return;
     }
 
-    int next = index_ + 1;
-
-    if (next < 0) {
-        next = 0;
-    } else if (next > labels_.size() - 1) {
-        next = labels_.size() - 1;
+    if (index_ < 0) {
+        index_ = 0;
+        labels_[0]->setPixmap(pixmap_active_);
+        return;
     }
 
-    if (index_ >= 0 && index_ < labels_.size()) {
-        labels_[index_]->setPixmap(pixmap_inactive_);
-    }
+    QSize active_label_size = labels_[index_]->size();
+    QSize inactive_label_size = labels_[index_ + 1]->size();
 
-    index_ = next;
-    labels_[next]->setPixmap(pixmap_active_);
+    labels_[index_]->setPixmap(pixmap_inactive_);
+    index_++;
+    labels_[index_]->setPixmap(pixmap_active_);
+
+    startAnimationNext(active_label_size, inactive_label_size);
 }
 
 void PageIndicator::prevPage() {
-    if (labels_.isEmpty()) {
+    if (labels_.isEmpty() || index_ <= 0) {
         return;
     }
 
-    int next = index_ - 1;
-
-    if (next < 0) {
-        next = 0;
-    } else if (next > labels_.size() - 1) {
-        next = labels_.size() - 1;
+    if (index_ > labels_.size() - 1) {
+        index_ = labels_.size() - 1;
+        labels_[index_]->setPixmap(pixmap_active_);
+        return;
     }
 
-    if (index_ >= 0 && index_ < labels_.size()) {
-        labels_[index_]->setPixmap(pixmap_inactive_);
-    }
+    QSize active_label_size = labels_[index_]->size();
+    QSize inactive_label_size = labels_[index_ - 1]->size();
 
-    index_ = next;
-    labels_[next]->setPixmap(pixmap_active_);
+    labels_[index_]->setPixmap(pixmap_inactive_);
+    index_--;
+    labels_[index_]->setPixmap(pixmap_active_);
+
+    startAnimationPrev(active_label_size, inactive_label_size);
 }
 
 void PageIndicator::clear() {
@@ -120,4 +124,34 @@ QPixmap PageIndicator::defaultActivePixmap(qreal ratio) const {
     painter.drawRoundedRect(0, 0, base * 3, base, base / 2, base / 2);
     painter.end();
     return pix;
+}
+
+void PageIndicator::startAnimationNext(QSize active_size, QSize inactive_size) {
+    auto top_left = labels_[index_]->pos();
+    top_left.setX(top_left.x() - active_size.width() + inactive_size.width());
+
+    QRect active = QRect(top_left, active_size);
+    QRect inactive = QRect(top_left, inactive_size);
+
+    auto *animation = new QPropertyAnimation(labels_[index_], "geometry");
+    animation->setDuration(animation_duration_);
+    animation->setStartValue(inactive);
+    animation->setEndValue(active);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void PageIndicator::startAnimationPrev(QSize active_size, QSize inactive_size) {
+    auto top_left_ed = labels_[index_]->pos();
+    auto top_left_st = top_left_ed;
+    top_left_st.setX(top_left_ed.x() + active_size.width() -
+                     inactive_size.width());
+
+    QRect active = QRect(top_left_ed, active_size);
+    QRect inactive = QRect(top_left_st, inactive_size);
+
+    auto *animation = new QPropertyAnimation(labels_[index_], "geometry");
+    animation->setDuration(animation_duration_);
+    animation->setStartValue(inactive);
+    animation->setEndValue(active);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
