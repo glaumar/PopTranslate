@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(PopTranslate VERSION 0.2.1 LANGUAGES CXX)
+project(PopTranslate
+    VERSION 0.2.1
+    DESCRIPTION "Translate the text selected by the mouse on plasma wayland"
+    HOMEPAGE_URL https://github.com/glaumar/PopTranslate
+    LANGUAGES CXX)
+
+set(APPLICATION_NAME "PopTranslate")
+set(APPLICATION_ID "io.github.glaumar.PopTranslate")
+set(DESKTOP_FILE_NAME ${APPLICATION_ID}.desktop)
+set(APPLICATION_ICON_BASE_NAME ${APPLICATION_ID})
+set(METAINFO_FILE_NAME ${APPLICATION_ID}.metainfo.xml)
+set(EXE_NAME poptranslate)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -43,6 +54,9 @@ set(TS_FILES i18n/poptranslate_zh_CN.ts)
 qt_add_translation(QM_FILES ${TS_FILES})
 add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+configure_file(src/poptranslate.h.in poptranslate.h)
+
 set(PROJECT_SOURCES
     src/main.cpp
     src/myapplication.cpp src/myapplication.h
@@ -59,14 +73,12 @@ set(PROJECT_SOURCES
     ${TS_FILES}
 )
 
-add_executable(poptranslate
-    ${PROJECT_SOURCES}
-)
-add_dependencies(poptranslate translations)
+add_executable(${EXE_NAME} ${PROJECT_SOURCES})
+add_dependencies(${EXE_NAME} translations)
 
-target_include_directories(poptranslate PRIVATE ${Tesseract_INCLUDE_DIRS} ${Leptonica_INCLUDE_DIRS})
+target_include_directories(${EXE_NAME} PRIVATE ${Tesseract_INCLUDE_DIRS} ${Leptonica_INCLUDE_DIRS})
 
-target_link_libraries(poptranslate PRIVATE
+target_link_libraries(${EXE_NAME} PRIVATE
     Qt5::Concurrent
     KF5::GlobalAccel
     KF5::GuiAddons
@@ -79,10 +91,10 @@ target_link_libraries(poptranslate PRIVATE
     ${Leptonica_LIBRARIES}
     mdict)
 
-install(TARGETS poptranslate DESTINATION bin)
-install(FILES data/io.github.glaumar.PopTranslate.desktop DESTINATION share/applications)
-install(FILES data/io.github.glaumar.PopTranslate.svg DESTINATION share/icons/hicolor/scalable/apps)
-install(FILES io.github.glaumar.PopTranslate.metainfo.xml DESTINATION share/metainfo)
+install(TARGETS ${EXE_NAME} DESTINATION bin)
+install(FILES data/${DESKTOP_FILE_NAME} DESTINATION share/applications)
+install(FILES data/${APPLICATION_ICON_BASE_NAME}.svg DESTINATION share/icons/hicolor/scalable/apps)
+install(FILES ${METAINFO_FILE_NAME} DESTINATION share/metainfo)
 install(FILES ${QM_FILES} DESTINATION share/PopTranslate/i18n)
 
 # CPack

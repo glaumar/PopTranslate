@@ -2,10 +2,11 @@
 
 #include <QObject>
 #include <QString>
+#include <poptranslate.h>
 
 class PopTranslateDBus : public QObject {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.glaumar.PopTranslate")
+    Q_CLASSINFO("D-Bus Interface", APPLICATION_ID)
 
    public:
     static PopTranslateDBus* instance();

@@ -6,10 +6,9 @@
 #include <QDebug>
 
 PopTranslateDBus::PopTranslateDBus(QObject *parent) : QObject(parent) {
-    QDBusConnection::sessionBus().registerService(
-        "io.github.glaumar.PopTranslate");
+    QDBusConnection::sessionBus().registerService(APPLICATION_ID);
     QDBusConnection::sessionBus().registerObject(
-        "/PopTranslate",
+        "/" APPLICATION_NAME,
         this,
         QDBusConnection::ExportAllSlots);
 }
@@ -20,11 +19,10 @@ PopTranslateDBus *PopTranslateDBus::instance() {
 }
 
 void PopTranslateDBus::callTranslateSelection() {
-    QDBusMessage msg =
-        QDBusMessage::createMethodCall("io.github.glaumar.PopTranslate",
-                                       "/PopTranslate",
-                                       "io.github.glaumar.PopTranslate",
-                                       "translateSelection");
+    QDBusMessage msg = QDBusMessage::createMethodCall(APPLICATION_ID,
+                                                      "/" APPLICATION_NAME,
+                                                      APPLICATION_ID,
+                                                      "translateSelection");
     QDBusConnection::sessionBus().call(msg);
 }
 
@@ -33,7 +31,7 @@ void PopTranslateDBus::registerService() {}
 
 bool PopTranslateDBus::isRegistered() {
     return QDBusConnection::sessionBus().interface()->isServiceRegistered(
-        "io.github.glaumar.PopTranslate");
+        APPLICATION_ID);
 }
 
 void PopTranslateDBus::translateSelection() {

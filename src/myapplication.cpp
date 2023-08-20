@@ -13,13 +13,14 @@
 #include <QSystemTrayIcon>
 #include <QTranslator>
 
+#include "poptranslate.h"
 #include "poptranslate_dbus.h"
 
 MyApplication::MyApplication(int &argc, char **argv)
     : QApplication(argc, argv) {
-    setApplicationName(QStringLiteral("PopTranslate"));
-    setDesktopFileName(
-        QStringLiteral("io.github.glaumar.PopTranslate.desktop"));
+    setApplicationName(PROJECT_NAME);
+    setDesktopFileName(DESKTOP_FILE_NAME);
+    setApplicationVersion(APPLICATION_VERSION);
 
     // Must install translator before create any ui
     initUiTranslator();
@@ -69,11 +70,8 @@ void MyApplication::initUiTranslator() {
 }
 
 void MyApplication::initGlobalShortcuts() {
-    auto obj_name_base = QString("io.github.glaumar.PopTranslate.%1");
-
     translate_selection_act_ = new QAction(tr("Translate selection"), this);
-    translate_selection_act_->setObjectName(
-        obj_name_base.arg("translate_selection"));
+    translate_selection_act_->setObjectName(APPLICATION_ID".translate_selection");
     setShortcut(translate_selection_act_,
                 setting_window_->TranslateSelectionShortcut());
     connect(translate_selection_act_, &QAction::triggered, [this](bool unuse) {
@@ -88,7 +86,7 @@ void MyApplication::initGlobalShortcuts() {
             });
 
     ocr_act_ = new QAction(tr("Translate selected area"), this);
-    ocr_act_->setObjectName(obj_name_base.arg("ocr"));
+    ocr_act_->setObjectName(APPLICATION_ID".ocr");
     setShortcut(ocr_act_, setting_window_->OcrShortcut());
     connect(ocr_act_, &QAction::triggered, [this](bool unuse) {
         Q_UNUSED(unuse);
@@ -111,9 +109,9 @@ void MyApplication::showPop() {
 }
 
 void MyApplication::initSystemTrayIcon() {
-    tray_->setToolTip(tr("PopTranslate"));
+    tray_->setToolTip(tr(APPLICATION_NAME));
     tray_->setIcon(
-        QIcon::fromTheme(QStringLiteral("io.github.glaumar.PopTranslate")));
+        QIcon::fromTheme(APPLICATION_ICON_BASE_NAME));
 
     // set systemtray menu
     QMenu *menu = new QMenu(setting_window_);
