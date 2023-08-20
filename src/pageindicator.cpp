@@ -19,6 +19,8 @@ PageIndicator::PageIndicator(QWidget *parent)
     pixmap_inactive_ = defaultInActivePixmap();
 }
 
+PageIndicator::~PageIndicator() { delete ui; }
+
 QPixmap PageIndicator::defaultInActivePixmap(qreal ratio) const {
     auto width = style()->pixelMetric(QStyle::PM_SmallIconSize) / 2;
     int base = static_cast<int>(width * ratio);
@@ -37,7 +39,6 @@ QPixmap PageIndicator::defaultInActivePixmap(qreal ratio) const {
 
 QPixmap PageIndicator::defaultActivePixmap(qreal ratio) const {
     int width = style()->pixelMetric(QStyle::PM_SmallIconSize) / 2;
-    qDebug() << width;
 
     int base = static_cast<int>(width * ratio);
 

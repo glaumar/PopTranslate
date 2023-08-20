@@ -28,8 +28,8 @@ class MyApplication : public QApplication {
     void initGlobalShortcuts();
     void initSystemTrayIcon();
     void initDBusInterface();
-    void loadSettings();
-    void loadDictionaries();
+    // void loadSettings();
+    // void loadDictionaries();
     void initClipboard();
     void initOcr();
 

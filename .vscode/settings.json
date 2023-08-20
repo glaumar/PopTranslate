@@ -132,7 +132,9 @@
         "qonlinetts": "cpp",
         "qmediaplaylist": "cpp",
         "qclipboard": "cpp",
-        "qmediaplayer": "cpp"
+        "qmediaplayer": "cpp",
+        "qstringlist": "cpp",
+        "poptranslate": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

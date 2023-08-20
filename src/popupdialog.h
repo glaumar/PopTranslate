@@ -16,7 +16,7 @@
 #include <QTextDocumentFragment>
 #include <QVector>
 
-#include "defaultsettings.h"
+// #include "allsettings.h"
 #include "dictionaries.h"
 #include "pageindicator.h"
 #include "qonlinetranslator.h"
@@ -51,9 +51,9 @@ class PopupDialog : public QWidget {
     void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
     void setFont(const QFont &font);
     void setOpacity(qreal opacity);
-    void enableBlur(bool enable);
+    // void enableBlur(bool enable);
     void setDictionaries(const QStringList &dicts);
-    void enableAutoCopyTranslation(bool enable);
+    // void enableAutoCopyTranslation(bool enable);
     void showTranslateResult(const QPair<QString, QString> &result);
 
     inline bool hasNextResult() const {
@@ -92,6 +92,7 @@ class PopupDialog : public QWidget {
     }
 
    private:
+    void loadSettings();
     void initContextMenu();
     void initWaylandConnection();
     void initTranslator();
@@ -106,7 +107,8 @@ class PopupDialog : public QWidget {
     void initStateMachine();
     void initTts();
     void speakText(const QString &text, QOnlineTranslator::Language lang);
-    void prepareTextAudio(const QString &text, QOnlineTranslator::Language lang);
+    void prepareTextAudio(const QString &text,
+                          QOnlineTranslator::Language lang);
     void clear();
 
     bool flag_normal_window_;
@@ -114,7 +116,7 @@ class PopupDialog : public QWidget {
     Ui::PopupDialog *ui;
     QOnlineTranslator translator_;
     QMediaPlayer *player_;
-    DefaultSettings setting_;
+    // AllSettings setting_;
     QMenu context_menu_;
     QMenu engine_menu_;
     QAction *action_source_text_;
@@ -134,4 +136,5 @@ class PopupDialog : public QWidget {
     int animation_duration_;
     QStateMachine result_state_machine_;
     bool speak_after_translate_;
+    QOnlineTranslator::Language target_language_;
 };

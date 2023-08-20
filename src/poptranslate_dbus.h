@@ -1,8 +1,9 @@
 #pragma once
 
+#include <poptranslate.h>
+
 #include <QObject>
 #include <QString>
-#include <poptranslate.h>
 
 class PopTranslateDBus : public QObject {
     Q_OBJECT

@@ -12,6 +12,7 @@ class PageIndicator : public QWidget {
     Q_OBJECT
    public:
     explicit PageIndicator(QWidget *parent = nullptr);
+    ~PageIndicator();
 
     inline void setActivePixmap(const QPixmap &pixmap) {
         pixmap_active_ = pixmap;

@@ -33,16 +33,18 @@ MyApplication::MyApplication(int &argc, char **argv)
     initGlobalShortcuts();
     initSystemTrayIcon();
     initDBusInterface();
-    loadSettings();
-    loadDictionaries();
+    // loadSettings();
+    // loadDictionaries();
     initOcr();
+
+    // Show setting window when PopupDialog contextmenu action "settings"
+    // triggered
+    connect(pop_, &PopupDialog::settingsActionTriggered, [this]() {
+        setting_window_->show();
+    });
 }
 
 MyApplication::~MyApplication() {
-    // save settings
-    setting_window_->setPopupWindowSize(pop_->size());
-    setting_window_->setShowSrcText(pop_->isSrcTextEditVisible());
-
     delete setting_window_;
     delete tray_;
     delete pop_;
@@ -71,30 +73,31 @@ void MyApplication::initUiTranslator() {
 
 void MyApplication::initGlobalShortcuts() {
     translate_selection_act_ = new QAction(tr("Translate selection"), this);
-    translate_selection_act_->setObjectName(APPLICATION_ID".translate_selection");
+    translate_selection_act_->setObjectName(APPLICATION_ID
+                                            ".translate_selection");
     setShortcut(translate_selection_act_,
-                setting_window_->TranslateSelectionShortcut());
+                PopTranslateSettings::instance().TranslateSelectionShortcut());
     connect(translate_selection_act_, &QAction::triggered, [this](bool unuse) {
         Q_UNUSED(unuse);
         this->showPop();
     });
-    connect(setting_window_,
-            &SettingWindow::TranslateSelectionShortcutChanged,
+    connect(&PopTranslateSettings::instance(),
+            &PopTranslateSettings::translateSelectionShortcutChanged,
             this,
             [this](const QKeySequence &seq) {
                 this->setShortcut(translate_selection_act_, seq);
             });
 
     ocr_act_ = new QAction(tr("Translate selected area"), this);
-    ocr_act_->setObjectName(APPLICATION_ID".ocr");
-    setShortcut(ocr_act_, setting_window_->OcrShortcut());
+    ocr_act_->setObjectName(APPLICATION_ID ".ocr");
+    setShortcut(ocr_act_, PopTranslateSettings::instance().OcrShortcut());
     connect(ocr_act_, &QAction::triggered, [this](bool unuse) {
         Q_UNUSED(unuse);
         this->grabber_->grabFullScreen();
     });
     connect(
-        setting_window_,
-        &SettingWindow::OcrShortcutChanged,
+        &PopTranslateSettings::instance(),
+        &PopTranslateSettings::ocrShortcutChanged,
         this,
         [this](const QKeySequence &seq) { this->setShortcut(ocr_act_, seq); });
 }
@@ -110,8 +113,7 @@ void MyApplication::showPop() {
 
 void MyApplication::initSystemTrayIcon() {
     tray_->setToolTip(tr(APPLICATION_NAME));
-    tray_->setIcon(
-        QIcon::fromTheme(APPLICATION_ICON_BASE_NAME));
+    tray_->setIcon(QIcon::fromTheme(APPLICATION_ICON_BASE_NAME));
 
     // set systemtray menu
     QMenu *menu = new QMenu(setting_window_);
@@ -159,75 +161,76 @@ void MyApplication::initDBusInterface() {
             });
 }
 
-void MyApplication::loadSettings() {
-    // Change settings for popupdialog when settings changed
-    connect(setting_window_,
-            &SettingWindow::translateEngineChanged,
-            pop_,
-            &PopupDialog::setTranslateEngine);
+// void MyApplication::loadSettings() {
+//     auto settings = PopTranslateSettings::instance();
+//     // Change settings for popupdialog when settings changed
+//     connect(&settings,
+//             &PopTranslateSettings::translateEngineChanged,
+//             pop_,
+//             &PopupDialog::setTranslateEngine);
 
-    connect(setting_window_,
-            &SettingWindow::targetLanguagesChanged,
-            pop_,
-            &PopupDialog::setTargetLanguages);
+//     connect(&settings,
+//             &PopTranslateSettings::targetLanguagesChanged,
+//             pop_,
+//             &PopupDialog::setTargetLanguages);
 
-    connect(setting_window_,
-            &SettingWindow::fontChanged,
-            pop_,
-            &PopupDialog::setFont);
+//     connect(&settings,
+//             &PopTranslateSettings::fontChanged,
+//             pop_,
+//             &PopupDialog::setFont);
 
-    connect(setting_window_,
-            &SettingWindow::opacityChanged,
-            pop_,
-            &PopupDialog::setOpacity);
+//     connect(&settings,
+//             &PopTranslateSettings::opacityChanged,
+//             pop_,
+//             &PopupDialog::setOpacity);
 
-    connect(setting_window_,
-            &SettingWindow::triggerBlurEffect,
-            pop_,
-            &PopupDialog::enableBlur);
+//     connect(&settings,
+//             &PopTranslateSettings::enableBlurChanged,
+//             pop_,
+//             &PopupDialog::enableBlur);
 
-    connect(setting_window_,
-            &SettingWindow::triggerAutoCopyTranslation,
-            pop_,
-            &PopupDialog::enableAutoCopyTranslation);
+//     connect(&settings,
+//             &PopTranslateSettings::enableAutoCopyTranslationChanged,
+//             pop_,
+//             &PopupDialog::enableAutoCopyTranslation);
 
-    // load settings for popupdialog
-    pop_->setTranslateEngine(setting_window_->translateEngine());
-    pop_->setTargetLanguages(setting_window_->targetLanguages());
-    pop_->setFont(setting_window_->font());
-    pop_->setOpacity(setting_window_->opacity());
-    pop_->enableBlur(setting_window_->isEnableBlur());
-    pop_->enableAutoCopyTranslation(
-        setting_window_->isEnableAutoCopyTranslation());
+//     // load settings for popupdialog
+//     pop_->setTranslateEngine(settings.translateEngine());
+//     pop_->setTargetLanguages(
+//         settings.targetLanguages());
+//     pop_->setFont(settings.font());
+//     pop_->setOpacity(settings.opacity());
+//     pop_->enableBlur(settings.isEnableBlur());
+//     pop_->enableAutoCopyTranslation(settings.isEnableAutoCopyTranslation());
 
-    // Show setting window when PopupDialog contextmenu action "settings"
-    // triggered
-    connect(pop_, &PopupDialog::settingsActionTriggered, [this]() {
-        setting_window_->show();
-    });
+//     // Show setting window when PopupDialog contextmenu action "settings"
+//     // triggered
+//     connect(pop_, &PopupDialog::settingsActionTriggered, [this]() {
+//         setting_window_->show();
+//     });
 
-    // resize popup window size
-    if (!setting_window_->popupWindowSize().isEmpty()) {
-        pop_->resize(setting_window_->popupWindowSize());
-    }
+//     // resize popup window size
+//     if (!settings.popupWindowSize().isEmpty()) {
+//         pop_->resize(settings.popupWindowSize());
+//     }
 
-    pop_->setSrcTextEditVisible(setting_window_->showSrcText());
-}
+//     pop_->setSrcTextEditVisible(settings.showSrcText());
+// }
 
-void MyApplication::loadDictionaries() {
-    connect(setting_window_,
-            &SettingWindow::dictionariesChanged,
-            pop_,
-            &PopupDialog::setDictionaries);
+// void MyApplication::loadDictionaries() {
+//     connect(&PopTranslateSettings::instance(),
+//             &PopTranslateSettings::dictionariesChanged,
+//             pop_,
+//             &PopupDialog::setDictionaries);
 
-    // connect(setting_window_,
-    //         &SettingWindow::dictionaryRemoved,
-    //         [this](const QString &dict) {
-    //             this->pop_->removeDictionaries({dict});
-    //         });
+//     // connect(setting_window_,
+//     //         &SettingWindow::dictionaryRemoved,
+//     //         [this](const QString &dict) {
+//     //             this->pop_->removeDictionaries({dict});
+//     //         });
 
-    pop_->setDictionaries(setting_window_->dictionaries());
-}
+//     pop_->setDictionaries(PopTranslateSettings::instance().dictionaries());
+// }
 
 void MyApplication::initClipboard() {
     clipboard_ = KSystemClipboard::instance();
@@ -262,15 +265,15 @@ void MyApplication::initOcr() {
             this->pop_->translate(text);
         },
         Qt::QueuedConnection);
-    connect(setting_window_,
-            &SettingWindow::ocrLanguagesChanged,
+    connect(&PopTranslateSettings::instance(),
+            &PopTranslateSettings::ocrLanguagesChanged,
             &ocr_,
             [this](const QStringList &languages) {
                 this->ocr_.init(languages.join("+").toLocal8Bit(), "", {});
             });
 
     ocr_.init("eng", "", {});
-    setting_window_->setAvailableOcrLanguages(ocr_.availableLanguages());
+    // setting_window_->setAvailableOcrLanguages(ocr_.availableLanguages());
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

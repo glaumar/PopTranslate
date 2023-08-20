@@ -63,13 +63,14 @@ set(PROJECT_SOURCES
     src/popupdialog.cpp src/popupdialog.h src/popupdialog.ui
     src/poptranslate_dbus.cpp src/poptranslate_dbus.h
     src/settingwindow.cpp src/settingwindow.h src/settingwindow.ui
-    src/defaultsettings.h
+    src/allsettings.h
     src/dictionaries.cpp src/dictionaries.h
     src/screengrabber.h src/screengrabber.cpp
     src/imagecropper.h src/imagecropper.cpp
     src/ocr.h src/ocr.cpp
     src/langcode2name.h src/langcode2name.cpp
     src/pageindicator.h src/pageindicator.cpp src/pageindicator.ui
+    src/poptranslatesettings.h src/poptranslatesettings.cpp
     ${TS_FILES}
 )
 
