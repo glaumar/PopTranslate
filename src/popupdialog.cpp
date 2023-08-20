@@ -104,9 +104,6 @@ void PopupDialog::setNormalWindow(bool enable) {
 }
 
 void PopupDialog::setTranslateEngine(QOnlineTranslator::Engine engine) {
-    // qDebug() << tr("Translate: Change translate engine: %1")
-    //                 .arg(DefaultSettings::enumValueToKey(engine));
-    // PopTranslateSettings::instance().setTranslateEngine(engine);
     engine_menu_.actions().at(engine)->setChecked(true);
 }
 
@@ -131,11 +128,8 @@ void PopupDialog::setTargetLanguages(
             target_language_ = lang;
             retranslate();
         });
-        // qDebug() << tr("Translate: Add target language to context menu: %1")
-        //                 .arg(DefaultSettings::enumValueToKey(lang));
     }
 
-    // setting_.target_language_1 = languages.at(0);
     target_languages_group->actions().at(0)->setChecked(true);
     context_menu_.addActions(target_languages_group->actions());
 }
@@ -698,7 +692,6 @@ void PopupDialog::prepareTextAudio(const QString &text,
         return;
     }
 
-    // playlist->clear();
     player_->playlist()->addMedia(tts.media());
 }
 
@@ -729,8 +722,6 @@ void PopupDialog::loadSettings() {
     setTargetLanguages(settings.targetLanguages());
     setFont(settings.font());
     setOpacity(settings.opacity());
-    // enableBlur(settings.isEnableBlur());
-    // enableAutoCopyTranslation(settings.isEnableAutoCopyTranslation());
 
     // Change settings for popupdialog when settings changed
     connect(&settings,
@@ -753,20 +744,6 @@ void PopupDialog::loadSettings() {
             this,
             &PopupDialog::setOpacity);
 
-    // connect(&settings,
-    //         &PopTranslateSettings::enableBlurChanged,
-    //         this,
-    //         &PopupDialog::enableBlur);
-
-    // connect(&settings,
-    //         &PopTranslateSettings::enableAutoCopyTranslationChanged,
-    //         this,
-    //         &PopupDialog::enableAutoCopyTranslation);
-
-    // resize popup window size
-    if (!settings.popupWindowSize().isEmpty()) {
-        resize(settings.popupWindowSize());
-    }
-
+    resize(settings.popupWindowSize());
     setSrcTextEditVisible(settings.showSrcText());
 }

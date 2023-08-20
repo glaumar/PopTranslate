@@ -28,16 +28,13 @@ class MyApplication : public QApplication {
     void initGlobalShortcuts();
     void initSystemTrayIcon();
     void initDBusInterface();
-    // void loadSettings();
-    // void loadDictionaries();
     void initClipboard();
     void initOcr();
 
-    QTranslator* translator_;  // init in initUiTranslator
+    QTranslator* translator_;
     PopupDialog* pop_;
     QSystemTrayIcon* tray_;
     SettingWindow* setting_window_;
-    KSystemClipboard* clipboard_;       // init in initClipboard
     QAction* translate_selection_act_;  // init in initGlobalShortcuts
     QAction* ocr_act_;                  // init in initGlobalShortcuts
     ScreenGrabber* grabber_;
