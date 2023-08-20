@@ -11,6 +11,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QMediaPlaylist>
 #include <QOnlineTts>
+#include <QStyle>
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent),
@@ -135,6 +136,10 @@ void PopupDialog::setFont(const QFont &font) {
     setting_.font = font;
     ui->trans_text_edit->setFont(font);
     ui->src_plain_text_edit->setFont(font);
+
+    auto title_font = font;
+    title_font.setPointSizeF(font.pointSizeF() * 0.75);
+    ui->title_label->setFont(title_font);
 }
 
 void PopupDialog::setOpacity(qreal opacity) {
@@ -383,11 +388,16 @@ void PopupDialog::initDictionaries() {
 }
 
 void PopupDialog::initFloatButton() {
-    btn_prev_->setIconSize(QSize(64, 64));
-    btn_next_->setIconSize(QSize(64, 64));
+    int width = style()->pixelMetric(QStyle::PM_LargeIconSize);
 
-    btn_prev_->setFixedSize(96, 96);
-    btn_next_->setFixedSize(96, 96);
+    QSize icon_size(width, width);
+    QSize btn_size(width * 2, width * 2);
+
+    btn_prev_->setIconSize(icon_size);
+    btn_next_->setIconSize(icon_size);
+
+    btn_prev_->setFixedSize(btn_size);
+    btn_next_->setFixedSize(btn_size);
 
     QString style(
         "QPushButton {background-color: palette(Button); border: none;"
@@ -657,8 +667,13 @@ void PopupDialog::initTts() {
     });
 }
 
-void PopupDialog::speakText(const QString &text,
-                            QOnlineTranslator::Language lang) {
+void PopupDialog::prepareTextAudio(const QString &text,
+                                   QOnlineTranslator::Language lang) {
+
+    if (player_->playlist()->mediaCount() > 0) {
+        return;
+    }
+
     QOnlineTts tts;
     auto engine = setting_.translate_engine;
     if (engine != QOnlineTranslator::Engine::Google &&
@@ -673,9 +688,13 @@ void PopupDialog::speakText(const QString &text,
         return;
     }
 
-    auto playlist = player_->playlist();
-    playlist->clear();
-    playlist->addMedia(tts.media());
+    // playlist->clear();
+    player_->playlist()->addMedia(tts.media());
+}
+
+void PopupDialog::speakText(const QString &text,
+                            QOnlineTranslator::Language lang) {
+    prepareTextAudio(text, lang);
     player_->play();
 }
 
@@ -687,6 +706,8 @@ void PopupDialog::clear() {
     translate_results_.clear();
     result_index_ = -1;
     indicator_->clear();
+
+    player_->playlist()->clear();
 
     emit cleared();
 }

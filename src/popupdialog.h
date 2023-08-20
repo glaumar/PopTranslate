@@ -106,6 +106,7 @@ class PopupDialog : public QWidget {
     void initStateMachine();
     void initTts();
     void speakText(const QString &text, QOnlineTranslator::Language lang);
+    void prepareTextAudio(const QString &text, QOnlineTranslator::Language lang);
     void clear();
 
     bool flag_normal_window_;

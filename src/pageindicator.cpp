@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <QPropertyAnimation>
+#include <QStyle>
 
 #include "ui_pageindicator.h"
 
@@ -19,7 +20,8 @@ PageIndicator::PageIndicator(QWidget *parent)
 }
 
 QPixmap PageIndicator::defaultInActivePixmap(qreal ratio) const {
-    int base = static_cast<int>(8 * ratio);
+    auto width = style()->pixelMetric(QStyle::PM_SmallIconSize) / 2;
+    int base = static_cast<int>(width * ratio);
 
     QPixmap pix(base, base);
     pix.fill(Qt::transparent);
@@ -29,6 +31,24 @@ QPixmap PageIndicator::defaultInActivePixmap(qreal ratio) const {
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(color);
     painter.drawEllipse(0, 0, base, base);
+    painter.end();
+    return pix;
+}
+
+QPixmap PageIndicator::defaultActivePixmap(qreal ratio) const {
+    int width = style()->pixelMetric(QStyle::PM_SmallIconSize) / 2;
+    qDebug() << width;
+
+    int base = static_cast<int>(width * ratio);
+
+    QPixmap pix(base * 3, base);
+    pix.fill(Qt::transparent);
+
+    auto color = palette().color(QPalette::WindowText);
+    QPainter painter(&pix);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setBrush(color);
+    painter.drawRoundedRect(0, 0, base * 3, base, base / 2, base / 2);
     painter.end();
     return pix;
 }
@@ -109,21 +129,6 @@ void PageIndicator::clear() {
     }
     labels_.clear();
     index_ = -1;
-}
-
-QPixmap PageIndicator::defaultActivePixmap(qreal ratio) const {
-    int base = static_cast<int>(8 * ratio);
-
-    QPixmap pix(base * 3, base);
-    pix.fill(Qt::transparent);
-
-    auto color = palette().color(QPalette::WindowText);
-    QPainter painter(&pix);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(color);
-    painter.drawRoundedRect(0, 0, base * 3, base, base / 2, base / 2);
-    painter.end();
-    return pix;
 }
 
 void PageIndicator::startAnimationNext(QSize active_size, QSize inactive_size) {
