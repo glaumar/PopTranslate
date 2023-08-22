@@ -19,6 +19,7 @@ class AllSettings {
           opacity(0.6),
           enable_blur(true),
           enable_auto_copy_translation(true),
+          enable_auto_speak(false),
           enable_proxy(false),
           proxy_hostname("localhost"),
           proxy_port(8080),
@@ -38,6 +39,7 @@ class AllSettings {
     qreal opacity;
     bool enable_blur;
     bool enable_auto_copy_translation;
+    bool enable_auto_speak;
     bool enable_proxy;
     QString proxy_hostname;
     quint16 proxy_port;

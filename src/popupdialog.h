@@ -16,7 +16,6 @@
 #include <QTextDocumentFragment>
 #include <QVector>
 
-// #include "allsettings.h"
 #include "dictionaries.h"
 #include "pageindicator.h"
 #include "qonlinetranslator.h"

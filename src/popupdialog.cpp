@@ -176,6 +176,11 @@ void PopupDialog::showTranslateResult(const QPair<QString, QString> &result) {
 
     auto plain_text = QTextDocumentFragment::fromHtml(t_text).toPlainText();
     ui->trans_text_edit->setText(plain_text);
+
+    // auto copy translation
+    if (PopTranslateSettings::instance().isEnableAutoCopyTranslation()) {
+        copyTranslation();
+    }
 }
 
 void PopupDialog::setDictionaries(const QStringList &dicts) {
@@ -636,11 +641,6 @@ void PopupDialog::initStateMachine() {
     connect(readyShowResult, &QState::entered, [this] {
         showTranslateResult(translate_results_.at(result_index_));
         showFloatButton(QCursor::pos());
-
-        // auto copy translation
-        if (PopTranslateSettings::instance().isEnableAutoCopyTranslation()) {
-            copyTranslation();
-        }
     });
 
     result_state_machine_.start();
@@ -664,7 +664,8 @@ void PopupDialog::initTts() {
 
     connect(&translator_, &QOnlineTranslator::finished, [this] {
         if (translator_.error() == QOnlineTranslator::NoError) {
-            if (speak_after_translate_) {
+            if (PopTranslateSettings::instance().isEnableAutoSpeak() ||
+                speak_after_translate_) {
                 speakText(sourceText(), translator_.sourceLanguage());
                 speak_after_translate_ = false;
             }

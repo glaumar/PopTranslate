@@ -40,6 +40,10 @@ void PopTranslateSettings::load() {
             .value("enable_auto_copy_translation",
                    default_settings.enable_auto_copy_translation)
             .value<bool>();
+    all_.enable_auto_speak = settings_
+                                 .value("enable_auto_speak",
+                                        default_settings.enable_auto_speak)
+                                 .value<bool>();
     all_.enable_proxy =
         settings_.value("enable_proxy", default_settings.enable_proxy)
             .value<bool>();
@@ -128,6 +132,14 @@ void PopTranslateSettings::setEnableAutoCopyTranslation(bool enable) {
     qDebug() << tr("Settings: %1 auto copy translation")
                     .arg(enable ? tr("Enable") : tr("Disable"));
 };
+
+void PopTranslateSettings::setEnableAutoSpeak(bool enable) {
+    all_.enable_auto_speak = enable;
+    settings_.setValue("enable_auto_speak", enable);
+    emit enableAutoSpeakChanged(enable);
+    qDebug() << tr("Settings: %1 auto speak")
+                    .arg(enable ? tr("Enable") : tr("Disable"));
+}
 
 void PopTranslateSettings::setEnableProxy(bool enable) {
     all_.enable_proxy = enable;

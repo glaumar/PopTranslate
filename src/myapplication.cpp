@@ -198,10 +198,10 @@ void MyApplication::initOcr() {
                 this->ocr_.init(languages.join("+").toLocal8Bit(), "", {});
             });
 
-    ocr_.init(PopTranslateSettings::instance().ocrLanguages().join("+")
-                  .toLocal8Bit(),
-              "",
-              {});
+    ocr_.init(
+        PopTranslateSettings::instance().ocrLanguages().join("+").toLocal8Bit(),
+        "",
+        {});
 }
 
 void MyApplication::trayActivated(QSystemTrayIcon::ActivationReason reason) {

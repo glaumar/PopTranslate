@@ -66,6 +66,7 @@ class PopTranslateSettings : public QObject {
     inline bool isEnableAutoCopyTranslation() const {
         return all_.enable_auto_copy_translation;
     };
+    inline bool isEnableAutoSpeak() const { return all_.enable_auto_speak; };
     inline bool isEnableProxy() const { return all_.enable_proxy; };
     inline QString proxyHostname() const { return all_.proxy_hostname; };
     inline quint16 proxyPort() const { return all_.proxy_port; };
@@ -87,6 +88,7 @@ class PopTranslateSettings : public QObject {
     void setOpacity(qreal opacity);
     void setEnableBlur(bool enable);
     void setEnableAutoCopyTranslation(bool enable);
+    void setEnableAutoSpeak(bool enable);
     void setEnableProxy(bool enable);
     void setProxyHostname(QString hostname);
     void setProxyPort(quint16 port);
@@ -107,6 +109,7 @@ class PopTranslateSettings : public QObject {
     void opacityChanged(qreal opacity);
     void enableBlurChanged(bool enable);
     void enableAutoCopyTranslationChanged(bool enable);
+    void enableAutoSpeakChanged(bool enable);
     void enableProxyChanged(bool enable);
     void proxyHostnameChanged(QString hostname);
     void proxyPortChanged(quint16 port);

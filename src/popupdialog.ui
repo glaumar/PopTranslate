@@ -81,8 +81,11 @@
       </property>
       <item>
        <widget class="QToolButton" name="pronounce_button">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="toolTip">
-         <string>Speak Source Text</string>
+         <string/>
         </property>
         <property name="styleSheet">
          <string notr="true"> QToolButton {background-color: transparent; border: none; border-style: none;  padding: 5px;  border-radius: 6px;}
@@ -96,6 +99,9 @@
          <iconset theme="player-volume">
           <normaloff>.</normaloff>.</iconset>
         </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -105,6 +111,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>PopTranslate</string>
