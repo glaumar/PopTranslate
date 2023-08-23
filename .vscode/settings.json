@@ -134,7 +134,9 @@
         "qclipboard": "cpp",
         "qmediaplayer": "cpp",
         "qstringlist": "cpp",
-        "poptranslate": "cpp"
+        "poptranslate": "cpp",
+        "qtconcurrent": "cpp",
+        "qvector": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

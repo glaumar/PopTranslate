@@ -3,12 +3,23 @@
 #include <QDebug>
 #include <QFileInfo>
 
-// macro “F” definition conflicts
-#undef F
-#include <QtConcurrent>
+#include "poptranslatesettings.h"
 
-Dictionaries::Dictionaries() {}
-Dictionaries::~Dictionaries() {}
+// macro “F” definition conflicts
+// #undef F
+// #include <QtConcurrent>
+
+Dictionaries::Dictionaries(QObject* parent)
+    : AbstractTranslator(parent), is_aborted_(false) {
+    setDicts(PopTranslateSettings::instance().dictionaries());
+    connect(&PopTranslateSettings::instance(),
+            &PopTranslateSettings::dictionariesChanged,
+            this,
+            &Dictionaries::setDicts);
+}
+
+void Dictionaries::translate(const QString& text) { lookup(text); }
+void Dictionaries::abort() { is_aborted_ = true; }
 
 void Dictionaries::clear() {
     dicts_.clear();
@@ -75,41 +86,24 @@ void Dictionaries::removeDicts(const QStringList& filenames) {
     }
 }
 
-QVector<QPair<QString, QString>> Dictionaries::lookup(const QString& word) {
-    qDebug() << "lookup:" << word;
-    QVector<QPair<QString, QString>> results;
+void Dictionaries::lookup(const QString& word) {
     for (auto& dict_name : dict_names_) {
-        qDebug() << "dict_name:" << dict_name;
         auto dict = dicts_.value(dict_name);
-        auto result = dict->lookup(word.toStdString());
-        if (result != "") {
-            qDebug() << "found:" << QString::fromStdString(result);
+        auto content = dict->lookup(word.toStdString());  // TODO:async
+        if (is_aborted_) {
+            break;
+        }
+        if (content != "") {
             auto dict_basename = QFileInfo(dict_name).baseName();
-            QPair<QString, QString> result_pair(dict_basename,
-                                                QString::fromStdString(result));
-            emit found(result_pair);
-            results.append(result_pair);
+            AbstractTranslator::Result result{dict_basename,
+                                              QString::fromStdString(content)};
+            emit resultAvailable(result);
+            qDebug()
+                << tr("Dictionaries Lookup Success: %1").arg(dict_basename);
         }
     }
-    return results;
-}
-
-void Dictionaries::lookupAsync(const QString& word) {
-    QtConcurrent::run(
-        [this](const QString& word) -> void {
-            for (auto& dict_name : dict_names_) {
-                auto dict = dicts_.value(dict_name);
-                auto result = dict->lookup(word.toStdString());
-                if (result != "") {
-                    auto dict_basename = QFileInfo(dict_name).baseName();
-                    QPair<QString, QString> result_pair(
-                        dict_basename,
-                        QString::fromStdString(result));
-                    emit found(result_pair);
-                }
-            }
-        },
-        word);
+    emit finished();
+    is_aborted_ = false;
 }
 
 bool Dictionaries::fileCheck(const QString& filename) {

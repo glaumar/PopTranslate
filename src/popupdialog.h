@@ -16,9 +16,8 @@
 #include <QTextDocumentFragment>
 #include <QVector>
 
-#include "dictionaries.h"
+#include "abstracttranslator.h"
 #include "pageindicator.h"
-#include "qonlinetranslator.h"
 #include "ui_popupdialog.h"
 
 namespace Ui {
@@ -43,26 +42,28 @@ class PopupDialog : public QWidget {
         ui->horizon_line->setVisible(visible);
         action_source_text_->setChecked(visible);
     }
+    void clear();
    public slots:
-    void translate(const QString &text);
-    void retranslate();
+    void addTranslateResult(const AbstractTranslator::Result &result);
     void setTranslateEngine(QOnlineTranslator::Engine engine);
     void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
     void setFont(const QFont &font);
     void setOpacity(qreal opacity);
-    // void enableBlur(bool enable);
-    void setDictionaries(const QStringList &dicts);
-    // void enableAutoCopyTranslation(bool enable);
-    void showTranslateResult(const QPair<QString, QString> &result);
-
+    void showTranslateResult(const AbstractTranslator::Result &result);
     inline bool hasNextResult() const {
         return result_index_ >= 0 &&
                result_index_ < translate_results_.size() - 1;
     }
-    inline bool hasPrevResult() const { return result_index_ > 0; }
+    inline bool hasPrevResult() const {
+        return result_index_ > 0 &&
+               result_index_ <= translate_results_.size() - 1;
+    }
 
     inline QString sourceText() const {
         return ui->src_plain_text_edit->toPlainText();
+    }
+    inline void setSourceText(const QString &text) {
+        ui->src_plain_text_edit->setPlainText(text);
     }
 
     inline QString translationText() const {
@@ -70,6 +71,7 @@ class PopupDialog : public QWidget {
     }
 
    signals:
+    void requestTranslate(const QString &text);
     void settingsActionTriggered();
     void translateResultsAvailable(int index);
     void cleared();
@@ -94,8 +96,6 @@ class PopupDialog : public QWidget {
     void loadSettings();
     void initContextMenu();
     void initWaylandConnection();
-    void initTranslator();
-    void initDictionaries();
     void initFloatButton();
     void showFloatButton(QPoint cursor_pos);
     void initPageIndicator();
@@ -108,19 +108,14 @@ class PopupDialog : public QWidget {
     void speakText(const QString &text, QOnlineTranslator::Language lang);
     void prepareTextAudio(const QString &text,
                           QOnlineTranslator::Language lang);
-    void clear();
-
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
     Ui::PopupDialog *ui;
-    QOnlineTranslator translator_;
     QMediaPlayer *player_;
-    // AllSettings setting_;
     QMenu context_menu_;
     QMenu engine_menu_;
     QAction *action_source_text_;
-    Dictionaries dicts_;
-    QVector<QPair<QString, QString>> translate_results_;
+    QVector<AbstractTranslator::Result> translate_results_;
     int result_index_;
     QPushButton *btn_prev_;
     QPushButton *btn_next_;
@@ -135,5 +130,4 @@ class PopupDialog : public QWidget {
     int animation_duration_;
     QStateMachine result_state_machine_;
     bool speak_after_translate_;
-    QOnlineTranslator::Language target_language_;
 };

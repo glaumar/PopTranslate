@@ -21,13 +21,16 @@ void PopTranslateSettings::load() {
         settings_.value("translate_engine", default_settings.translate_engine)
             .value<QOnlineTranslator::Engine>();
 
-    auto languages =
-        settings_
-            .value("target_languages",
-                   targetLanguagesStr(default_settings.targetLanguages))
-            .value<QStringList>();
+    auto languages = settings_.value("target_languages").value<QStringList>();
 
-    all_.targetLanguages = stringListToTargetLanguages(languages);
+    if (languages.isEmpty()) {
+        all_.target_languages_ = default_settings.target_languages_;
+    } else {
+        all_.target_languages_ = stringListToTargetLanguages(languages);
+    }
+
+    // active_target_language_ not saved in config file
+    all_.active_target_language_ = all_.target_languages_[0];
 
     all_.font = settings_.value("font", default_settings.font).value<QFont>();
     all_.opacity =
@@ -40,10 +43,9 @@ void PopTranslateSettings::load() {
             .value("enable_auto_copy_translation",
                    default_settings.enable_auto_copy_translation)
             .value<bool>();
-    all_.enable_auto_speak = settings_
-                                 .value("enable_auto_speak",
-                                        default_settings.enable_auto_speak)
-                                 .value<bool>();
+    all_.enable_auto_speak =
+        settings_.value("enable_auto_speak", default_settings.enable_auto_speak)
+            .value<bool>();
     all_.enable_proxy =
         settings_.value("enable_proxy", default_settings.enable_proxy)
             .value<bool>();
@@ -94,11 +96,19 @@ void PopTranslateSettings::setTranslateEngine(
 
 void PopTranslateSettings::setTargetLanguages(
     QVector<QOnlineTranslator::Language> languages) {
-    all_.targetLanguages = languages;
+    all_.target_languages_ = languages;
     settings_.setValue("target_languages", targetLanguagesStr());
     emit targetLanguagesChanged(languages);
     qDebug() << tr("Settings: set target languages : %1")
                     .arg(targetLanguagesStr().join(" "));
+}
+
+void PopTranslateSettings::setActiveTargetLanguage(
+    QOnlineTranslator::Language language) {
+    all_.active_target_language_ = language;
+    emit activeTargetLanguageChanged(language);
+    qDebug() << tr("Settings: set active target language : %1")
+                    .arg(targetLanguageStr(language));
 }
 
 void PopTranslateSettings::setFont(QFont font) {

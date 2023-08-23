@@ -38,7 +38,7 @@ class PopTranslateSettings : public QObject {
         return enumValueToKey(lang);
     };
     inline QStringList targetLanguagesStr() {
-        return targetLanguagesStr(all_.targetLanguages);
+        return targetLanguagesStr(all_.target_languages_);
     };
     static inline QStringList targetLanguagesStr(
         QVector<QOnlineTranslator::Language> languages) {
@@ -58,7 +58,10 @@ class PopTranslateSettings : public QObject {
         return languages;
     };
     inline QVector<QOnlineTranslator::Language> targetLanguages() const {
-        return all_.targetLanguages;
+        return all_.target_languages_;
+    };
+    inline QOnlineTranslator::Language activeTargetLanguage() const {
+        return all_.active_target_language_;
     };
     inline QFont font() const { return all_.font; };
     inline qreal opacity() const { return all_.opacity; };
@@ -84,6 +87,7 @@ class PopTranslateSettings : public QObject {
 
     void setTranslateEngine(QOnlineTranslator::Engine engine);
     void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
+    void setActiveTargetLanguage(QOnlineTranslator::Language language);
     void setFont(QFont font);
     void setOpacity(qreal opacity);
     void setEnableBlur(bool enable);
@@ -106,6 +110,7 @@ class PopTranslateSettings : public QObject {
     void translateEngineChanged(QOnlineTranslator::Engine engine);
     void fontChanged(QFont font);
     void targetLanguagesChanged(QVector<QOnlineTranslator::Language> languages);
+    void activeTargetLanguageChanged(QOnlineTranslator::Language language);
     void opacityChanged(qreal opacity);
     void enableBlurChanged(bool enable);
     void enableAutoCopyTranslationChanged(bool enable);

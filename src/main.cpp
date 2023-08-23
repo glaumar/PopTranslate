@@ -1,6 +1,10 @@
+#include <QApplication>
 #include <QLocale>
+#include <QStandardPaths>
+#include <QTranslator>
 
-#include "myapplication.h"
+#include "appmain.h"
+#include "poptranslate.h"
 #include "poptranslate_dbus.h"
 
 int main(int argc, char *argv[]) {
@@ -14,7 +18,26 @@ int main(int argc, char *argv[]) {
         PopTranslateDBus::instance()->registerService();
     }
 
-    MyApplication a(argc, argv);
+    QApplication a(argc, argv);
+    a.setApplicationName(PROJECT_NAME);
+    a.setDesktopFileName(DESKTOP_FILE_NAME);
+    a.setApplicationVersion(APPLICATION_VERSION);
+
+    QTranslator translator;
+    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    for (const QString &locale : uiLanguages) {
+        const QString base_name = "poptranslate_" + QLocale(locale).name();
+        QString i18n_dir =
+            QStandardPaths::locate(QStandardPaths::AppDataLocation,
+                                   "i18n",
+                                   QStandardPaths::LocateDirectory);
+        if (translator.load(base_name, i18n_dir, "_", ".qm")) {
+            bool ret = a.installTranslator(&translator);
+            break;
+        }
+    }
+
+    AppMain app_main;
 
     return a.exec();
 }

@@ -13,7 +13,11 @@
 #include <QOnlineTts>
 #include <QStyle>
 
+#include "dictionaries.h"
+#include "onlinetranslator.h"
+#include "poptranslate.h"
 #include "poptranslatesettings.h"
+#include "qonlinetranslator.h"
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent),
@@ -27,16 +31,12 @@ PopupDialog::PopupDialog(QWidget *parent)
       animation_group1_(new QParallelAnimationGroup(this)),
       animation_group2_(new QParallelAnimationGroup(this)),
       player_(new QMediaPlayer(this)),
-      speak_after_translate_(false),
-      target_language_(
-          PopTranslateSettings::instance().targetLanguages().at(0)) {
+      speak_after_translate_(false) {
     ui->setupUi(this);
     setNormalWindow(false);
 
     initContextMenu();
     initWaylandConnection();
-    initTranslator();
-    initDictionaries();
     initFloatButton();
     initPageIndicator();
     initAnimation();
@@ -61,34 +61,6 @@ PopupDialog::~PopupDialog() {
     delete ui;
 }
 
-void PopupDialog::translate(const QString &text) {
-    if (text.isEmpty()) {
-        return;
-    }
-
-    if (translator_.isRunning()) {
-        qDebug() << tr("Translate: Abort previous translation");
-        translator_.abort();
-    }
-
-    qDebug() << tr("Translate: Engine: %1, Target language: %2")
-                    .arg(PopTranslateSettings::instance().translateEngineStr(),
-                         PopTranslateSettings::instance().targetLanguageStr(
-                             target_language_));
-    clear();
-    ui->src_plain_text_edit->setPlainText(text);
-
-    dicts_.lookupAsync(text);
-    translator_.translate(text,
-                          PopTranslateSettings::instance().translateEngine(),
-                          target_language_);
-}
-
-void PopupDialog::retranslate() {
-    const QString text = ui->src_plain_text_edit->toPlainText();
-    translate(text);
-}
-
 void PopupDialog::setNormalWindow(bool enable) {
     if (enable) {
         this->setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
@@ -101,6 +73,11 @@ void PopupDialog::setNormalWindow(bool enable) {
         this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
     }
     flag_normal_window_ = enable;
+}
+
+void PopupDialog::addTranslateResult(const AbstractTranslator::Result &result) {
+    translate_results_.append(result);
+    emit translateResultsAvailable(translate_results_.size() - 1);
 }
 
 void PopupDialog::setTranslateEngine(QOnlineTranslator::Engine engine) {
@@ -125,8 +102,10 @@ void PopupDialog::setTargetLanguages(
             PopTranslateSettings::targetLanguageStr(lang));
         action->setCheckable(true);
         connect(action, &QAction::triggered, [this, lang]() {
-            target_language_ = lang;
-            retranslate();
+            PopTranslateSettings::instance().setActiveTargetLanguage(lang);
+            auto text = sourceText();
+            clear();
+            emit requestTranslate(text);
         });
     }
 
@@ -160,7 +139,8 @@ void PopupDialog::setOpacity(qreal opacity) {
     ui->src_plain_text_edit->setPalette(pal_edit);
 }
 
-void PopupDialog::showTranslateResult(const QPair<QString, QString> &result) {
+void PopupDialog::showTranslateResult(
+    const AbstractTranslator::Result &result) {
     auto &[s_text, t_text] = result;
 
     QFontMetrics metrics(ui->title_label->font());
@@ -181,10 +161,6 @@ void PopupDialog::showTranslateResult(const QPair<QString, QString> &result) {
     if (PopTranslateSettings::instance().isEnableAutoCopyTranslation()) {
         copyTranslation();
     }
-}
-
-void PopupDialog::setDictionaries(const QStringList &dicts) {
-    dicts_.setDicts(dicts);
 }
 
 void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
@@ -210,7 +186,7 @@ bool PopupDialog::event(QEvent *event) {
     }
 
     if (event->type() == QEvent::Hide) {
-        translator_.abort();
+        // TODO: translator_.abort();
         player_->stop();
         btn_prev_->hide();
         btn_next_->hide();
@@ -325,7 +301,9 @@ void PopupDialog::initContextMenu() {
             auto engine =
                 static_cast<QOnlineTranslator::Engine>(engines_enum.value(i));
             PopTranslateSettings::instance().setTranslateEngine(engine);
-            retranslate();
+            auto text = sourceText();
+            clear();
+            emit requestTranslate(text);
         });
     }
     engine_menu_.addActions(engine_group->actions());
@@ -351,50 +329,6 @@ void PopupDialog::initWaylandConnection() {
 
     registry->create(connection);
     registry->setup();
-}
-
-void PopupDialog::initTranslator() {
-    connect(&translator_, &QOnlineTranslator::finished, [this] {
-        if (translator_.error() == QOnlineTranslator::NoError) {
-            qDebug() << tr("Translate Success");
-            QPair<QString, QString> result(
-                PopTranslateSettings::instance().translateEngineStr(),
-                translator_.translation());
-            translate_results_.append(result);
-            emit translateResultsAvailable(translate_results_.size() - 1);
-        } else {
-            auto error_msg =
-                tr("Failed Translate: %1").arg(translator_.errorString());
-            if (this->isVisible() &&
-                translator_.errorString() != QString("Operation canceled")) {
-                QPair<QString, QString> result(
-                    PopTranslateSettings::instance().translateEngineStr(),
-                    error_msg);
-                translate_results_.append(result);
-                emit translateResultsAvailable(translate_results_.size() - 1);
-            }
-            qWarning() << error_msg;
-        }
-    });
-}
-
-void PopupDialog::initDictionaries() {
-    setDictionaries(PopTranslateSettings::instance().dictionaries());
-    connect(&PopTranslateSettings::instance(),
-            &PopTranslateSettings::dictionariesChanged,
-            this,
-            &PopupDialog::setDictionaries);
-
-    // lookup word in dictionaries
-    connect(
-        &dicts_,
-        &Dictionaries::found,
-        this,
-        [this](QPair<QString, QString> result) {
-            translate_results_.append(result);
-            emit translateResultsAvailable(translate_results_.size() - 1);
-        },
-        Qt::QueuedConnection);
 }
 
 void PopupDialog::initFloatButton() {
@@ -650,27 +584,29 @@ void PopupDialog::initTts() {
     QMediaPlaylist *playlist = new QMediaPlaylist(player_);
     player_->setPlaylist(playlist);
 
-    connect(ui->pronounce_button, &QToolButton::clicked, [this](bool checked) {
-        Q_UNUSED(checked);
-        if (translator_.sourceLanguage() == QOnlineTranslator::Auto &&
-            translator_.isRunning()) {
-            // The language may not have been recognized yet, set this flag and
-            // wait for the QOnlineTranslator::finished signal to try again
-            speak_after_translate_ = true;
-        } else {
-            speakText(sourceText(), translator_.sourceLanguage());
-        }
-    });
+    // connect(ui->pronounce_button, &QToolButton::clicked, [this](bool checked)
+    // {
+    //     Q_UNUSED(checked);
+    //     if (translator_.sourceLanguage() == QOnlineTranslator::Auto &&
+    //         translator_.isRunning()) {
+    //         // The language may not have been recognized yet, set this flag
+    //         and
+    //         // wait for the QOnlineTranslator::finished signal to try again
+    //         speak_after_translate_ = true;
+    //     } else {
+    //         speakText(sourceText(), translator_.sourceLanguage());
+    //     }
+    // });
 
-    connect(&translator_, &QOnlineTranslator::finished, [this] {
-        if (translator_.error() == QOnlineTranslator::NoError) {
-            if (PopTranslateSettings::instance().isEnableAutoSpeak() ||
-                speak_after_translate_) {
-                speakText(sourceText(), translator_.sourceLanguage());
-                speak_after_translate_ = false;
-            }
-        }
-    });
+    // connect(&translator_, &QOnlineTranslator::finished, [this] {
+    //     if (translator_.error() == QOnlineTranslator::NoError) {
+    //         if (PopTranslateSettings::instance().isEnableAutoSpeak() ||
+    //             speak_after_translate_) {
+    //             speakText(sourceText(), translator_.sourceLanguage());
+    //             speak_after_translate_ = false;
+    //         }
+    //     }
+    // });
 }
 
 void PopupDialog::prepareTextAudio(const QString &text,

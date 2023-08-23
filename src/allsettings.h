@@ -1,20 +1,21 @@
 #pragma once
 
-// #include <QMetaEnum>
 #include <QOnlineTranslator>
 #include <QStringList>
 
 // get variable name as string, void(Variable) force compiler to check if
-// variable exists #define MACRO_VARIABLE_TO_STRING(Variable)
-// (void(Variable),#Variable)
+// variable exists
+// #define VAR2STR(Variable) (void(Variable),#Variable)
 
 class AllSettings {
    public:
     AllSettings()
         : translate_engine(QOnlineTranslator::Engine::Google),
-          targetLanguages({QOnlineTranslator::Language::SimplifiedChinese,
-                           QOnlineTranslator::Language::English,
-                           QOnlineTranslator::Language::Japanese}),
+          target_languages_({QOnlineTranslator::Language::SimplifiedChinese,
+                             QOnlineTranslator::Language::English,
+                             QOnlineTranslator::Language::Japanese}),
+          active_target_language_(
+              QOnlineTranslator::Language::SimplifiedChinese),
           font(),
           opacity(0.6),
           enable_blur(true),
@@ -34,7 +35,8 @@ class AllSettings {
           ocr_languages("eng") {}
 
     QOnlineTranslator::Engine translate_engine;
-    QVector<QOnlineTranslator::Language> targetLanguages;
+    QVector<QOnlineTranslator::Language> target_languages_;
+    QOnlineTranslator::Language active_target_language_;
     QFont font;
     qreal opacity;
     bool enable_blur;

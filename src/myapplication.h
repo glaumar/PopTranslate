@@ -10,34 +10,39 @@
 #include "popupdialog.h"
 #include "screengrabber.h"
 #include "settingwindow.h"
+#include "translatormanager.h"
 
 class MyApplication : public QApplication {
     Q_OBJECT
 
    public:
     MyApplication(int& argc, char** argv);
-    ~MyApplication();
+    // ~MyApplication();
 
-   private slots:
-    void showPop();
-    void trayActivated(QSystemTrayIcon::ActivationReason reason);
-    bool setShortcut(QAction* act, const QKeySequence& seq);
+    //    private slots:
+    //     // void showPop();
+    //     void translate(const QString& text);
+    //     void translateSelection();
+    //     void trayActivated(QSystemTrayIcon::ActivationReason reason);
+    //     bool setShortcut(QAction* act, const QKeySequence& seq);
 
    private:
     void initUiTranslator();
-    void initGlobalShortcuts();
-    void initSystemTrayIcon();
-    void initDBusInterface();
-    void initClipboard();
-    void initOcr();
+    // void initGlobalShortcuts();
+    // void initSystemTrayIcon();
+    // void initDBusInterface();
+    // void initClipboard();
+    // void initOcr();
+    // void initTranslatorManager();
 
     QTranslator* translator_;
-    PopupDialog* pop_;
-    QSystemTrayIcon* tray_;
-    SettingWindow* setting_window_;
-    QAction* translate_selection_act_;  // init in initGlobalShortcuts
-    QAction* ocr_act_;                  // init in initGlobalShortcuts
-    ScreenGrabber* grabber_;
-    ImageCropper* cropper_;
-    Ocr ocr_;
+    // PopupDialog* pop_;
+    // QSystemTrayIcon* tray_;
+    // SettingWindow* setting_window_;
+    // QAction* translate_selection_act_;
+    // QAction* ocr_act_;
+    // ScreenGrabber* grabber_;
+    // ImageCropper* cropper_;
+    // Ocr ocr_;
+    // TranslatorManager translator_manager_;
 };

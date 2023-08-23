@@ -59,18 +59,21 @@ configure_file(src/poptranslate.h.in poptranslate.h)
 
 set(PROJECT_SOURCES
     src/main.cpp
-    src/myapplication.cpp src/myapplication.h
-    src/popupdialog.cpp src/popupdialog.h src/popupdialog.ui
-    src/poptranslate_dbus.cpp src/poptranslate_dbus.h
-    src/settingwindow.cpp src/settingwindow.h src/settingwindow.ui
-    src/allsettings.h
-    src/dictionaries.cpp src/dictionaries.h
-    src/screengrabber.h src/screengrabber.cpp
-    src/imagecropper.h src/imagecropper.cpp
-    src/ocr.h src/ocr.cpp
-    src/langcode2name.h src/langcode2name.cpp
-    src/pageindicator.h src/pageindicator.cpp src/pageindicator.ui
-    src/poptranslatesettings.h src/poptranslatesettings.cpp
+    src/myapplication.cpp
+    src/appmain.cpp
+    src/popupdialog.cpp
+    src/poptranslate_dbus.cpp
+    src/settingwindow.cpp
+    src/dictionaries.cpp
+    src/screengrabber.cpp
+    src/imagecropper.cpp
+    src/ocr.cpp
+    src/langcode2name.cpp
+    src/pageindicator.cpp
+    src/poptranslatesettings.cpp
+    src/abstracttranslator.h
+    src/onlinetranslator.cpp
+    src/translatormanager.cpp
     ${TS_FILES}
 )
 
