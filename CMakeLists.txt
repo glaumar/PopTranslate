@@ -59,7 +59,6 @@ configure_file(src/poptranslate.h.in poptranslate.h)
 
 set(PROJECT_SOURCES
     src/main.cpp
-    src/myapplication.cpp
     src/appmain.cpp
     src/popupdialog.cpp
     src/poptranslate_dbus.cpp
