@@ -187,6 +187,7 @@ bool PopupDialog::event(QEvent *event) {
     }
 
     if (event->type() == QEvent::Hide) {
+        emit hidden();
         btn_prev_->hide();
         btn_next_->hide();
     }

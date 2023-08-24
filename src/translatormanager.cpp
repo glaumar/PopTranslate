@@ -38,6 +38,7 @@ void TranslatorManager::setTargetLanguage(
 void TranslatorManager::translate(const QString& text) {
     // TODO: abort all
     for (auto t : translators_) {
+        t->abort();
         t->translate(text);  // TODO: async
     }
 }

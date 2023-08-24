@@ -29,12 +29,7 @@ AppMain::AppMain(QObject *parent) : QObject(parent) {
     initDBusInterface();
     initOcr();
     initTts();
-
-    // Show setting window when PopupDialog contextmenu action "settings"
-    // triggered
-    connect(&pop_, &PopupDialog::settingsActionTriggered, [this]() {
-        setting_window_.show();
-    });
+    initPopupWindow();
 }
 
 void AppMain::initGlobalShortcuts() {
@@ -178,6 +173,20 @@ void AppMain::initTranslatorManager() {
             &PopupDialog::addTranslateResult);
 
     connect(&pop_, &PopupDialog::requestTranslate, this, &AppMain::translate);
+}
+
+void AppMain::initPopupWindow() {
+    // Show setting window when PopupDialog contextmenu action "settings"
+    // triggered
+    connect(&pop_, &PopupDialog::settingsActionTriggered, [this]{
+        setting_window_.show();
+    });
+
+    // stop translate and speking when PopupDialog hidden
+    connect(&pop_, &PopupDialog::hidden, [this]{
+        tts_.stop();
+        translator_manager_.abortAll();
+    });
 }
 
 void AppMain::trayActivated(QSystemTrayIcon::ActivationReason reason) {

@@ -29,6 +29,7 @@ class AppMain : public QObject {
     void initOcr();
     void initTts();
     void initTranslatorManager();
+    void initPopupWindow();
 
     PopupDialog pop_;
     QSystemTrayIcon tray_;

@@ -42,7 +42,7 @@ void Tts::preloadAudio(const QString &text, QOnlineTranslator::Language lang) {
 void Tts::play() { player_.play(); }
 
 void Tts::speak(const QString &text, QOnlineTranslator::Language lang) {
-    player_.stop();
+    stop();
 
     if (text.isEmpty()) {
         return;
@@ -56,4 +56,8 @@ void Tts::speak(const QString &text, QOnlineTranslator::Language lang) {
         preloadAudio(text, lang);
         play();
     }
+}
+
+void Tts::stop(){
+    player_.stop();
 }

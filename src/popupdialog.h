@@ -77,6 +77,7 @@ class PopupDialog : public QWidget {
     void settingsActionTriggered();
     void translateResultsAvailable(int index);
     void cleared();
+    void hidden();
 
    protected:
     void mouseMoveEvent(QMouseEvent *event) override;
