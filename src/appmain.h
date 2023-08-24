@@ -7,6 +7,7 @@
 #include "screengrabber.h"
 #include "settingwindow.h"
 #include "translatormanager.h"
+#include "tts.h"
 
 class AppMain : public QObject {
     Q_OBJECT
@@ -26,6 +27,7 @@ class AppMain : public QObject {
     void initDBusInterface();
     void initClipboard();
     void initOcr();
+    void initTts();
     void initTranslatorManager();
 
     PopupDialog pop_;
@@ -36,5 +38,6 @@ class AppMain : public QObject {
     ScreenGrabber grabber_;
     ImageCropper cropper_;
     Ocr ocr_;
+    Tts tts_;
     TranslatorManager translator_manager_;
 };

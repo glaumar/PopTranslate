@@ -136,7 +136,8 @@
         "qstringlist": "cpp",
         "poptranslate": "cpp",
         "qtconcurrent": "cpp",
-        "qvector": "cpp"
+        "qvector": "cpp",
+        "qpair": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

@@ -5,9 +5,7 @@
 
 #include <QClipboard>
 #include <QDebug>
-#include <QMediaPlayer>
 #include <QMenu>
-#include <QPair>
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
 #include <QPushButton>
@@ -18,6 +16,7 @@
 
 #include "abstracttranslator.h"
 #include "pageindicator.h"
+#include "tts.h"
 #include "ui_popupdialog.h"
 
 namespace Ui {
@@ -72,6 +71,9 @@ class PopupDialog : public QWidget {
 
    signals:
     void requestTranslate(const QString &text);
+    void requestSpeak(
+        const QString &text,
+        QOnlineTranslator::Language lang = QOnlineTranslator::Auto);
     void settingsActionTriggered();
     void translateResultsAvailable(int index);
     void cleared();
@@ -104,14 +106,10 @@ class PopupDialog : public QWidget {
     void startAnimationPrev();
     void startAnimationNext();
     void initStateMachine();
-    void initTts();
-    void speakText(const QString &text, QOnlineTranslator::Language lang);
-    void prepareTextAudio(const QString &text,
-                          QOnlineTranslator::Language lang);
+
     bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
     Ui::PopupDialog *ui;
-    QMediaPlayer *player_;
     QMenu context_menu_;
     QMenu engine_menu_;
     QAction *action_source_text_;
@@ -129,5 +127,4 @@ class PopupDialog : public QWidget {
     QSequentialAnimationGroup *animation_group_all_;
     int animation_duration_;
     QStateMachine result_state_machine_;
-    bool speak_after_translate_;
 };

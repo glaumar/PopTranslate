@@ -28,6 +28,7 @@ AppMain::AppMain(QObject *parent) : QObject(parent) {
     initSystemTrayIcon();
     initDBusInterface();
     initOcr();
+    initTts();
 
     // Show setting window when PopupDialog contextmenu action "settings"
     // triggered
@@ -72,13 +73,12 @@ void AppMain::translateSelection() {
 }
 
 void AppMain::translate(const QString &text) {
-    // if (pop_.isVisible() && !pop_.isNormalWindow()) {
-    //     pop_.hide();
-    //     return;
-    // }
     pop_.clear();
     pop_.setSourceText(text);
     translator_manager_.translate(text);
+    if (PopTranslateSettings::instance().isEnableAutoSpeak()) {
+        tts_.speak(text);
+    }
     pop_.show();
 }
 
@@ -162,6 +162,10 @@ void AppMain::initOcr() {
         PopTranslateSettings::instance().ocrLanguages().join("+").toLocal8Bit(),
         "",
         {});
+}
+
+void AppMain::initTts() {
+    connect(&pop_, &PopupDialog::requestSpeak, &tts_, &Tts::speak);
 }
 
 void AppMain::initTranslatorManager() {

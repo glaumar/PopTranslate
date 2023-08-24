@@ -68,6 +68,7 @@ set(PROJECT_SOURCES
     src/screengrabber.cpp
     src/imagecropper.cpp
     src/ocr.cpp
+    src/tts.cpp
     src/langcode2name.cpp
     src/pageindicator.cpp
     src/poptranslatesettings.cpp
