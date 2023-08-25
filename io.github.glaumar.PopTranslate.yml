@@ -6,6 +6,7 @@ command: poptranslate
 finish-args:
   - --socket=wayland
   - --socket=session-bus
+  - --socket=pulseaudio
   - --share=network
   - --device=dri
   - --filesystem=xdg-config/fontconfig:ro

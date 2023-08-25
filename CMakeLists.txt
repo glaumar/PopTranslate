@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(PopTranslate
-    VERSION 0.2.1
+    VERSION 0.3.0
     DESCRIPTION "Translate the text selected by the mouse on plasma wayland"
     HOMEPAGE_URL https://github.com/glaumar/PopTranslate
     LANGUAGES CXX)

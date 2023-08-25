@@ -16,8 +16,16 @@ GoldenDict, Crow Translate等等翻译软件都很好用,但由于 wayland 协�
 `Meta + G` 翻译鼠标选中的文本
 
 `Meta + Ctrl + G` OCR识别截屏中的文本并翻译
+
+# 词典
+支持MDX词典，一些词典下载地址:
+- [简明英汉字典增强版](https://github.com/skywind3000/ECDICT/releases)
+
+
+
 # 安装
 ## Arch Linux (AUR)
+
 ```bash
 paru -S poptranslate
 ```
