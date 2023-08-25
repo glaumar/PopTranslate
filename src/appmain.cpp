@@ -164,9 +164,8 @@ void AppMain::initTts() {
 }
 
 void AppMain::initTranslatorManager() {
+    translator_manager_.addTranslator(new OnlineTranslator(&translator_manager_));
     translator_manager_.addTranslator(new Dictionaries(&translator_manager_));
-    translator_manager_.addTranslator(
-        new OnlineTranslator(&translator_manager_));
     connect(&translator_manager_,
             &TranslatorManager::resultAvailable,
             &pop_,
@@ -178,12 +177,12 @@ void AppMain::initTranslatorManager() {
 void AppMain::initPopupWindow() {
     // Show setting window when PopupDialog contextmenu action "settings"
     // triggered
-    connect(&pop_, &PopupDialog::settingsActionTriggered, [this]{
+    connect(&pop_, &PopupDialog::settingsActionTriggered, [this] {
         setting_window_.show();
     });
 
     // stop translate and speking when PopupDialog hidden
-    connect(&pop_, &PopupDialog::hidden, [this]{
+    connect(&pop_, &PopupDialog::hidden, [this] {
         tts_.stop();
         translator_manager_.abortAll();
     });

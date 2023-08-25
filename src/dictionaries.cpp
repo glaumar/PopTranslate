@@ -6,27 +6,27 @@
 #include "poptranslatesettings.h"
 
 // macro “F” definition conflicts
-// #undef F
-// #include <QtConcurrent>
+#undef F
+#include <QThread>
+#include <QtConcurrent>
 
 Dictionaries::Dictionaries(QObject* parent)
-    : AbstractTranslator(parent), is_aborted_(false) {
-    setDicts(PopTranslateSettings::instance().dictionaries());
+    : AbstractTranslator(parent), abort_(false), lock_(QReadWriteLock::Recursive) {
+    setDictsAsync(PopTranslateSettings::instance().dictionaries());
     connect(&PopTranslateSettings::instance(),
             &PopTranslateSettings::dictionariesChanged,
             this,
-            &Dictionaries::setDicts);
+            &Dictionaries::setDictsAsync);
 }
 
-void Dictionaries::translate(const QString& text) { lookup(text); }
-void Dictionaries::abort() { is_aborted_ = true; }
-
 void Dictionaries::clear() {
+    QWriteLocker locker(&lock_);
     dicts_.clear();
     dict_names_.clear();
 }
 
 void Dictionaries::addDict(const QString& filename) {
+    QWriteLocker locker(&lock_);
     if (dicts_.contains(filename)) {
         qDebug() << tr("dictionary already exists: %1").arg(filename);
         return;
@@ -39,6 +39,7 @@ void Dictionaries::addDict(const QString& filename) {
     qDebug() << tr("addDict: %1").arg(filename);
     QSharedPointer<mdict::Mdict> md_p(new mdict::Mdict(filename.toStdString()));
     md_p->init();
+
     dicts_.insert(filename, md_p);
     dict_names_.append(filename);
 }
@@ -50,6 +51,7 @@ void Dictionaries::addDicts(const QStringList& filenames) {
 }
 
 void Dictionaries::setDicts(const QStringList& filenames) {
+    QWriteLocker locker(&lock_);
     QSet<QString> old_set(dict_names_.begin(), dict_names_.end());
     QSet<QString> new_set(filenames.begin(), filenames.end());
     auto diff = old_set - new_set;
@@ -66,7 +68,12 @@ void Dictionaries::setDicts(const QStringList& filenames) {
     };
 }
 
+void Dictionaries::setDictsAsync(const QStringList& filenames) {
+   QtConcurrent::run(this, &Dictionaries::setDicts, filenames);
+}
+
 void Dictionaries::removeDict(const QString& filename) {
+    QWriteLocker locker(&lock_);
     if (!dicts_.contains(filename)) {
         return;
     }
@@ -86,24 +93,33 @@ void Dictionaries::removeDicts(const QStringList& filenames) {
     }
 }
 
-void Dictionaries::lookup(const QString& word) {
-    for (auto& dict_name : dict_names_) {
-        auto dict = dicts_.value(dict_name);
-        auto content = dict->lookup(word.toStdString());  // TODO:async
-        if (is_aborted_) {
-            break;
-        }
+void Dictionaries::translate(const QString& text) {
+    QtConcurrent::run(this, &Dictionaries::lookup, text);
+}
+
+void Dictionaries::abort() { abort_ = true; }
+
+void Dictionaries::lookup(const QString& text) {
+    abort_ = false;
+
+    QReadLocker locker(&lock_);
+    for (auto it = dict_names_.begin(); it != dict_names_.end() && !abort_;
+         ++it) {
+        auto dict = dicts_.value(*it);
+        auto content = dict->lookup(text.toStdString());
         if (content != "") {
-            auto dict_basename = QFileInfo(dict_name).baseName();
+            auto dict_basename = QFileInfo(*it).baseName();
             AbstractTranslator::Result result{dict_basename,
                                               QString::fromStdString(content)};
+            if (abort_) {
+                break;
+            }
             emit resultAvailable(result);
             qDebug()
                 << tr("Dictionaries Lookup Success: %1").arg(dict_basename);
         }
     }
     emit finished();
-    is_aborted_ = false;
 }
 
 bool Dictionaries::fileCheck(const QString& filename) {

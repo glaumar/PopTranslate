@@ -17,7 +17,10 @@ class AbstractTranslator : public QObject {
     explicit AbstractTranslator(QObject *parent = nullptr)
         : QObject(parent),
           source_language_(QOnlineTranslator::NoLanguage),
-          target_language_(QOnlineTranslator::NoLanguage){};
+          target_language_(QOnlineTranslator::NoLanguage) {
+        qRegisterMetaType<AbstractTranslator::Result>(
+            "AbstractTranslator::Result");
+    };
 
     virtual ~AbstractTranslator() = default;
     virtual void translate(const QString &text) = 0;

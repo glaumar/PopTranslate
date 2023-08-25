@@ -12,7 +12,11 @@ Tts::Tts(QObject *parent) : QObject(parent) {
 
     // detect language finished
     connect(&translator_, &QOnlineTranslator::finished, this, [this] {
-        speak(text_, translator_.sourceLanguage());
+        if(translator_.error() == QOnlineTranslator::NoError){
+            speak(text_, translator_.sourceLanguage());
+        }else{
+            qWarning() << tr("TTS: %1").arg(translator_.errorString());
+        }
     });
 }
 
@@ -37,6 +41,8 @@ void Tts::preloadAudio(const QString &text, QOnlineTranslator::Language lang) {
 
     player_.playlist()->clear();
     player_.playlist()->addMedia(onlinetts.media());
+
+    // TODO: cache audio
 }
 
 void Tts::play() { player_.play(); }
@@ -58,6 +64,4 @@ void Tts::speak(const QString &text, QOnlineTranslator::Language lang) {
     }
 }
 
-void Tts::stop(){
-    player_.stop();
-}
+void Tts::stop() { player_.stop(); }
