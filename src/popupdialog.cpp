@@ -249,10 +249,10 @@ void PopupDialog::initContextMenu() {
     action_source_text_->setCheckable(true);
     connect(action_source_text_, &QAction::triggered, this, [this](bool state) {
         if (state) {
-            QSize new_size(this->size().width(), this->size().height() * 2);
+            QSize new_size(this->size().width(), this->size().height() * 1.5);
             this->resize(new_size);
         } else {
-            QSize new_size(this->size().width(), this->size().height() / 2);
+            QSize new_size(this->size().width(), this->size().height() / 1.5);
             this->resize(new_size);
         }
         setSrcTextEditVisible(state);

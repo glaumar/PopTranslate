@@ -2,11 +2,11 @@
 
 #include <QFuture>
 #include <QMap>
+#include <QReadWriteLock>
 #include <QSharedPointer>
 #include <QStringList>
 #include <QVector>
 #include <atomic>
-#include <QReadWriteLock>
 
 #include "abstracttranslator.h"
 #include "mdict.h"

@@ -12,9 +12,9 @@ Tts::Tts(QObject *parent) : QObject(parent) {
 
     // detect language finished
     connect(&translator_, &QOnlineTranslator::finished, this, [this] {
-        if(translator_.error() == QOnlineTranslator::NoError){
+        if (translator_.error() == QOnlineTranslator::NoError) {
             speak(text_, translator_.sourceLanguage());
-        }else{
+        } else {
             qWarning() << tr("TTS: %1").arg(translator_.errorString());
         }
     });

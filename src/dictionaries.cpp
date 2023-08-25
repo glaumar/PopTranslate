@@ -11,7 +11,9 @@
 #include <QtConcurrent>
 
 Dictionaries::Dictionaries(QObject* parent)
-    : AbstractTranslator(parent), abort_(false), lock_(QReadWriteLock::Recursive) {
+    : AbstractTranslator(parent),
+      abort_(false),
+      lock_(QReadWriteLock::Recursive) {
     setDictsAsync(PopTranslateSettings::instance().dictionaries());
     connect(&PopTranslateSettings::instance(),
             &PopTranslateSettings::dictionariesChanged,
@@ -69,7 +71,7 @@ void Dictionaries::setDicts(const QStringList& filenames) {
 }
 
 void Dictionaries::setDictsAsync(const QStringList& filenames) {
-   QtConcurrent::run(this, &Dictionaries::setDicts, filenames);
+    QtConcurrent::run(this, &Dictionaries::setDicts, filenames);
 }
 
 void Dictionaries::removeDict(const QString& filename) {
