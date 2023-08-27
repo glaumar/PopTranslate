@@ -6,8 +6,7 @@ TranslatorManager::TranslatorManager(QObject* parent) : QObject(parent) {
     connect(&PopTranslateSettings::instance(),
             &PopTranslateSettings::activeTargetLanguageChanged,
             this,
-            &TranslatorManager::setTargetLanguage,
-            Qt::QueuedConnection);
+            &TranslatorManager::setTargetLanguage);
 }
 
 void TranslatorManager::addTranslator(AbstractTranslator* translator) {

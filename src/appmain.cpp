@@ -126,8 +126,8 @@ void AppMain::initClipboard() {
     connect(KSystemClipboard::instance(),
             &KSystemClipboard::changed,
             [this](QClipboard::Mode mode) {
-                // only translate when popupdialog is visible
-                if (mode == QClipboard::Selection && pop_.isVisible()) {
+                if (mode == QClipboard::Selection &&
+                    PopTranslateSettings::instance().monitorClipboard()) {
                     translateSelection();
                 }
             });
@@ -178,7 +178,7 @@ void AppMain::initTranslatorManager() {
 void AppMain::initPopupWindow() {
     // Show setting window when PopupDialog contextmenu action "settings"
     // triggered
-    connect(&pop_, &PopupDialog::settingsActionTriggered, [this] {
+    connect(&pop_, &PopupDialog::requestShowSettingsWindow, [this] {
         setting_window_.show();
     });
 

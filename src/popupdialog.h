@@ -16,6 +16,7 @@
 
 #include "abstracttranslator.h"
 #include "pageindicator.h"
+#include "poptranslatesettings.h"
 #include "tts.h"
 #include "ui_popupdialog.h"
 
@@ -29,44 +30,29 @@ class PopupDialog : public QWidget {
    public:
     explicit PopupDialog(QWidget *parent = nullptr);
     ~PopupDialog();
-    void setNormalWindow(bool enable = false);
 
-    inline bool isNormalWindow() const { return flag_normal_window_; }
-    inline bool isSrcTextEditVisible() const {
-        return action_source_text_->isChecked();
+    void enableMonitorMode(bool enable);
+    void addTranslateResult(const AbstractTranslator::Result &result);
+    void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
+    void setFont(const QFont &font);
+    void setOpacity(qreal opacity);
+    void clear();
+
+    inline QString sourceText() const {
+        return ui->src_plain_text_edit->toPlainText();
+    }
+
+    inline QString translationText() const {
+        return ui->trans_text_edit->toPlainText();
+    }
+
+    inline void setSourceText(const QString &text) {
+        ui->src_plain_text_edit->setPlainText(text);
     }
 
     inline void setSrcTextEditVisible(bool visible) {
         ui->src_plain_text_edit->setVisible(visible);
         ui->horizon_line->setVisible(visible);
-        action_source_text_->setChecked(visible);
-    }
-    void clear();
-   public slots:
-    void addTranslateResult(const AbstractTranslator::Result &result);
-    void setTranslateEngine(QOnlineTranslator::Engine engine);
-    void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
-    void setFont(const QFont &font);
-    void setOpacity(qreal opacity);
-    void showTranslateResult(const AbstractTranslator::Result &result);
-    inline bool hasNextResult() const {
-        return result_index_ >= 0 &&
-               result_index_ < translate_results_.size() - 1;
-    }
-    inline bool hasPrevResult() const {
-        return result_index_ > 0 &&
-               result_index_ <= translate_results_.size() - 1;
-    }
-
-    inline QString sourceText() const {
-        return ui->src_plain_text_edit->toPlainText();
-    }
-    inline void setSourceText(const QString &text) {
-        ui->src_plain_text_edit->setPlainText(text);
-    }
-
-    inline QString translationText() const {
-        return ui->trans_text_edit->toPlainText();
     }
 
    signals:
@@ -74,7 +60,7 @@ class PopupDialog : public QWidget {
     void requestSpeak(
         const QString &text,
         QOnlineTranslator::Language lang = QOnlineTranslator::Auto);
-    void settingsActionTriggered();
+    void requestShowSettingsWindow();
     void translateResultsAvailable(int index);
     void cleared();
     void hidden();
@@ -84,7 +70,7 @@ class PopupDialog : public QWidget {
     bool event(QEvent *event) override;
     bool eventFilter(QObject *filtered, QEvent *event) override;
 
-   private slots:
+   private:
     inline void copySourceText() const {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(sourceText());
@@ -95,9 +81,22 @@ class PopupDialog : public QWidget {
         clipboard->setText(translationText());
     }
 
-   private:
+    void showTranslateResult(const AbstractTranslator::Result &result);
+
+    inline bool hasNextResult() const {
+        return result_index_ >= 0 &&
+               result_index_ < translate_results_.size() - 1;
+    }
+    inline bool hasPrevResult() const {
+        return result_index_ > 0 &&
+               result_index_ <= translate_results_.size() - 1;
+    }
+    inline bool isEnableMonitorMode() const {
+        return PopTranslateSettings::instance().monitorClipboard();
+    }
+
     void loadSettings();
-    void initContextMenu();
+    void initBottomButtons();
     void initWaylandConnection();
     void initFloatButton();
     void showFloatButton(QPoint cursor_pos);
@@ -108,12 +107,8 @@ class PopupDialog : public QWidget {
     void startAnimationNext();
     void initStateMachine();
 
-    bool flag_normal_window_;
     KWayland::Client::PlasmaShell *plasmashell_;
     Ui::PopupDialog *ui;
-    QMenu context_menu_;
-    QMenu engine_menu_;
-    QAction *action_source_text_;
     QVector<AbstractTranslator::Result> translate_results_;
     int result_index_;
     QPushButton *btn_prev_;

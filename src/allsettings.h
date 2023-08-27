@@ -32,7 +32,8 @@ class AllSettings {
           popup_window_size(512, 384),
           show_src_text(false),
           dictionaries(),
-          ocr_languages("eng") {}
+          ocr_languages("eng"),
+          monitor_clipboard(false) {}
 
     QOnlineTranslator::Engine translate_engine;
     QVector<QOnlineTranslator::Language> target_languages_;
@@ -54,6 +55,7 @@ class AllSettings {
     bool show_src_text;
     QStringList dictionaries;
     QStringList ocr_languages;
+    bool monitor_clipboard;
 
     static const AllSettings& defaultSettings() {
         static AllSettings default_settings;

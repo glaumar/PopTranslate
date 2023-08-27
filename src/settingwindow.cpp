@@ -26,6 +26,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     initOpacityAndBlur();
     initAutoCopyTranslation();
     initAutoSpeak();
+    initShowSrcText();
     initProxy();
     initShortcut();
     initDictionaries();
@@ -169,6 +170,18 @@ void SettingWindow::initAutoSpeak() {
             [this](int state) {
                 auto enable = state == Qt::Checked;
                 PopTranslateSettings::instance().setEnableAutoSpeak(enable);
+            });
+}
+
+void SettingWindow::initShowSrcText(){
+    ui->show_src_text_checkbox->setChecked(
+        PopTranslateSettings::instance().showSrcText());
+
+    connect(ui->show_src_text_checkbox,
+            &QCheckBox::stateChanged,
+            [this](int state) {
+                auto enable = state == Qt::Checked;
+                PopTranslateSettings::instance().setShowSrcText(enable);
             });
 }
 

@@ -1,5 +1,9 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
+    "files.exclude": {
+        ".flatpak-builder": true,
+        "build_flatpak": true
+    },
     "files.associations": {
         "new": "cpp",
         "utility": "cpp",
@@ -138,7 +142,8 @@
         "qtconcurrent": "cpp",
         "qvector": "cpp",
         "qpair": "cpp",
-        "threadweaver": "cpp"
+        "threadweaver": "cpp",
+        "qradiobutton": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

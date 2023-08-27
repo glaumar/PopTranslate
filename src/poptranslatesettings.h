@@ -84,6 +84,7 @@ class PopTranslateSettings : public QObject {
     inline bool showSrcText() const { return all_.show_src_text; };
     inline QStringList dictionaries() const { return all_.dictionaries; };
     inline QStringList ocrLanguages() const { return all_.ocr_languages; };
+    inline bool monitorClipboard() const { return all_.monitor_clipboard; };
 
     void setTranslateEngine(QOnlineTranslator::Engine engine);
     void setTargetLanguages(QVector<QOnlineTranslator::Language> languages);
@@ -105,6 +106,7 @@ class PopTranslateSettings : public QObject {
     void setShowSrcText(bool enable);
     void setDictionaries(QStringList dictionaries);
     void setOcrLanguages(QStringList ocr_languages);
+    void setMonitorClipboard(bool enable);
 
    signals:
     void translateEngineChanged(QOnlineTranslator::Engine engine);
@@ -127,6 +129,7 @@ class PopTranslateSettings : public QObject {
     void showSrcTextChanged(bool enable);
     void dictionariesChanged(QStringList dictionaries);
     void ocrLanguagesChanged(QStringList ocr_languages);
+    void monitorClipboardChanged(bool enable);
 
    private:
     PopTranslateSettings();

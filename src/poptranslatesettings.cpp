@@ -241,3 +241,11 @@ void PopTranslateSettings::setOcrLanguages(QStringList ocr_languages) {
     qDebug() << tr("Settings: Change ocr languages : %1")
                     .arg(ocr_languages.join(" "));
 };
+
+void PopTranslateSettings::setMonitorClipboard(bool enable) {
+    all_.monitor_clipboard = enable;
+    settings_.setValue("monitor_clipboard", enable);
+    emit monitorClipboardChanged(enable);
+    qDebug() << tr("Settings: %1 monitor clipboard")
+                    .arg(enable ? tr("Enable") : tr("Disable"));
+};
