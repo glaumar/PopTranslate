@@ -69,6 +69,7 @@ set(PROJECT_SOURCES
     src/ocr.cpp
     src/tts.cpp
     src/langcode2name.cpp
+    src/lang2iso639.cpp
     src/pageindicator.cpp
     src/poptranslatesettings.cpp
     src/abstracttranslator.h

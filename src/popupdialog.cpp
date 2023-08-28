@@ -18,6 +18,7 @@
 #include "onlinetranslator.h"
 #include "poptranslate.h"
 #include "qonlinetranslator.h"
+#include "lang2iso639.h"
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent),
@@ -93,7 +94,7 @@ void PopupDialog::setTargetLanguages(
 
     for (auto lang : languages) {
         auto button = new QRadioButton(
-            PopTranslateSettings::instance().targetLanguageStr(lang),
+            Lang2ISO639(lang),
             this);
         layout->addWidget(button);
 

@@ -126,7 +126,7 @@ void AppMain::initClipboard() {
     connect(KSystemClipboard::instance(),
             &KSystemClipboard::changed,
             [this](QClipboard::Mode mode) {
-                if (mode == QClipboard::Selection &&
+                if (mode == QClipboard::Selection && pop_.isVisible() &&
                     PopTranslateSettings::instance().monitorClipboard()) {
                     translateSelection();
                 }
