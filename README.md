@@ -7,11 +7,11 @@ PopTranslate is a translator running under wayland, which can translate the text
 GoldenDict, Crow Translate and other translation software are very useful, but due to the wayland protocol restrictions, they cannot register global shortcut keys, and cannot read the clipboard and mouse position in the background (resulting in the inability to pop up a window near the mouse and translate)
 # Screenshots
 
-![](./screeshots/Screenshot1.png)
+![](./screenshots/Screenshot1.png)
 
-![](./screeshots/Screenshot2.png)
+![](./screenshots/Screenshot2.png)
 
-![](./screeshots/Screenshot3.png)
+![](./screenshots/Screenshot3.png)
 
 # Global Shortcuts
 

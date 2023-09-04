@@ -28,15 +28,15 @@
     <screenshots>
         <screenshot type="default">
             <image>
-                https://raw.githubusercontent.com/glaumar/PopTranslate/main/screeshots/Screenshot1.png</image>
+                https://raw.githubusercontent.com/glaumar/PopTranslate/main/screenshots/Screenshot1.png</image>
         </screenshot>
         <screenshot>
             <image>
-                https://raw.githubusercontent.com/glaumar/PopTranslate/main/screeshots/Screenshot2.png</image>
+                https://raw.githubusercontent.com/glaumar/PopTranslate/main/screenshots/Screenshot2.png</image>
         </screenshot>
         <screenshot>
             <image>
-                https://raw.githubusercontent.com/glaumar/PopTranslate/main/screeshots/Screenshot3.png</image>
+                https://raw.githubusercontent.com/glaumar/PopTranslate/main/screenshots/Screenshot3.png</image>
         </screenshot>
     </screenshots>
 </component>

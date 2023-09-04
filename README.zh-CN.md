@@ -6,11 +6,11 @@ PopTranslate 是一个运行在 wayland 下的翻译器,能够翻译鼠标选中
 GoldenDict, Crow Translate等等翻译软件都很好用,但由于 wayland 协议限制,他们在 wayland 下无法注册全局快捷键,无法在后台读取剪贴板和鼠标位置(导致无法在鼠标附近弹出窗口并翻译)
 # 应用截图
 
-![](./screeshots/Screenshot1.png)
+![](./screenshots/Screenshot1.png)
 
-![](./screeshots/Screenshot2.png)
+![](./screenshots/Screenshot2.png)
 
-![](./screeshots/Screenshot3.png)
+![](./screenshots/Screenshot3.png)
 
 # 全局快捷键
 `Meta + G` 翻译鼠标选中的文本

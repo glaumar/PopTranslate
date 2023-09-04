@@ -92,6 +92,11 @@ void PopupDialog::setTargetLanguages(
         delete child;
     }
 
+    if(languages.isEmpty()){
+        return;
+    }
+
+    PopTranslateSettings::instance().setActiveTargetLanguage(languages.at(0));
     for (auto lang : languages) {
         auto button = new QRadioButton(
             Lang2ISO639(lang),
@@ -109,6 +114,7 @@ void PopupDialog::setTargetLanguages(
             emit requestTranslate(text);
         });
     }
+
 }
 
 void PopupDialog::setFont(const QFont &font) {
