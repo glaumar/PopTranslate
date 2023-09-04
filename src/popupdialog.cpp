@@ -158,8 +158,9 @@ void PopupDialog::showTranslateResult(
         ui->title_label->setText(s_text);
     }
 
-    auto plain_text = QTextDocumentFragment::fromHtml(t_text).toPlainText();
-    ui->trans_text_edit->setText(plain_text);
+    // auto plain_text = QTextDocumentFragment::fromHtml(t_text).toPlainText();
+    // ui->trans_text_edit->setText(plain_text);
+    ui->trans_text_edit->setText(t_text);
 
     // auto copy translation
     if (PopTranslateSettings::instance().isEnableAutoCopyTranslation()) {

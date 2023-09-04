@@ -41,7 +41,7 @@ void Dictionaries::addDict(const QString& filename) {
     qDebug() << tr("addDict: %1").arg(filename);
     QSharedPointer<mdict::Mdict> md_p(new mdict::Mdict(filename.toStdString()));
     md_p->init();
-
+    qDebug() << tr("%1 load success").arg(filename);
     dicts_.insert(filename, md_p);
     dict_names_.append(filename);
 }
@@ -110,9 +110,10 @@ void Dictionaries::lookup(const QString& text) {
         auto dict = dicts_.value(*it);
         auto content = dict->lookup(text.toStdString());
         if (content != "") {
+            QString content_qstr = QString::fromStdString(content);
+            content_qstr.remove(QRegExp("`[0-9]`|</?br>"));
             auto dict_basename = QFileInfo(*it).baseName();
-            AbstractTranslator::Result result{dict_basename,
-                                              QString::fromStdString(content)};
+            AbstractTranslator::Result result{dict_basename, content_qstr};
             if (abort_) {
                 break;
             }
