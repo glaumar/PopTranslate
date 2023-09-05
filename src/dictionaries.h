@@ -10,6 +10,7 @@
 
 #include "abstracttranslator.h"
 #include "mdict.h"
+#include "dictionaryinfo.h"
 
 class Dictionaries : public AbstractTranslator {
     Q_OBJECT
@@ -20,18 +21,18 @@ class Dictionaries : public AbstractTranslator {
     void abort() override;
 
     void clear();
-    void addDict(const QString& filename);
-    void addDicts(const QStringList& filenames);
-    void setDicts(const QStringList& filenames);
-    void setDictsAsync(const QStringList& filenames);
-    void removeDict(const QString& filename);
-    void removeDicts(const QStringList& filenames);
+    void addDict(const DictionaryInfo& dict_info);
+    void addDicts(const QVector<DictionaryInfo>& info_vec);
+    void setDicts(const QVector<DictionaryInfo>& info_vec);
+    void setDictsAsync(const QVector<DictionaryInfo>& info_vec);
+    void removeDict(const DictionaryInfo& dict_info);
+    void removeDicts(const QVector<DictionaryInfo>& info_vec);
     void lookup(const QString& text);
 
    private:
     bool fileCheck(const QString& filename);
-    QMap<QString, QSharedPointer<mdict::Mdict>> dicts_;
-    QStringList dict_names_;
+    QMap<DictionaryInfo, QSharedPointer<mdict::Mdict>> dicts_;
+    QVector<DictionaryInfo> dict_names_;
     std::atomic_bool abort_;
     QReadWriteLock lock_;
 };

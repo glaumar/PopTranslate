@@ -135,6 +135,4 @@ static const QMap<QOnlineTranslator::Language, QString> KISO639 = {
     {QOnlineTranslator::Zulu, QString("ZU")},
 };
 
-QString Lang2ISO639(QOnlineTranslator::Language lang) {
-    return KISO639[lang];
-}
+QString Lang2ISO639(QOnlineTranslator::Language lang) { return KISO639[lang]; }

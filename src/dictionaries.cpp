@@ -27,42 +27,42 @@ void Dictionaries::clear() {
     dict_names_.clear();
 }
 
-void Dictionaries::addDict(const QString& filename) {
+void Dictionaries::addDict(const DictionaryInfo& dict_info) {
     QWriteLocker locker(&lock_);
-    if (dicts_.contains(filename)) {
-        qDebug() << tr("dictionary already exists: %1").arg(filename);
+    if (dicts_.contains(dict_info)) {
+        qDebug() << tr("dictionary already exists: %1").arg(dict_info.filename);//TODO: maybe remove
         return;
     }
 
-    if (!fileCheck(filename)) {
+    if (!fileCheck(dict_info.filename)) {
         return;
     }
 
-    qDebug() << tr("addDict: %1").arg(filename);
-    QSharedPointer<mdict::Mdict> md_p(new mdict::Mdict(filename.toStdString()));
+    // qDebug() << tr("addDict: %1").arg(dict_info.filename);
+    QSharedPointer<mdict::Mdict> md_p(new mdict::Mdict(dict_info.filename.toStdString()));
     md_p->init();
-    qDebug() << tr("%1 load success").arg(filename);
-    dicts_.insert(filename, md_p);
-    dict_names_.append(filename);
+    qDebug() << tr("%1 load success").arg(dict_info.filename);
+    dicts_.insert(dict_info, md_p);
+    dict_names_.append(dict_info);
 }
 
-void Dictionaries::addDicts(const QStringList& filenames) {
-    for (auto& filename : filenames) {
-        addDict(filename);
+void Dictionaries::addDicts(const QVector<DictionaryInfo>& info_vec) {
+    for (auto& info : info_vec) {
+        addDict(info);
     }
 }
 
-void Dictionaries::setDicts(const QStringList& filenames) {
+void Dictionaries::setDicts(const QVector<DictionaryInfo>& info_vec) {
     QWriteLocker locker(&lock_);
-    QSet<QString> old_set(dict_names_.begin(), dict_names_.end());
-    QSet<QString> new_set(filenames.begin(), filenames.end());
+    QSet<DictionaryInfo> old_set(dict_names_.begin(), dict_names_.end());
+    QSet<DictionaryInfo> new_set(info_vec.begin(), info_vec.end());
     auto diff = old_set - new_set;
 
-    removeDicts(diff.values());
-    addDicts(filenames);
+    removeDicts(QVector<DictionaryInfo>(diff.begin(), diff.end()));
+    addDicts(info_vec);
 
-    dict_names_ = filenames;
-    QMutableStringListIterator it(dict_names_);
+    dict_names_ = info_vec;
+    QMutableVectorIterator<DictionaryInfo> it(dict_names_);
     while (it.hasNext()) {
         if (!dicts_.contains(it.next())) {
             it.remove();
@@ -70,28 +70,29 @@ void Dictionaries::setDicts(const QStringList& filenames) {
     };
 }
 
-void Dictionaries::setDictsAsync(const QStringList& filenames) {
-    QtConcurrent::run(this, &Dictionaries::setDicts, filenames);
+void Dictionaries::setDictsAsync(const QVector<DictionaryInfo>& info_vec) {
+    QtConcurrent::run(this, &Dictionaries::setDicts, info_vec);
 }
 
-void Dictionaries::removeDict(const QString& filename) {
+void Dictionaries::removeDict(const DictionaryInfo& dict_info) {
     QWriteLocker locker(&lock_);
-    if (!dicts_.contains(filename)) {
+    if (!dicts_.contains(dict_info)) {
         return;
     }
 
-    dicts_.remove(filename);
+    dicts_.remove(dict_info);
     for (int i = 0; i < dict_names_.size(); i++) {
-        if (dict_names_[i] == filename) {
+        if (dict_names_[i] == dict_info) {
             dict_names_.removeAt(i);
-            qDebug() << tr("removeDict: %1").arg(filename);
+            qDebug() << tr("removeDict: %1").arg(dict_info.filename);
             break;
         }
     }
 }
-void Dictionaries::removeDicts(const QStringList& filenames) {
-    for (auto& filename : filenames) {
-        removeDict(filename);
+
+void Dictionaries::removeDicts(const QVector<DictionaryInfo>& info_vec) {
+    for (auto& info : info_vec) {
+        removeDict(info);
     }
 }
 
@@ -107,12 +108,17 @@ void Dictionaries::lookup(const QString& text) {
     QReadLocker locker(&lock_);
     for (auto it = dict_names_.begin(); it != dict_names_.end() && !abort_;
          ++it) {
+        
+        if(it->target_language != targetLanguage()) {
+            continue;
+        }
+
         auto dict = dicts_.value(*it);
         auto content = dict->lookup(text.toStdString());
         if (content != "") {
             QString content_qstr = QString::fromStdString(content);
             content_qstr.remove(QRegExp("`[0-9]`|</?br>"));
-            auto dict_basename = QFileInfo(*it).baseName();
+            auto dict_basename = QFileInfo(it->filename).baseName();
             AbstractTranslator::Result result{dict_basename, content_qstr};
             if (abort_) {
                 break;

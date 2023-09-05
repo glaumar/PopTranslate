@@ -15,10 +15,10 @@
 #include <QStyle>
 
 #include "dictionaries.h"
+#include "lang2iso639.h"
 #include "onlinetranslator.h"
 #include "poptranslate.h"
 #include "qonlinetranslator.h"
-#include "lang2iso639.h"
 
 PopupDialog::PopupDialog(QWidget *parent)
     : QWidget(parent),
@@ -92,15 +92,13 @@ void PopupDialog::setTargetLanguages(
         delete child;
     }
 
-    if(languages.isEmpty()){
+    if (languages.isEmpty()) {
         return;
     }
 
     PopTranslateSettings::instance().setActiveTargetLanguage(languages.at(0));
     for (auto lang : languages) {
-        auto button = new QRadioButton(
-            Lang2ISO639(lang),
-            this);
+        auto button = new QRadioButton(Lang2ISO639(lang), this);
         layout->addWidget(button);
 
         if (lang == PopTranslateSettings::instance().activeTargetLanguage()) {
@@ -114,7 +112,6 @@ void PopupDialog::setTargetLanguages(
             emit requestTranslate(text);
         });
     }
-
 }
 
 void PopupDialog::setFont(const QFont &font) {

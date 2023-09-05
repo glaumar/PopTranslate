@@ -4,9 +4,11 @@
 #include <QComboBox>
 #include <QNetworkProxy>
 #include <QWidget>
+#include <QListWidgetItem>
 
 #include "poptranslatesettings.h"
 #include "qonlinetranslator.h"
+#include "dictionaryinfo.h"
 
 namespace Ui {
 class SettingWindow;
@@ -34,6 +36,10 @@ class SettingWindow : public QWidget {
     QMap<QString, QCheckBox *> addOcrLanguageToUi(QStringList ocr_languages,
                                                   bool is_checked = false,
                                                   bool is_enabled = true);
+    
+    void addDictionaryItem(const DictionaryInfo& dict_info);
+    QWidget* newDictionaryItemWidget(const DictionaryInfo& dict_info, QListWidgetItem* item);
+    QVector<DictionaryInfo> getAllDictInfo() const;
 
     Ui::SettingWindow *ui;
     QVector<QComboBox *> target_languages_combobox_;

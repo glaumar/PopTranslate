@@ -173,7 +173,7 @@ void SettingWindow::initAutoSpeak() {
             });
 }
 
-void SettingWindow::initShowSrcText(){
+void SettingWindow::initShowSrcText() {
     ui->show_src_text_checkbox->setChecked(
         PopTranslateSettings::instance().showSrcText());
 
@@ -315,34 +315,33 @@ void SettingWindow::initShortcut() {
 }
 
 void SettingWindow::initDictionaries() {
-    auto *add_button = ui->dictionary_keditlistwidget->addButton();
-    add_button->setEnabled(true);
-    ui->dictionary_keditlistwidget->lineEdit()->setVisible(false);
+    ui->dict_listwidget->setDragDropMode(QAbstractItemView::InternalMove);
+    ui->dict_listwidget->setMovement(QListView::Snap);
 
-    auto dictionaries = PopTranslateSettings::instance().dictionaries();
-    if (!dictionaries.isEmpty()) {
-        ui->dictionary_keditlistwidget->setItems(dictionaries);
+    for(const auto& dict_info : PopTranslateSettings::instance().dictionaries()){
+        addDictionaryItem(dict_info);
     }
 
-    // add dictionary files using filedialog
-    connect(add_button, &QPushButton::pressed, [this] {
-        static auto *dialog =
-            new QFileDialog(this, tr("Select Dictionary Files"));
-        dialog->setFileMode(QFileDialog::ExistingFiles);
-        dialog->setNameFilter(tr("MDict Files (*.mdx)"));
-        dialog->setDirectory(QDir::homePath());
-        dialog->exec();
-        if (!dialog->selectedFiles().isEmpty()) {
-            ui->dictionary_keditlistwidget->insertStringList(
-                dialog->selectedFiles());
-        };
-        emit ui->dictionary_keditlistwidget->changed();
+    connect(ui->dict_listwidget, &QListWidget::currentRowChanged, [this](int currentRow){
+        qDebug() << "ssssssssssssss" << currentRow;
     });
 
-    connect(ui->dictionary_keditlistwidget, &KEditListWidget::changed, [this] {
-        PopTranslateSettings::instance().setDictionaries(
-            ui->dictionary_keditlistwidget->items());
-        ui->dictionary_keditlistwidget->addButton()->setEnabled(true);
+    // connect(ui->dict_listwidget, &QListView::itemMoved, [this](const QModelIndexList &indexes){
+    //     qDebug() << "ddddddddddddddddddddddddddd" << indexes.size();
+    // });
+
+    connect(ui->add_pushbutton, &QPushButton::clicked, [this]() {
+        static auto *dialog = new QFileDialog(this,
+                                              tr("Select Dictionary Files"),
+                                              QDir::homePath());
+        dialog->setFileMode(QFileDialog::ExistingFiles);
+        dialog->setNameFilter(tr("MDict Files (*.mdx)"));
+        dialog->exec();
+        if (!dialog->selectedFiles().isEmpty()) {
+            for (auto f : dialog->selectedFiles()) {
+                addDictionaryItem(DictionaryInfo{f, QOnlineTranslator::Auto});
+            }
+        };
     });
 }
 
@@ -400,4 +399,71 @@ QMap<QString, QCheckBox *> SettingWindow::addOcrLanguageToUi(
     }
 
     return result;
+}
+
+void SettingWindow::addDictionaryItem(const DictionaryInfo& dict_info) {
+    QListWidgetItem *item = new QListWidgetItem(ui->dict_listwidget);
+    item->setData(Qt::UserRole, QVariant::fromValue(dict_info));
+    QWidget *item_widget = newDictionaryItemWidget(dict_info, item);
+
+    item->setSizeHint(item_widget->sizeHint());
+    ui->dict_listwidget->addItem(item);
+    ui->dict_listwidget->setItemWidget(item, item_widget);
+
+    PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
+}
+
+QWidget *SettingWindow::newDictionaryItemWidget(const DictionaryInfo& dict_info,
+                                                QListWidgetItem *item) {
+    QWidget *item_widget = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(item_widget);
+
+    QLabel *dictname = new QLabel(QFileInfo(dict_info.filename).baseName(), item_widget);
+    dictname->setToolTip(dict_info.filename);
+
+    QComboBox *combobox = new QComboBox(item_widget);
+    combobox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+    combobox->setToolTip(tr("Target Language"));
+
+    // add all languages to all target language comboboxes
+    const QMetaEnum languages =
+        QMetaEnum::fromType<QOnlineTranslator::Language>();
+    for (int i = 0; i < languages.keyCount(); i++) {
+        if (languages.value(i) == QOnlineTranslator::NoLanguage) continue;
+        if (languages.value(i) == QOnlineTranslator::Auto){
+            combobox->addItem(tr("All Languages"), languages.value(i));
+        }else{
+            combobox->addItem(languages.key(i), languages.value(i));
+        }
+    }
+
+    combobox->setCurrentIndex(static_cast<int>(dict_info.target_language));
+
+    connect(combobox,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [this, item](int index) {
+                auto dict_info =
+                    item->data(Qt::UserRole).value<DictionaryInfo>();
+                dict_info.target_language =
+                    static_cast<QOnlineTranslator::Language>(index);
+                item->setData(Qt::UserRole, QVariant::fromValue(dict_info));
+                PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
+
+            });
+
+    layout->addWidget(combobox);
+    layout->addWidget(dictname);
+    item_widget->setLayout(layout);
+
+    return item_widget;
+}
+
+QVector<DictionaryInfo> SettingWindow::getAllDictInfo() const{
+    QVector<DictionaryInfo> all_dict_info;
+    for (int i = 0; i < ui->dict_listwidget->count(); ++i) {
+        auto item = ui->dict_listwidget->item(i);
+        all_dict_info.append(item->data(Qt::UserRole).value<DictionaryInfo>());
+    }
+    return all_dict_info;
 }

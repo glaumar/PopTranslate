@@ -82,7 +82,10 @@ class PopTranslateSettings : public QObject {
     inline QKeySequence OcrShortcut() const { return all_.ocr_shortcut; };
     inline QSize popupWindowSize() const { return all_.popup_window_size; };
     inline bool showSrcText() const { return all_.show_src_text; };
-    inline QStringList dictionaries() const { return all_.dictionaries; };
+    inline QVector<DictionaryInfo> dictionaries() const {
+        return all_.dictionaries_info;
+    };
+
     inline QStringList ocrLanguages() const { return all_.ocr_languages; };
     inline bool monitorClipboard() const { return all_.monitor_clipboard; };
 
@@ -104,7 +107,7 @@ class PopTranslateSettings : public QObject {
     void setOcrShortcut(QKeySequence shortcut);
     void setPopupWindowSize(QSize size);
     void setShowSrcText(bool enable);
-    void setDictionaries(QStringList dictionaries);
+    void setDictionaries(QVector<DictionaryInfo> dictionaries_info);
     void setOcrLanguages(QStringList ocr_languages);
     void setMonitorClipboard(bool enable);
 
@@ -127,7 +130,7 @@ class PopTranslateSettings : public QObject {
     void ocrShortcutChanged(QKeySequence shortcut);
     void popupWindowSizeChanged(QSize size);
     void showSrcTextChanged(bool enable);
-    void dictionariesChanged(QStringList dictionaries);
+    void dictionariesChanged(QVector<DictionaryInfo> dictionaries);
     void ocrLanguagesChanged(QStringList ocr_languages);
     void monitorClipboardChanged(bool enable);
 

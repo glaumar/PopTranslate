@@ -143,7 +143,10 @@
         "qvector": "cpp",
         "qpair": "cpp",
         "threadweaver": "cpp",
-        "qradiobutton": "cpp"
+        "qradiobutton": "cpp",
+        "qlistwidgetitem": "cpp",
+        "qsize": "cpp",
+        "qonlinetranslator": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {
