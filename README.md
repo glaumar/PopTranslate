@@ -90,3 +90,6 @@ flatpak build-bundle export PopTranslate.flatpak io.github.glaumar.PopTranslate 
 git clone https://aur@aur.archlinux.org/poptranslate.git 
 cd poptranslate && makepkg -s
 ```
+
+---
+![](https://badges.pufler.dev/visits/glaumar/PopTranslate)
