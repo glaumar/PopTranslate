@@ -146,7 +146,9 @@
         "qradiobutton": "cpp",
         "qlistwidgetitem": "cpp",
         "qsize": "cpp",
-        "qonlinetranslator": "cpp"
+        "qonlinetranslator": "cpp",
+        "qdragmoveevent": "cpp",
+        "qnetworkproxy": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QMetaEnum>
 #include <QSharedPointer>
+#include <QToolButton>
 
 #include "langcode2name.h"
 #include "ocr.h"
@@ -315,20 +316,13 @@ void SettingWindow::initShortcut() {
 }
 
 void SettingWindow::initDictionaries() {
-    ui->dict_listwidget->setDragDropMode(QAbstractItemView::InternalMove);
-    ui->dict_listwidget->setMovement(QListView::Snap);
+    // ui->dict_listwidget->setDragDropMode(QAbstractItemView::InternalMove);
+    // ui->dict_listwidget->setMovement(QListView::Snap);
 
-    for(const auto& dict_info : PopTranslateSettings::instance().dictionaries()){
+    for (const auto &dict_info :
+         PopTranslateSettings::instance().dictionaries()) {
         addDictionaryItem(dict_info);
     }
-
-    connect(ui->dict_listwidget, &QListWidget::currentRowChanged, [this](int currentRow){
-        qDebug() << "ssssssssssssss" << currentRow;
-    });
-
-    // connect(ui->dict_listwidget, &QListView::itemMoved, [this](const QModelIndexList &indexes){
-    //     qDebug() << "ddddddddddddddddddddddddddd" << indexes.size();
-    // });
 
     connect(ui->add_pushbutton, &QPushButton::clicked, [this]() {
         static auto *dialog = new QFileDialog(this,
@@ -401,24 +395,28 @@ QMap<QString, QCheckBox *> SettingWindow::addOcrLanguageToUi(
     return result;
 }
 
-void SettingWindow::addDictionaryItem(const DictionaryInfo& dict_info) {
+void SettingWindow::addDictionaryItem(const DictionaryInfo &dict_info) {
     QListWidgetItem *item = new QListWidgetItem(ui->dict_listwidget);
     item->setData(Qt::UserRole, QVariant::fromValue(dict_info));
     QWidget *item_widget = newDictionaryItemWidget(dict_info, item);
 
     item->setSizeHint(item_widget->sizeHint());
+
     ui->dict_listwidget->addItem(item);
     ui->dict_listwidget->setItemWidget(item, item_widget);
+    ui->dict_listwidget->setMinimumWidth(
+        ui->dict_listwidget->sizeHintForColumn(0));
 
     PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
 }
 
-QWidget *SettingWindow::newDictionaryItemWidget(const DictionaryInfo& dict_info,
+QWidget *SettingWindow::newDictionaryItemWidget(const DictionaryInfo &dict_info,
                                                 QListWidgetItem *item) {
     QWidget *item_widget = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(item_widget);
 
-    QLabel *dictname = new QLabel(QFileInfo(dict_info.filename).baseName(), item_widget);
+    QLabel *dictname =
+        new QLabel(QFileInfo(dict_info.filename).baseName(), item_widget);
     dictname->setToolTip(dict_info.filename);
 
     QComboBox *combobox = new QComboBox(item_widget);
@@ -431,35 +429,91 @@ QWidget *SettingWindow::newDictionaryItemWidget(const DictionaryInfo& dict_info,
         QMetaEnum::fromType<QOnlineTranslator::Language>();
     for (int i = 0; i < languages.keyCount(); i++) {
         if (languages.value(i) == QOnlineTranslator::NoLanguage) continue;
-        if (languages.value(i) == QOnlineTranslator::Auto){
+        if (languages.value(i) == QOnlineTranslator::Auto) {
             combobox->addItem(tr("All Languages"), languages.value(i));
-        }else{
+        } else {
             combobox->addItem(languages.key(i), languages.value(i));
         }
     }
 
     combobox->setCurrentIndex(static_cast<int>(dict_info.target_language));
 
-    connect(combobox,
-            QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [this, item](int index) {
-                auto dict_info =
-                    item->data(Qt::UserRole).value<DictionaryInfo>();
-                dict_info.target_language =
-                    static_cast<QOnlineTranslator::Language>(index);
-                item->setData(Qt::UserRole, QVariant::fromValue(dict_info));
-                PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
+    connect(
+        combobox,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        [this, item](int index) {
+            auto dict_info = item->data(Qt::UserRole).value<DictionaryInfo>();
+            dict_info.target_language =
+                static_cast<QOnlineTranslator::Language>(index);
+            item->setData(Qt::UserRole, QVariant::fromValue(dict_info));
 
-            });
+            PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
+        });
+
+    // button to move dictionary up
+    QToolButton *up = new QToolButton(item_widget);
+    up->setIcon(QIcon::fromTheme("go-up"));
+    connect(up, &QToolButton::clicked, [this, item, item_widget]() {
+        int r = ui->dict_listwidget->row(item);
+        if (r > 0) {
+            ui->dict_listwidget->takeItem(r);
+            // delete item_widget;
+
+            ui->dict_listwidget->insertItem(r - 1, item);
+            auto dict_info = item->data(Qt::UserRole).value<DictionaryInfo>();
+            ui->dict_listwidget->setItemWidget(
+                item,
+                newDictionaryItemWidget(dict_info, item));
+            ui->dict_listwidget->setCurrentItem(item);
+
+            PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
+        }
+    });
+
+    // button to move dictionary down
+    QToolButton *down = new QToolButton(item_widget);
+    down->setIcon(QIcon::fromTheme("go-down"));
+    connect(down, &QToolButton::clicked, [this, item, item_widget]() {
+        int r = ui->dict_listwidget->row(item);
+        if (r < ui->dict_listwidget->count() - 1) {
+            ui->dict_listwidget->takeItem(r);
+            // delete item_widget;
+
+            ui->dict_listwidget->insertItem(r + 1, item);
+            auto dict_info = item->data(Qt::UserRole).value<DictionaryInfo>();
+            ui->dict_listwidget->setItemWidget(
+                item,
+                newDictionaryItemWidget(dict_info, item));
+            ui->dict_listwidget->setCurrentItem(item);
+
+            PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
+        }
+    });
+
+    // button to remove dictionary
+    QToolButton *remove = new QToolButton(item_widget);
+    remove->setIcon(QIcon::fromTheme("delete"));
+    connect(remove, &QToolButton::clicked, [this, item, item_widget]() {
+        int r = ui->dict_listwidget->row(item);
+        delete ui->dict_listwidget->takeItem(r);
+        // delete item_widget;
+        PopTranslateSettings::instance().setDictionaries(getAllDictInfo());
+
+        ui->dict_listwidget->setMinimumWidth(
+            ui->dict_listwidget->sizeHintForColumn(0));
+    });
 
     layout->addWidget(combobox);
     layout->addWidget(dictname);
+    layout->addWidget(up);
+    layout->addWidget(down);
+    layout->addWidget(remove);
     item_widget->setLayout(layout);
 
     return item_widget;
 }
 
-QVector<DictionaryInfo> SettingWindow::getAllDictInfo() const{
+QVector<DictionaryInfo> SettingWindow::getAllDictInfo() const {
     QVector<DictionaryInfo> all_dict_info;
     for (int i = 0; i < ui->dict_listwidget->count(); ++i) {
         auto item = ui->dict_listwidget->item(i);

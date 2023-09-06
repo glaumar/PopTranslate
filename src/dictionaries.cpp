@@ -30,7 +30,8 @@ void Dictionaries::clear() {
 void Dictionaries::addDict(const DictionaryInfo& dict_info) {
     QWriteLocker locker(&lock_);
     if (dicts_.contains(dict_info)) {
-        qDebug() << tr("dictionary already exists: %1").arg(dict_info.filename);//TODO: maybe remove
+        qDebug() << tr("dictionary already exists: %1")
+                        .arg(dict_info.filename);  // TODO: maybe remove
         return;
     }
 
@@ -39,7 +40,8 @@ void Dictionaries::addDict(const DictionaryInfo& dict_info) {
     }
 
     // qDebug() << tr("addDict: %1").arg(dict_info.filename);
-    QSharedPointer<mdict::Mdict> md_p(new mdict::Mdict(dict_info.filename.toStdString()));
+    QSharedPointer<mdict::Mdict> md_p(
+        new mdict::Mdict(dict_info.filename.toStdString()));
     md_p->init();
     qDebug() << tr("%1 load success").arg(dict_info.filename);
     dicts_.insert(dict_info, md_p);
@@ -108,8 +110,8 @@ void Dictionaries::lookup(const QString& text) {
     QReadLocker locker(&lock_);
     for (auto it = dict_names_.begin(); it != dict_names_.end() && !abort_;
          ++it) {
-        
-        if(it->target_language != targetLanguage()) {
+        if (it->target_language != QOnlineTranslator::Auto &&
+            it->target_language != targetLanguage()) {
             continue;
         }
 

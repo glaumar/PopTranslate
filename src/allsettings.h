@@ -2,8 +2,8 @@
 
 #include <QOnlineTranslator>
 #include <QStringList>
-#include "dictionaryinfo.h"
 
+#include "dictionaryinfo.h"
 
 // get variable name as string, void(Variable) force compiler to check if
 // variable exists

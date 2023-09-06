@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>597</width>
+    <width>858</width>
     <height>680</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="general_tab">
       <property name="sizePolicy">
@@ -275,7 +275,7 @@
      </widget>
      <widget class="QWidget" name="dict_tab">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -300,6 +300,12 @@
         <widget class="QListWidget" name="dict_listwidget">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
          </property>
         </widget>
        </item>
@@ -351,7 +357,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>577</width>
+            <width>838</width>
             <height>622</height>
            </rect>
           </property>

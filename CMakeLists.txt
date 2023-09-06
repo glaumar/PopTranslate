@@ -78,6 +78,8 @@ set(PROJECT_SOURCES
     ${TS_FILES}
 )
 
+include_directories(src)
+
 add_executable(${EXE_NAME} ${PROJECT_SOURCES})
 add_dependencies(${EXE_NAME} translations)
 

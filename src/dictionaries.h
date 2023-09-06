@@ -9,8 +9,8 @@
 #include <atomic>
 
 #include "abstracttranslator.h"
-#include "mdict.h"
 #include "dictionaryinfo.h"
+#include "mdict.h"
 
 class Dictionaries : public AbstractTranslator {
     Q_OBJECT
