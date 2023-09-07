@@ -44,7 +44,7 @@ PopupDialog::PopupDialog(QWidget *parent)
     loadSettings();
 
     // show first translate result
-    connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
+    connect(this, &PopupDialog::newResultsAvailable, [this](int index) {
         if (index == 0) {
             result_index_ = index;
             showTranslateResult(translate_results_.at(result_index_));
@@ -55,6 +55,12 @@ PopupDialog::PopupDialog(QWidget *parent)
     connect(ui->pronounce_button, &QPushButton::clicked, [this] {
         emit requestSpeak(sourceText());
     });
+
+    // search lineEdit
+    ui->search_lineedit->hide();
+    connect(ui->search_lineedit,
+            &QLineEdit::textChanged,
+            [this](const QString &text) { emit requestTranslate(text); });
 }
 
 PopupDialog::~PopupDialog() {
@@ -78,7 +84,7 @@ void PopupDialog::enableMonitorMode(bool enable) {
 
 void PopupDialog::addTranslateResult(const AbstractTranslator::Result &result) {
     translate_results_.append(result);
-    emit translateResultsAvailable(translate_results_.size() - 1);
+    emit newResultsAvailable(translate_results_.size() - 1);
 }
 
 void PopupDialog::setTargetLanguages(
@@ -142,17 +148,17 @@ void PopupDialog::setOpacity(qreal opacity) {
 
 void PopupDialog::showTranslateResult(
     const AbstractTranslator::Result &result) {
-    auto &[s_text, t_text] = result;
+    auto &[title, t_text, unuse] = result;
 
     QFontMetrics metrics(ui->title_label->font());
-    if (metrics.horizontalAdvance(s_text) > ui->title_label->width()) {
-        // s_text is too long, so it is truncated
+    if (metrics.horizontalAdvance(title) > ui->title_label->width()) {
+        // title is too long, so it is truncated
         QString str =
             QFontMetrics(ui->title_label->font())
-                .elidedText(s_text, Qt::ElideRight, ui->title_label->width());
+                .elidedText(title, Qt::ElideRight, ui->title_label->width());
         ui->title_label->setText(str);
     } else {
-        ui->title_label->setText(s_text);
+        ui->title_label->setText(title);
     }
 
     // auto plain_text = QTextDocumentFragment::fromHtml(t_text).toPlainText();
@@ -169,26 +175,54 @@ void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
     showFloatButton(event->pos());
 }
 
-bool PopupDialog::event(QEvent *event) {
-    if (event->type() == QEvent::Leave) {
-        if (isEnableMonitorMode()) {
-            btn_next_->hide();
-            btn_prev_->hide();
-        } else {
-            this->hide();
-        }
-        return true;
-    }
-
-    if (event->type() == QEvent::Hide) {
-        emit hidden();
-        btn_prev_->hide();
+void PopupDialog::leaveEvent(QEvent *event) {
+    Q_UNUSED(event);
+    if (isEnableMonitorMode()) {
         btn_next_->hide();
-    } else if (event->type() == QEvent::Show) {
-        this->windowHandle()->installEventFilter(this);
+        btn_prev_->hide();
+    } else {
+        this->hide();
     }
+}
 
-    return QWidget::event(event);
+void PopupDialog::hideEvent(QHideEvent *event) {
+    Q_UNUSED(event);
+    emit hidden();
+    btn_prev_->hide();
+    btn_next_->hide();
+    ui->search_lineedit->hide();
+}
+
+void PopupDialog::showEvent(QShowEvent *event) {
+    Q_UNUSED(event);
+    this->windowHandle()->installEventFilter(this);
+}
+
+void PopupDialog::keyPressEvent(QKeyEvent *event) {
+    switch (event->key()) {
+        case Qt::Key_Escape:
+            ui->search_lineedit->hide();
+            break;
+        case Qt::Key_PageUp:
+        case Qt::Key_Left:
+            emit showPrevResult();
+            break;
+        case Qt::Key_PageDown:
+        case Qt::Key_Right:
+            emit showNextResult();
+            break;
+        default:
+            if (ui->search_lineedit->isHidden()) {
+                QString text = event->text();
+                if (!text.isEmpty()) {
+                    ui->search_lineedit->setText(text);
+                }
+                ui->search_lineedit->show();
+                ui->search_lineedit->setFocus();
+            } else {
+                QWidget::keyPressEvent(event);
+            }
+    }
 }
 
 bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
@@ -299,6 +333,16 @@ void PopupDialog::initFloatButton() {
     // mouse button is pressed
     setMouseTracking(true);
     ui->trans_text_edit->setMouseTracking(true);
+
+    connect(btn_prev_,
+            &QPushButton::clicked,
+            this,
+            &PopupDialog::showPrevResult);
+
+    connect(btn_next_,
+            &QPushButton::clicked,
+            this,
+            &PopupDialog::showNextResult);
 }
 
 void PopupDialog::showFloatButton(QPoint cursor_pos) {
@@ -327,18 +371,18 @@ void PopupDialog::initPageIndicator() {
 
     auto hlayout = dynamic_cast<QHBoxLayout *>(ui->tools_widget->layout());
     hlayout->setStretchFactor(indicator_, 1);
-    hlayout->setStretchFactor(ui->title_label, 3);
+    hlayout->setStretchFactor(ui->title_label, 4);
     hlayout->setStretchFactor(ui->pronounce_button, 1);
 
-    connect(btn_prev_, &QPushButton::clicked, [this] {
-        indicator_->prevPage();
-    });
+    // connect(btn_prev_, &QPushButton::clicked, [this] {
+    //     indicator_->prevPage();
+    // });
 
-    connect(btn_next_, &QPushButton::clicked, [this] {
-        indicator_->nextPage();
-    });
+    // connect(btn_next_, &QPushButton::clicked, [this] {
+    //     indicator_->nextPage();
+    // });
 
-    connect(this, &PopupDialog::translateResultsAvailable, [this](int index) {
+    connect(this, &PopupDialog::newResultsAvailable, [this](int index) {
         if (index == 0) {
             indicator_->initPages(1);
         } else {
@@ -463,24 +507,40 @@ void PopupDialog::initStateMachine() {
     result_state_machine_.setInitialState(resultUnavailable);
 
     resultUnavailable->addTransition(this,
-                                     &PopupDialog::translateResultsAvailable,
+                                     &PopupDialog::newResultsAvailable,
                                      resultAvailable);
 
-    resultAvailable->addTransition(btn_prev_,
-                                   &QPushButton::clicked,
+    // resultAvailable->addTransition(btn_prev_,
+    //                                &QPushButton::clicked,
+    //                                requestPrevResult);
+
+    // resultAvailable->addTransition(btn_next_,
+    //                                &QPushButton::clicked,
+    //                                requestNextResult);
+
+    resultAvailable->addTransition(this,
+                                   &PopupDialog::showPrevResult,
                                    requestPrevResult);
 
-    resultAvailable->addTransition(btn_next_,
-                                   &QPushButton::clicked,
+    resultAvailable->addTransition(this,
+                                   &PopupDialog::showNextResult,
                                    requestNextResult);
 
     requestNextResult->addTransition(animation_group1_,
                                      &QAbstractAnimation::finished,
                                      readyShowResult);
 
+    requestNextResult->addTransition(this,
+                                     &PopupDialog::noNextResult,
+                                     resultAvailable);
+
     requestPrevResult->addTransition(animation_group1_,
                                      &QAbstractAnimation::finished,
                                      readyShowResult);
+
+    requestPrevResult->addTransition(this,
+                                     &PopupDialog::noPrevResult,
+                                     resultAvailable);
 
     readyShowResult->addTransition(animation_group2_,
                                    &QAbstractAnimation::finished,
@@ -495,6 +555,9 @@ void PopupDialog::initStateMachine() {
             result_index_++;
             btn_next_->hide();
             startAnimationNext();
+            indicator_->nextPage();
+        } else {
+            emit noNextResult();
         }
     });
 
@@ -503,6 +566,9 @@ void PopupDialog::initStateMachine() {
             result_index_--;
             btn_prev_->hide();
             startAnimationPrev();
+            indicator_->prevPage();
+        } else {
+            emit noPrevResult();
         }
     });
 

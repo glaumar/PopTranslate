@@ -121,7 +121,7 @@ void Dictionaries::lookup(const QString& text) {
             QString content_qstr = QString::fromStdString(content);
             content_qstr.remove(QRegExp("`[0-9]`|</?br>"));
             auto dict_basename = QFileInfo(it->filename).baseName();
-            AbstractTranslator::Result result{dict_basename, content_qstr};
+            AbstractTranslator::Result result{dict_basename, content_qstr, text};
             if (abort_) {
                 break;
             }
@@ -130,7 +130,7 @@ void Dictionaries::lookup(const QString& text) {
                 << tr("Dictionaries Lookup Success: %1").arg(dict_basename);
         }
     }
-    emit finished();
+    emit finished(text);
 }
 
 bool Dictionaries::fileCheck(const QString& filename) {

@@ -61,13 +61,21 @@ class PopupDialog : public QWidget {
         const QString &text,
         QOnlineTranslator::Language lang = QOnlineTranslator::Auto);
     void requestShowSettingsWindow();
-    void translateResultsAvailable(int index);
+    void newResultsAvailable(int index);
     void cleared();
     void hidden();
+    void showNextResult();
+    void showPrevResult();
+    void noNextResult();
+    void noPrevResult();
 
+ 
    protected:
     void mouseMoveEvent(QMouseEvent *event) override;
-    bool event(QEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
     bool eventFilter(QObject *filtered, QEvent *event) override;
 
    private:

@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QPair>
 
 #include "abstracttranslator.h"
 
@@ -20,5 +21,8 @@ class TranslatorManager : public QObject {
     void finished();
 
    private:
-    QVector<AbstractTranslator*> translators_;
+    QVector<QPair<bool, AbstractTranslator*>> translators_;
+    QOnlineTranslator::Language target_language_;
+    QOnlineTranslator::Language source_language_;
+    QString source_text_;
 };

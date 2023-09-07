@@ -9,21 +9,25 @@ OnlineTranslator::OnlineTranslator(QObject *parent)
             qDebug() << tr("OnlineTranslator Success");
             OnlineTranslator::Result result{
                 PopTranslateSettings::instance().translateEngineStr(),
-                translator_.translation()};
+                translator_.translation(),
+                translator_.source()};
             emit resultAvailable(result);
         } else {
             auto error_msg = tr("OnlineTranslator Failed: %1")
                                  .arg(translator_.errorString());
             qWarning() << error_msg;
         }
-        emit finished();
+        emit finished(translator_.source());
     });
 }
 
 void OnlineTranslator::translate(const QString &text) {
     if (text.isEmpty()) {
+        emit finished(text);
         return;
     }
+
+    // setSourceText(text);
 
     if (sourceLanguage() == QOnlineTranslator::NoLanguage) {
         setSourceLanguage(QOnlineTranslator::Auto);
