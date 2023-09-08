@@ -98,8 +98,16 @@ class PopupDialog : public QWidget {
         return result_index_ > 0 &&
                result_index_ <= translate_results_.size() - 1;
     }
+
     inline bool isEnableMonitorMode() const {
         return PopTranslateSettings::instance().monitorClipboard();
+    }
+
+    inline bool cursorInWidget() const {
+        auto pos = QCursor::pos();
+        uint deviation = 10;
+        return pos.x() > x() + deviation && pos.x() <= width() - deviation &&
+               pos.y() > y() + deviation && pos.y() <= height() - deviation;
     }
 
     void loadSettings();

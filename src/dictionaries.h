@@ -32,7 +32,7 @@ class Dictionaries : public AbstractTranslator {
    private:
     bool fileCheck(const QString& filename);
     QMap<DictionaryInfo, QSharedPointer<mdict::Mdict>> dicts_;
-    QVector<DictionaryInfo> dict_names_;
+    QVector<DictionaryInfo> dict_info_vec_;
     std::atomic_bool abort_;
     QReadWriteLock lock_;
 };

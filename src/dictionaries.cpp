@@ -24,7 +24,7 @@ Dictionaries::Dictionaries(QObject* parent)
 void Dictionaries::clear() {
     QWriteLocker locker(&lock_);
     dicts_.clear();
-    dict_names_.clear();
+    dict_info_vec_.clear();
 }
 
 void Dictionaries::addDict(const DictionaryInfo& dict_info) {
@@ -45,7 +45,7 @@ void Dictionaries::addDict(const DictionaryInfo& dict_info) {
     md_p->init();
     qDebug() << tr("%1 load success").arg(dict_info.filename);
     dicts_.insert(dict_info, md_p);
-    dict_names_.append(dict_info);
+    dict_info_vec_.append(dict_info);
 }
 
 void Dictionaries::addDicts(const QVector<DictionaryInfo>& info_vec) {
@@ -56,15 +56,15 @@ void Dictionaries::addDicts(const QVector<DictionaryInfo>& info_vec) {
 
 void Dictionaries::setDicts(const QVector<DictionaryInfo>& info_vec) {
     QWriteLocker locker(&lock_);
-    QSet<DictionaryInfo> old_set(dict_names_.begin(), dict_names_.end());
+    QSet<DictionaryInfo> old_set(dict_info_vec_.begin(), dict_info_vec_.end());
     QSet<DictionaryInfo> new_set(info_vec.begin(), info_vec.end());
     auto diff = old_set - new_set;
 
     removeDicts(QVector<DictionaryInfo>(diff.begin(), diff.end()));
     addDicts(info_vec);
 
-    dict_names_ = info_vec;
-    QMutableVectorIterator<DictionaryInfo> it(dict_names_);
+    dict_info_vec_ = info_vec;
+    QMutableVectorIterator<DictionaryInfo> it(dict_info_vec_);
     while (it.hasNext()) {
         if (!dicts_.contains(it.next())) {
             it.remove();
@@ -83,9 +83,9 @@ void Dictionaries::removeDict(const DictionaryInfo& dict_info) {
     }
 
     dicts_.remove(dict_info);
-    for (int i = 0; i < dict_names_.size(); i++) {
-        if (dict_names_[i] == dict_info) {
-            dict_names_.removeAt(i);
+    for (int i = 0; i < dict_info_vec_.size(); i++) {
+        if (dict_info_vec_[i] == dict_info) {
+            dict_info_vec_.removeAt(i);
             qDebug() << tr("removeDict: %1").arg(dict_info.filename);
             break;
         }
@@ -108,7 +108,8 @@ void Dictionaries::lookup(const QString& text) {
     abort_ = false;
 
     QReadLocker locker(&lock_);
-    for (auto it = dict_names_.begin(); it != dict_names_.end() && !abort_;
+    for (auto it = dict_info_vec_.begin();
+         it != dict_info_vec_.end() && !abort_;
          ++it) {
         if (it->target_language != QOnlineTranslator::Auto &&
             it->target_language != targetLanguage()) {

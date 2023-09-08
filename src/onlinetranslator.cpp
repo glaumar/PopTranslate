@@ -1,5 +1,6 @@
 #include "onlinetranslator.h"
 
+#include "lang2iso639.h"
 #include "poptranslatesettings.h"
 
 OnlineTranslator::OnlineTranslator(QObject *parent)
@@ -25,11 +26,20 @@ OnlineTranslator::OnlineTranslator(QObject *parent)
                 return;
             } else {
                 qDebug() << tr("OnlineTranslator Success");
-                // TODO: enginstr with language code
-                OnlineTranslator::Result result{
-                    PopTranslateSettings::instance().translateEngineStr(),
-                    translator_.translation(),
-                    translator_.source()};
+
+                QString title;
+                if (!retry_flag) {
+                    title = QString("%1 (%2)").arg(
+                        PopTranslateSettings::instance().translateEngineStr(),
+                        Lang2ISO639(targetLanguage()));
+                } else {
+                    title =
+                        PopTranslateSettings::instance().translateEngineStr();
+                }
+
+                OnlineTranslator::Result result{title,
+                                                translator_.translation(),
+                                                translator_.source()};
                 emit resultAvailable(result);
                 retry_flag = true;
                 emit finished(translator_.source());

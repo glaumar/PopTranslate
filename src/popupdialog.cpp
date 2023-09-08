@@ -32,7 +32,7 @@ PopupDialog::PopupDialog(QWidget *parent)
       animation_group1_(new QParallelAnimationGroup(this)),
       animation_group2_(new QParallelAnimationGroup(this)) {
     ui->setupUi(this);
-
+    loadSettings();
     enableMonitorMode(false);
     PopTranslateSettings::instance().setMonitorClipboard(false);
     initBottomButtons();
@@ -41,7 +41,6 @@ PopupDialog::PopupDialog(QWidget *parent)
     initPageIndicator();
     initAnimation();
     initStateMachine();
-    loadSettings();
 
     // show first translate result
     connect(this, &PopupDialog::newResultsAvailable, [this](int index) {
@@ -91,9 +90,10 @@ void PopupDialog::enableMonitorMode(bool enable) {
         //                                            NET::SkipSwitcher |
         //                                            NET::SkipPager);
         // KWindowSystem::setState(this->winId(), NET::KeepAbove);
-
+        ui->pin_button->setIcon(QIcon::fromTheme("xapp-unpin-symbolic"));
     } else {
         this->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
+        ui->pin_button->setIcon(QIcon::fromTheme("pin"));
     }
 }
 
@@ -191,8 +191,7 @@ void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
 void PopupDialog::leaveEvent(QEvent *event) {
     Q_UNUSED(event);
 
-    auto pos = QCursor::pos();
-    if (isEnableMonitorMode() || ui->src_plain_text_edit->isVisible()) {
+    if (isEnableMonitorMode() || isEnableSrcEditMode() || cursorInWidget()) {
         btn_next_->hide();
         btn_prev_->hide();
     } else {
@@ -252,10 +251,9 @@ void PopupDialog::keyPressEvent(QKeyEvent *event) {
 
 bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
     // show window under mouse cursor on wayland
-    const bool ret = QObject::eventFilter(filtered, event);
-    auto pop_window = qobject_cast<QWindow *>(filtered);
 
-    if (pop_window && event->type() == QEvent::Expose) {
+    if (filtered == this->windowHandle() && event->type() == QEvent::Expose) {
+        auto pop_window = qobject_cast<QWindow *>(filtered);
         if (!pop_window->isVisible()) {
             pop_window->setVisible(true);
         }
@@ -280,8 +278,13 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
         // plasmaSurface->setRole(KWayland::Client::PlasmaShellSurface::Role::Panel);
         // plasmaSurface->setPanelBehavior(KWayland::Client::PlasmaShellSurface::PanelBehavior::AlwaysVisible);
         pop_window->removeEventFilter(this);
+    } else if (filtered == ui->trans_text_edit &&
+               event->type() == QEvent::HoverMove) {
+        auto hover_event = dynamic_cast<QHoverEvent *>(event);
+        showFloatButton(hover_event->pos());
     }
-    return ret;
+
+    return QObject::eventFilter(filtered, event);
 }
 
 void PopupDialog::initBottomButtons() {
@@ -363,6 +366,7 @@ void PopupDialog::initFloatButton() {
     // mouse button is pressed
     setMouseTracking(true);
     ui->trans_text_edit->setMouseTracking(true);
+    ui->trans_text_edit->installEventFilter(this);
 
     connect(btn_prev_,
             &QPushButton::clicked,
@@ -633,12 +637,17 @@ void PopupDialog::enableSrcEditMode(bool enable) {
         ui->search_lineedit->hide();
         ui->src_plain_text_edit->setFocus();
         ui->show_src_toolbutton->setIcon(QIcon::fromTheme("arrow-down-double"));
+        ui->show_src_toolbutton->setToolTip(tr("Hide Source Text"));
+        ui->copy_button->setToolTip(tr("Copy Source Text"));
         btn_next_->hide();
         btn_prev_->hide();
+
     } else {
         ui->trans_text_edit->setFocus();
         ui->src_plain_text_edit->clearFocus();
         ui->show_src_toolbutton->setIcon(QIcon::fromTheme("arrow-up-double"));
+        ui->show_src_toolbutton->setToolTip(tr("Show Source Text"));
+        ui->copy_button->setToolTip(tr("Copy Translation"));
     }
 }
 
@@ -664,6 +673,5 @@ void PopupDialog::loadSettings() {
             this,
             &PopupDialog::setOpacity);
 
-    // TODO: resize will cause the window to flicker
     resize(settings.popupWindowSize());
 }
