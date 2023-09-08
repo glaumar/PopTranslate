@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QObject>
-#include <QVector>
 #include <QPair>
+#include <QVector>
 
 #include "abstracttranslator.h"
 

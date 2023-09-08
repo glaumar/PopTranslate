@@ -70,7 +70,7 @@ void AppMain::translateSelection() {
 void AppMain::translate(const QString &text) {
     pop_.clear();
     pop_.setSourceText(text);
-    if(text.isEmpty()){
+    if (text.isEmpty()) {
         return;
     }
     translator_manager_.translate(text);

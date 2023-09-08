@@ -55,12 +55,27 @@ PopupDialog::PopupDialog(QWidget *parent)
     connect(ui->pronounce_button, &QPushButton::clicked, [this] {
         emit requestSpeak(sourceText());
     });
+    connect(ui->pronounce_button_2, &QPushButton::clicked, [this] {
+        emit requestSpeak(sourceText());
+    });
 
     // search lineEdit
     ui->search_lineedit->hide();
     connect(ui->search_lineedit,
             &QLineEdit::textChanged,
             [this](const QString &text) { emit requestTranslate(text); });
+
+    // src text edit
+    enableSrcEditMode(false);
+    connect(ui->show_src_toolbutton, &QToolButton::clicked, [this] {
+        auto flag = ui->src_plain_text_edit->isVisible();
+        enableSrcEditMode(!flag);
+    });
+
+    connect(ui->translate_pushbutton, &QPushButton::clicked, [this] {
+        enableSrcEditMode(false);
+        emit requestTranslate(sourceText());
+    });
 }
 
 PopupDialog::~PopupDialog() {
@@ -105,6 +120,7 @@ void PopupDialog::setTargetLanguages(
     PopTranslateSettings::instance().setActiveTargetLanguage(languages.at(0));
     for (auto lang : languages) {
         auto button = new QRadioButton(Lang2ISO639(lang), this);
+        button->setFocusPolicy(Qt::NoFocus);
         layout->addWidget(button);
 
         if (lang == PopTranslateSettings::instance().activeTargetLanguage()) {
@@ -131,8 +147,6 @@ void PopupDialog::setFont(const QFont &font) {
 }
 
 void PopupDialog::setOpacity(qreal opacity) {
-    // setting_.opacity = opacity;
-
     QPalette pal = palette();
     QColor background_color = pal.color(QWidget::backgroundRole());
     background_color.setAlpha(static_cast<int>(opacity * 255));
@@ -140,8 +154,7 @@ void PopupDialog::setOpacity(qreal opacity) {
     setPalette(pal);
 
     QPalette pal_edit = ui->trans_text_edit->palette();
-    background_color.setAlpha(0);
-    pal_edit.setColor(QPalette::Base, background_color);
+    pal_edit.setColor(QPalette::Base, Qt::transparent);
     ui->trans_text_edit->setPalette(pal_edit);
     ui->src_plain_text_edit->setPalette(pal_edit);
 }
@@ -177,7 +190,9 @@ void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
 
 void PopupDialog::leaveEvent(QEvent *event) {
     Q_UNUSED(event);
-    if (isEnableMonitorMode()) {
+
+    auto pos = QCursor::pos();
+    if (isEnableMonitorMode() || ui->src_plain_text_edit->isVisible()) {
         btn_next_->hide();
         btn_prev_->hide();
     } else {
@@ -191,17 +206,27 @@ void PopupDialog::hideEvent(QHideEvent *event) {
     btn_prev_->hide();
     btn_next_->hide();
     ui->search_lineedit->hide();
+    enableSrcEditMode(false);
 }
 
 void PopupDialog::showEvent(QShowEvent *event) {
     Q_UNUSED(event);
+    // ui->tools_widget->setMinimumHeight(ui->src_tools_widget->height());
+    // ui->bottom_widget->setMinimumHeight(ui->bottom_widget->height());
+    enableSrcEditMode(false);
     this->windowHandle()->installEventFilter(this);
 }
 
 void PopupDialog::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
         case Qt::Key_Escape:
-            ui->search_lineedit->hide();
+            if (isEnableSrcEditMode()) {
+                enableSrcEditMode(false);
+            } else if (ui->search_lineedit->isVisible()) {
+                ui->search_lineedit->hide();
+                ui->search_lineedit->clear();
+                ui->search_lineedit->clearFocus();
+            }
             break;
         case Qt::Key_PageUp:
         case Qt::Key_Left:
@@ -212,7 +237,7 @@ void PopupDialog::keyPressEvent(QKeyEvent *event) {
             emit showNextResult();
             break;
         default:
-            if (ui->search_lineedit->isHidden()) {
+            if (ui->search_lineedit->isHidden() && !isEnableSrcEditMode()) {
                 QString text = event->text();
                 if (!text.isEmpty()) {
                     ui->search_lineedit->setText(text);
@@ -263,10 +288,13 @@ void PopupDialog::initBottomButtons() {
     ui->bottom_left->layout()->setAlignment(Qt::AlignLeft);
     ui->bottom_right->layout()->setAlignment(Qt::AlignRight);
 
-    connect(ui->copy_button,
-            &QPushButton::released,
-            this,
-            &PopupDialog::copyTranslation);
+    connect(ui->copy_button, &QPushButton::released, [this] {
+        if (isEnableSrcEditMode()) {
+            copySourceText();
+        } else {
+            copyTranslation();
+        }
+    });
 
     connect(ui->pin_button, &QToolButton::clicked, [this](bool checked) {
         bool flag = !isEnableMonitorMode();
@@ -311,11 +339,13 @@ void PopupDialog::initFloatButton() {
     btn_prev_->setFixedSize(btn_size);
     btn_next_->setFixedSize(btn_size);
 
-    QString style(
-        "QPushButton {background-color: palette(Button); border: none;"
-        "border-radius: 48;}"
-        "QPushButton:hover { background-color: palette(Midlight); }"
-        "QPushButton:pressed { background-color: palette(Highlight); }");
+    QString style =
+        QString(
+            "QPushButton {background-color: palette(light); border: none;"
+            "border-radius: %1;}"
+            "QPushButton:hover { background-color: palette(Midlight); }"
+            "QPushButton:pressed { background-color: palette(Highlight); }")
+            .arg(width);
 
     btn_prev_->setStyleSheet(style);
     btn_next_->setStyleSheet(style);
@@ -592,13 +622,34 @@ void PopupDialog::clear() {
     emit cleared();
 }
 
+void PopupDialog::enableSrcEditMode(bool enable) {
+    ui->src_plain_text_edit->setVisible(enable);
+    ui->src_tools_widget->setVisible(enable);
+
+    ui->trans_text_edit->setVisible(!enable);
+    ui->tools_widget->setVisible(!enable);
+
+    if (enable) {
+        ui->search_lineedit->hide();
+        ui->src_plain_text_edit->setFocus();
+        ui->show_src_toolbutton->setIcon(QIcon::fromTheme("arrow-down-double"));
+        btn_next_->hide();
+        btn_prev_->hide();
+    } else {
+        ui->trans_text_edit->setFocus();
+        ui->src_plain_text_edit->clearFocus();
+        ui->show_src_toolbutton->setIcon(QIcon::fromTheme("arrow-up-double"));
+    }
+}
+
 void PopupDialog::loadSettings() {
     auto &settings = PopTranslateSettings::instance();
 
     setTargetLanguages(settings.targetLanguages());
     setFont(settings.font());
     setOpacity(settings.opacity());
-    setSrcTextEditVisible(settings.showSrcText());
+    // TODO: delete showSrcText setting
+    // enableSrcEditMode(settings.showSrcText());
     // enableMonitorMode(settings.monitorClipboard());
 
     connect(&settings,
@@ -616,10 +667,10 @@ void PopupDialog::loadSettings() {
             this,
             &PopupDialog::setOpacity);
 
-    connect(&settings,
-            &PopTranslateSettings::showSrcTextChanged,
-            this,
-            &PopupDialog::setSrcTextEditVisible);
+    // connect(&settings,
+    //         &PopTranslateSettings::showSrcTextChanged,
+    //         this,
+    //         &PopupDialog::enableSrcEditMode);
 
     // connect(&settings,
     //         &PopTranslateSettings::monitorClipboardChanged,

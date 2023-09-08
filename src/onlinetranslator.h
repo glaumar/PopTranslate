@@ -12,4 +12,5 @@ class OnlineTranslator : public AbstractTranslator {
 
    private:
     QOnlineTranslator translator_;
+    bool retry_flag;
 };

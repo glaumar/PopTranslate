@@ -37,6 +37,11 @@ class PopupDialog : public QWidget {
     void setFont(const QFont &font);
     void setOpacity(qreal opacity);
     void clear();
+    void enableSrcEditMode(bool enable);
+
+    inline bool isEnableSrcEditMode() const {
+        return ui->src_plain_text_edit->isVisible();
+    }
 
     inline QString sourceText() const {
         return ui->src_plain_text_edit->toPlainText();
@@ -48,11 +53,6 @@ class PopupDialog : public QWidget {
 
     inline void setSourceText(const QString &text) {
         ui->src_plain_text_edit->setPlainText(text);
-    }
-
-    inline void setSrcTextEditVisible(bool visible) {
-        ui->src_plain_text_edit->setVisible(visible);
-        ui->horizon_line->setVisible(visible);
     }
 
    signals:
@@ -69,7 +69,6 @@ class PopupDialog : public QWidget {
     void noNextResult();
     void noPrevResult();
 
- 
    protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void leaveEvent(QEvent *event) override;
