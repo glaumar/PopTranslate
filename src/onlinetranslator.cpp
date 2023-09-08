@@ -25,7 +25,7 @@ OnlineTranslator::OnlineTranslator(QObject *parent)
                 return;
             } else {
                 qDebug() << tr("OnlineTranslator Success");
-                //TODO: enginstr with language code
+                // TODO: enginstr with language code
                 OnlineTranslator::Result result{
                     PopTranslateSettings::instance().translateEngineStr(),
                     translator_.translation(),

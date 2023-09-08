@@ -77,9 +77,9 @@ void PopTranslateSettings::load() {
     all_.popup_window_size =
         settings_.value("popup_window_size", default_settings.popup_window_size)
             .value<QSize>();
-    all_.show_src_text =
-        settings_.value("show_src_text", default_settings.show_src_text)
-            .value<bool>();
+    // all_.show_src_text =
+    //     settings_.value("show_src_text", default_settings.show_src_text)
+    //         .value<bool>();
     all_.dictionaries_info =
         settings_
             .value("dictionaries_info",
@@ -225,11 +225,11 @@ void PopTranslateSettings::setPopupWindowSize(QSize size) {
     emit popupWindowSizeChanged(size);
 };
 
-void PopTranslateSettings::setShowSrcText(bool enable) {
-    all_.show_src_text = enable;
-    settings_.setValue("show_src_text", enable);
-    emit showSrcTextChanged(enable);
-};
+// void PopTranslateSettings::setShowSrcText(bool enable) {
+//     all_.show_src_text = enable;
+//     settings_.setValue("show_src_text", enable);
+//     emit showSrcTextChanged(enable);
+// };
 
 void PopTranslateSettings::setDictionaries(
     QVector<DictionaryInfo> dictionaries_info) {

@@ -131,21 +131,21 @@
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="font_label">
             <property name="text">
              <string>Font :</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="7" column="1">
            <widget class="KFontRequester" name="font_kfontrequester">
             <property name="enabled">
              <bool>true</bool>
@@ -161,7 +161,7 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="9" column="0">
            <widget class="QLabel" name="opacity_label">
             <property name="text">
              <string>Opacity :</string>
@@ -171,7 +171,7 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
+          <item row="9" column="1">
            <widget class="QSlider" name="opacity_slider">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -214,7 +214,7 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="0">
+          <item row="10" column="0">
            <widget class="QLabel" name="blur_lable">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -227,46 +227,32 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="1">
+          <item row="10" column="1">
            <widget class="QCheckBox" name="blur_checkbox">
             <property name="text">
              <string>Enable</string>
             </property>
            </widget>
           </item>
-          <item row="13" column="0">
+          <item row="12" column="0">
            <widget class="QLabel" name="translate_selection_label">
             <property name="text">
              <string>Translate Selection :</string>
             </property>
            </widget>
           </item>
-          <item row="13" column="1">
+          <item row="12" column="1">
            <widget class="KKeySequenceWidget" name="translate_selection_kkeysequencewidget"/>
           </item>
-          <item row="14" column="0">
+          <item row="13" column="0">
            <widget class="QLabel" name="ocr_label">
             <property name="text">
              <string>OCR :</string>
             </property>
            </widget>
           </item>
-          <item row="14" column="1">
+          <item row="13" column="1">
            <widget class="KKeySequenceWidget" name="ocr_kkeysequencewidget"/>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="show_src_text_label">
-            <property name="text">
-             <string>Show Source Text :</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QCheckBox" name="show_src_text_checkbox">
-            <property name="text">
-             <string>Enable</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>

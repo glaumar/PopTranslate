@@ -648,9 +648,6 @@ void PopupDialog::loadSettings() {
     setTargetLanguages(settings.targetLanguages());
     setFont(settings.font());
     setOpacity(settings.opacity());
-    // TODO: delete showSrcText setting
-    // enableSrcEditMode(settings.showSrcText());
-    // enableMonitorMode(settings.monitorClipboard());
 
     connect(&settings,
             &PopTranslateSettings::targetLanguagesChanged,
@@ -667,15 +664,6 @@ void PopupDialog::loadSettings() {
             this,
             &PopupDialog::setOpacity);
 
-    // connect(&settings,
-    //         &PopTranslateSettings::showSrcTextChanged,
-    //         this,
-    //         &PopupDialog::enableSrcEditMode);
-
-    // connect(&settings,
-    //         &PopTranslateSettings::monitorClipboardChanged,
-    //         this,
-    //         &PopupDialog::enableMonitorMode);
-
+    // TODO: resize will cause the window to flicker
     resize(settings.popupWindowSize());
 }

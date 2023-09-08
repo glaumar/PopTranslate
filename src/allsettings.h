@@ -32,7 +32,7 @@ class AllSettings {
           translate_selection_shortcut(Qt::META | Qt::Key_G),
           ocr_shortcut(Qt::CTRL | Qt::META | Qt::Key_G),
           popup_window_size(512, 384),
-          show_src_text(false),
+          //   show_src_text(false),
           dictionaries_info(),
           ocr_languages("eng"),
           monitor_clipboard(false) {}
@@ -54,7 +54,7 @@ class AllSettings {
     QKeySequence translate_selection_shortcut;
     QKeySequence ocr_shortcut;
     QSize popup_window_size;
-    bool show_src_text;
+    // bool show_src_text;
     QVector<DictionaryInfo> dictionaries_info;
     QStringList ocr_languages;
     bool monitor_clipboard;

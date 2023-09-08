@@ -28,7 +28,7 @@ class SettingWindow : public QWidget {
     void initOpacityAndBlur();
     void initAutoCopyTranslation();
     void initAutoSpeak();
-    void initShowSrcText();
+    // void initShowSrcText();
     void initProxy();
     void initShortcut();
     void initDictionaries();

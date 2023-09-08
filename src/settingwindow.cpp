@@ -27,7 +27,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     initOpacityAndBlur();
     initAutoCopyTranslation();
     initAutoSpeak();
-    initShowSrcText();
+    // initShowSrcText();
     initProxy();
     initShortcut();
     initDictionaries();
@@ -174,17 +174,17 @@ void SettingWindow::initAutoSpeak() {
             });
 }
 
-void SettingWindow::initShowSrcText() {
-    ui->show_src_text_checkbox->setChecked(
-        PopTranslateSettings::instance().showSrcText());
+// void SettingWindow::initShowSrcText() {
+//     ui->show_src_text_checkbox->setChecked(
+//         PopTranslateSettings::instance().showSrcText());
 
-    connect(ui->show_src_text_checkbox,
-            &QCheckBox::stateChanged,
-            [this](int state) {
-                auto enable = state == Qt::Checked;
-                PopTranslateSettings::instance().setShowSrcText(enable);
-            });
-}
+//     connect(ui->show_src_text_checkbox,
+//             &QCheckBox::stateChanged,
+//             [this](int state) {
+//                 auto enable = state == Qt::Checked;
+//                 PopTranslateSettings::instance().setShowSrcText(enable);
+//             });
+// }
 
 void SettingWindow::initProxy() {
     auto enable_proxy = PopTranslateSettings::instance().isEnableProxy();
