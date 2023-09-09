@@ -70,7 +70,7 @@ class PopupDialog : public QWidget {
     void noPrevResult();
 
    protected:
-    void mouseMoveEvent(QMouseEvent *event) override;
+    // void mouseMoveEvent(QMouseEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void hideEvent(QHideEvent *event) override;
     void showEvent(QShowEvent *event) override;
@@ -108,6 +108,11 @@ class PopupDialog : public QWidget {
         uint deviation = 10;
         return pos.x() > x() + deviation && pos.x() <= width() - deviation &&
                pos.y() > y() + deviation && pos.y() <= height() - deviation;
+    }
+
+    inline void hideFloatButton() {
+        btn_next_->hide();
+        btn_prev_->hide();
     }
 
     void loadSettings();

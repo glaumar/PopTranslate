@@ -62,7 +62,11 @@ PopupDialog::PopupDialog(QWidget *parent)
     ui->search_lineedit->hide();
     connect(ui->search_lineedit,
             &QLineEdit::textChanged,
-            [this](const QString &text) { emit requestTranslate(text); });
+            [this](const QString &text) {
+                if (!text.isEmpty()) {
+                    emit requestTranslate(text);
+                }
+            });
 
     // src text edit
     enableSrcEditMode(false);
@@ -184,17 +188,14 @@ void PopupDialog::showTranslateResult(
     }
 }
 
-void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
-    showFloatButton(event->pos());
-}
+// void PopupDialog::mouseMoveEvent(QMouseEvent *event) {
+//     showFloatButton(event->pos());
+// }
 
 void PopupDialog::leaveEvent(QEvent *event) {
     Q_UNUSED(event);
 
-    if (isEnableMonitorMode() || isEnableSrcEditMode() || cursorInWidget()) {
-        btn_next_->hide();
-        btn_prev_->hide();
-    } else {
+    if (!isEnableMonitorMode() && !isEnableSrcEditMode() && !cursorInWidget()) {
         this->hide();
     }
 }
@@ -202,8 +203,6 @@ void PopupDialog::leaveEvent(QEvent *event) {
 void PopupDialog::hideEvent(QHideEvent *event) {
     Q_UNUSED(event);
     emit hidden();
-    btn_prev_->hide();
-    btn_next_->hide();
     ui->search_lineedit->hide();
     enableSrcEditMode(false);
 }
@@ -214,9 +213,26 @@ void PopupDialog::showEvent(QShowEvent *event) {
     // ui->bottom_widget->setMinimumHeight(ui->bottom_widget->height());
     enableSrcEditMode(false);
     this->windowHandle()->installEventFilter(this);
+    KWindowEffects::enableBlurBehind(
+        windowHandle(),
+        PopTranslateSettings::instance().isEnableBlur());
 }
 
 void PopupDialog::keyPressEvent(QKeyEvent *event) {
+    Qt::KeyboardModifiers modifiers = event->modifiers();
+
+    if (QString text = event->text(); ui->search_lineedit->isHidden() &&
+                                      !isEnableSrcEditMode() &&
+                                      modifiers == Qt::NoModifier &&
+                                      !text.isEmpty() && text.at(0).isPrint()) {
+        if (!text.at(0).isSpace()) {
+            ui->search_lineedit->setText(text);
+        }
+        ui->search_lineedit->show();
+        ui->search_lineedit->setFocus();
+        return;
+    }
+
     switch (event->key()) {
         case Qt::Key_Escape:
             if (isEnableSrcEditMode()) {
@@ -229,30 +245,22 @@ void PopupDialog::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_PageUp:
         case Qt::Key_Left:
+        case Qt::Key_Home:
             emit showPrevResult();
             break;
         case Qt::Key_PageDown:
         case Qt::Key_Right:
+        case Qt::Key_End:
             emit showNextResult();
             break;
         default:
-            if (ui->search_lineedit->isHidden() && !isEnableSrcEditMode()) {
-                QString text = event->text();
-                if (!text.isEmpty()) {
-                    ui->search_lineedit->setText(text);
-                }
-                ui->search_lineedit->show();
-                ui->search_lineedit->setFocus();
-            } else {
-                QWidget::keyPressEvent(event);
-            }
+            QWidget::keyPressEvent(event);
     }
 }
 
 bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
-    // show window under mouse cursor on wayland
-
     if (filtered == this->windowHandle() && event->type() == QEvent::Expose) {
+        // show window under mouse cursor on wayland
         auto pop_window = qobject_cast<QWindow *>(filtered);
         if (!pop_window->isVisible()) {
             pop_window->setVisible(true);
@@ -266,9 +274,7 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
         // KWindowSystem::setState(pop_window->winId(), NET::KeepAbove);
 
         // blur window Behind
-        KWindowEffects::enableBlurBehind(
-            pop_window,
-            PopTranslateSettings::instance().isEnableBlur());
+
         bool flag = !isEnableMonitorMode();
         if (flag) {
             plasmaSurface->openUnderCursor();
@@ -278,10 +284,31 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
         // plasmaSurface->setRole(KWayland::Client::PlasmaShellSurface::Role::Panel);
         // plasmaSurface->setPanelBehavior(KWayland::Client::PlasmaShellSurface::PanelBehavior::AlwaysVisible);
         pop_window->removeEventFilter(this);
-    } else if (filtered == ui->trans_text_edit &&
-               event->type() == QEvent::HoverMove) {
-        auto hover_event = dynamic_cast<QHoverEvent *>(event);
-        showFloatButton(hover_event->pos());
+    } else if (filtered == ui->trans_text_edit) {
+        // Show prev/next button when the mouse is close to the window edge
+        if (event->type() == QEvent::HoverMove) {
+
+            auto hover_event = dynamic_cast<QHoverEvent *>(event);
+            showFloatButton(hover_event->pos());
+
+
+        } else if (event->type() == QEvent::Leave) {
+            hideFloatButton();
+        } else if (event->type() == QEvent::KeyPress) {
+            auto key_event = dynamic_cast<QKeyEvent *>(event);
+            switch (key_event->key()) {
+                case Qt::Key_PageUp:
+                case Qt::Key_Left:
+                case Qt::Key_Home:
+                    emit showPrevResult();
+                    break;
+                case Qt::Key_PageDown:
+                case Qt::Key_Right:
+                case Qt::Key_End:
+                    emit showNextResult();
+                    break;
+            }
+        }
     }
 
     return QObject::eventFilter(filtered, event);
@@ -353,8 +380,7 @@ void PopupDialog::initFloatButton() {
     btn_prev_->setStyleSheet(style);
     btn_next_->setStyleSheet(style);
 
-    btn_prev_->hide();
-    btn_next_->hide();
+    hideFloatButton();
 
     QHBoxLayout *layout = new QHBoxLayout(ui->trans_text_edit);
     layout->addWidget(btn_prev_);
@@ -364,8 +390,8 @@ void PopupDialog::initFloatButton() {
 
     // If mouse tracking is switched on, mouse move events occur even if no
     // mouse button is pressed
-    setMouseTracking(true);
-    ui->trans_text_edit->setMouseTracking(true);
+    // setMouseTracking(true);
+
     ui->trans_text_edit->installEventFilter(this);
 
     connect(btn_prev_,
@@ -380,6 +406,8 @@ void PopupDialog::initFloatButton() {
 }
 
 void PopupDialog::showFloatButton(QPoint cursor_pos) {
+    // TODO: hide float button when the mouse button is pressed
+
     // Show prev/next button when the mouse is close to the window edge
     int x = cursor_pos.x();
     const int window_width = this->width();
@@ -391,8 +419,7 @@ void PopupDialog::showFloatButton(QPoint cursor_pos) {
                this->underMouse()) {
         btn_next_->show();
     } else {
-        btn_prev_->hide();
-        btn_next_->hide();
+        hideFloatButton();
     }
 }
 
@@ -444,6 +471,12 @@ void PopupDialog::initAnimation() {
 
     setEffectAnimation(ui->title_label);
     setEffectAnimation(ui->trans_text_edit);
+
+    // reinstall event filter in animation_group2_ finished signal
+    connect(animation_group2_, &QAnimationGroup::finished, [this] {
+        ui->trans_text_edit->installEventFilter(this);
+        showFloatButton(QCursor::pos());
+    });
 }
 
 void PopupDialog::setEffectAnimation(QWidget *w) {
@@ -467,6 +500,12 @@ void PopupDialog::setEffectAnimation(QWidget *w) {
 }
 
 void PopupDialog::startAnimationNext() {
+    // When the animation starts, uninstall the event filter.
+    // Will reinstall event filter in animation_group2_ finished signal
+    ui->trans_text_edit->removeEventFilter(this);
+
+    hideFloatButton();
+
     QRect origin, origin_left, origin_right;
 
     origin = origin_left = origin_right = ui->title_label->geometry();
@@ -497,6 +536,12 @@ void PopupDialog::startAnimationNext() {
 }
 
 void PopupDialog::startAnimationPrev() {
+    // When the animation starts, uninstall the event filter.
+    // Will reinstall event filter in animation_group2_ finished signal
+    ui->trans_text_edit->removeEventFilter(this);
+
+    hideFloatButton();
+
     QRect origin, origin_left, origin_right;
     origin = origin_left = origin_right = ui->title_label->geometry();
     origin_left.moveRight(origin.x() + origin.width() * 0.7);
@@ -544,14 +589,6 @@ void PopupDialog::initStateMachine() {
                                      &PopupDialog::newResultsAvailable,
                                      resultAvailable);
 
-    // resultAvailable->addTransition(btn_prev_,
-    //                                &QPushButton::clicked,
-    //                                requestPrevResult);
-
-    // resultAvailable->addTransition(btn_next_,
-    //                                &QPushButton::clicked,
-    //                                requestNextResult);
-
     resultAvailable->addTransition(this,
                                    &PopupDialog::showPrevResult,
                                    requestPrevResult);
@@ -587,7 +624,6 @@ void PopupDialog::initStateMachine() {
     connect(requestNextResult, &QState::entered, [this] {
         if (hasNextResult()) {
             result_index_++;
-            btn_next_->hide();
             startAnimationNext();
             indicator_->nextPage();
         } else {
@@ -598,7 +634,6 @@ void PopupDialog::initStateMachine() {
     connect(requestPrevResult, &QState::entered, [this] {
         if (hasPrevResult()) {
             result_index_--;
-            btn_prev_->hide();
             startAnimationPrev();
             indicator_->prevPage();
         } else {
@@ -608,7 +643,6 @@ void PopupDialog::initStateMachine() {
 
     connect(readyShowResult, &QState::entered, [this] {
         showTranslateResult(translate_results_.at(result_index_));
-        showFloatButton(QCursor::pos());
     });
 
     result_state_machine_.start();
@@ -636,14 +670,13 @@ void PopupDialog::enableSrcEditMode(bool enable) {
     if (enable) {
         ui->search_lineedit->hide();
         ui->src_plain_text_edit->setFocus();
+        ui->src_plain_text_edit->moveCursor(QTextCursor::End);
         ui->show_src_toolbutton->setIcon(QIcon::fromTheme("arrow-down-double"));
         ui->show_src_toolbutton->setToolTip(tr("Hide Source Text"));
         ui->copy_button->setToolTip(tr("Copy Source Text"));
-        btn_next_->hide();
-        btn_prev_->hide();
-
     } else {
-        ui->trans_text_edit->setFocus();
+        // ui->trans_text_edit->setFocus();
+        ui->title_label->setFocus();
         ui->src_plain_text_edit->clearFocus();
         ui->show_src_toolbutton->setIcon(QIcon::fromTheme("arrow-up-double"));
         ui->show_src_toolbutton->setToolTip(tr("Show Source Text"));

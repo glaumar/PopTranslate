@@ -88,7 +88,7 @@
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Speak</string>
         </property>
         <property name="styleSheet">
          <string notr="true"> QToolButton {background-color: transparent; border: none; border-style: none;  padding: 5px;  border-radius: 6px;}
@@ -96,11 +96,11 @@
  QToolButton:pressed { background-color: palette(Highlight); }</string>
         </property>
         <property name="text">
-         <string>...</string>
+         <string/>
         </property>
         <property name="icon">
          <iconset theme="player-volume">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
         </property>
         <property name="autoExclusive">
          <bool>true</bool>
@@ -116,7 +116,7 @@
          </sizepolicy>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
+         <enum>Qt::ClickFocus</enum>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
@@ -150,7 +150,7 @@
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="toolTip">
-         <string/>
+         <string>Speak</string>
         </property>
         <property name="styleSheet">
          <string notr="true"> QToolButton {background-color: transparent; border: none; border-style: none;  padding: 5px;  border-radius: 6px;}
@@ -158,11 +158,11 @@
  QToolButton:pressed { background-color: palette(Highlight); }</string>
         </property>
         <property name="text">
-         <string>...</string>
+         <string>Speak</string>
         </property>
         <property name="icon">
          <iconset theme="player-volume">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
         </property>
         <property name="autoExclusive">
          <bool>true</bool>
@@ -210,7 +210,7 @@
         </property>
         <property name="icon">
          <iconset theme="search">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
         </property>
        </widget>
       </item>
@@ -389,7 +389,7 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="icon">
          <iconset theme="arrow-up-double">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
         </property>
        </widget>
       </item>
@@ -424,7 +424,7 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="icon">
             <iconset theme="edit-copy">
-             <normaloff>.</normaloff>.</iconset>
+             <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
            </property>
           </widget>
          </item>
@@ -441,7 +441,7 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="icon">
             <iconset theme="settings-configure">
-             <normaloff>.</normaloff>.</iconset>
+             <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
            </property>
           </widget>
          </item>
@@ -458,7 +458,7 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="icon">
             <iconset theme="window-pin">
-             <normaloff>.</normaloff>.</iconset>
+             <normaloff>../../../.designer/backup</normaloff>../../../.designer/backup</iconset>
            </property>
           </widget>
          </item>
