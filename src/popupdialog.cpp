@@ -205,6 +205,7 @@ void PopupDialog::hideEvent(QHideEvent *event) {
     emit hidden();
     ui->search_lineedit->hide();
     enableSrcEditMode(false);
+    hideFloatButton();
 }
 
 void PopupDialog::showEvent(QShowEvent *event) {
@@ -241,6 +242,8 @@ void PopupDialog::keyPressEvent(QKeyEvent *event) {
                 ui->search_lineedit->hide();
                 ui->search_lineedit->clear();
                 ui->search_lineedit->clearFocus();
+            } else {
+                this->hide();
             }
             break;
         case Qt::Key_PageUp:
