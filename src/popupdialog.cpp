@@ -14,7 +14,7 @@
 #include <QRadioButton>
 #include <QStyle>
 
-#include "dictionaries.h"
+#include "mdict.h"
 #include "lang2iso639.h"
 #include "onlinetranslator.h"
 #include "poptranslate.h"

@@ -148,7 +148,8 @@
         "qsize": "cpp",
         "qonlinetranslator": "cpp",
         "qdragmoveevent": "cpp",
-        "qnetworkproxy": "cpp"
+        "qnetworkproxy": "cpp",
+        "qthread": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

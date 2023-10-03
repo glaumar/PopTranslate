@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
 
+# clear warming
+cmake_policy(SET CMP0148 NEW)
+
 project(PopTranslate
     VERSION 0.3.0
     DESCRIPTION "Translate the text selected by the mouse on plasma wayland"
@@ -23,13 +26,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
 
 find_package(Qt5 REQUIRED COMPONENTS LinguistTools Concurrent REQUIRED)
-
 find_package(KF5GlobalAccel REQUIRED)
 find_package(KF5GuiAddons REQUIRED)
 find_package(KF5Wayland REQUIRED)
 find_package(KF5WindowSystem REQUIRED)
 find_package(KF5WidgetsAddons REQUIRED)
 find_package(KF5XmlGui REQUIRED)
+find_package(pybind11 REQUIRED) 
 
 # Find Tesseract and Leptonica libraries using PkgConfig
 find_package(PkgConfig REQUIRED)
@@ -45,10 +48,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(QOnlineTranslator)
 
-# mdict-cpp
-add_subdirectory(mdict-cpp)
-include_directories(mdict-cpp)
-
 # generate translation files
 set(TS_FILES i18n/poptranslate_zh_CN.ts)
 qt_add_translation(QM_FILES ${TS_FILES})
@@ -63,7 +62,7 @@ set(PROJECT_SOURCES
     src/popupdialog.cpp
     src/poptranslate_dbus.cpp
     src/settingwindow.cpp
-    src/dictionaries.cpp
+    src/mdict.cpp
     src/screengrabber.cpp
     src/imagecropper.cpp
     src/ocr.cpp
@@ -83,7 +82,9 @@ include_directories(src)
 add_executable(${EXE_NAME} ${PROJECT_SOURCES})
 add_dependencies(${EXE_NAME} translations)
 
-target_include_directories(${EXE_NAME} PRIVATE ${Tesseract_INCLUDE_DIRS} ${Leptonica_INCLUDE_DIRS})
+target_include_directories(${EXE_NAME} PRIVATE 
+                                        ${Tesseract_INCLUDE_DIRS} 
+                                        ${Leptonica_INCLUDE_DIRS})
 
 target_link_libraries(${EXE_NAME} PRIVATE
     Qt5::Concurrent
@@ -96,13 +97,14 @@ target_link_libraries(${EXE_NAME} PRIVATE
     QOnlineTranslator
     ${Tesseract_LIBRARIES}
     ${Leptonica_LIBRARIES}
-    mdict)
+    pybind11::embed)
 
 install(TARGETS ${EXE_NAME} DESTINATION bin)
 install(FILES data/${DESKTOP_FILE_NAME} DESTINATION share/applications)
 install(FILES data/${APPLICATION_ICON_BASE_NAME}.svg DESTINATION share/icons/hicolor/scalable/apps)
 install(FILES ${METAINFO_FILE_NAME} DESTINATION share/metainfo)
 install(FILES ${QM_FILES} DESTINATION share/PopTranslate/i18n)
+install(DIRECTORY mdict-query DESTINATION share/PopTranslate)
 
 # CPack
 include(DEB/deb.cmake)
