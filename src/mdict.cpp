@@ -33,8 +33,8 @@ void MDict::clear() {
 void MDict::addDict(const DictionaryInfo& dict_info) {
     pybind11::gil_scoped_acquire acquire;
     if (dicts_.contains(dict_info)) {
-        qDebug() << tr("dictionary already exists: %1")
-                        .arg(dict_info.filename);  // TODO: maybe remove
+        // qDebug() << tr("dictionary already exists: %1")
+        //                 .arg(dict_info.filename);
         return;
     }
 

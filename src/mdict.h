@@ -10,8 +10,9 @@
 #include "dictionaryinfo.h"
 #include "pybind11_wrap.h"
 
-// using __attribute__((visibility("default"))) to remove the warning (https://github.com/vgc/vgc/issues/11)
-class __attribute__((visibility("default")))  MDict : public AbstractTranslator {
+// using __attribute__((visibility("default"))) to remove the warning
+// (https://github.com/vgc/vgc/issues/11)
+class __attribute__((visibility("default"))) MDict : public AbstractTranslator {
     Q_OBJECT
    public:
     explicit MDict(QObject* parent = nullptr);

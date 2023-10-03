@@ -14,8 +14,8 @@
 #include <QRadioButton>
 #include <QStyle>
 
-#include "mdict.h"
 #include "lang2iso639.h"
+#include "mdict.h"
 #include "onlinetranslator.h"
 #include "poptranslate.h"
 #include "qonlinetranslator.h"
@@ -79,6 +79,11 @@ PopupDialog::PopupDialog(QWidget *parent)
         enableSrcEditMode(false);
         emit requestTranslate(sourceText());
     });
+
+    // Avoid too small a space causing only "..." to be displayed
+    QFontMetrics metrics(ui->title_label->font());
+    ui->title_label->setMinimumWidth(
+        metrics.horizontalAdvance(ui->title_label->text()));
 }
 
 PopupDialog::~PopupDialog() {
@@ -290,10 +295,8 @@ bool PopupDialog::eventFilter(QObject *filtered, QEvent *event) {
     } else if (filtered == ui->trans_text_edit) {
         // Show prev/next button when the mouse is close to the window edge
         if (event->type() == QEvent::HoverMove) {
-
             auto hover_event = dynamic_cast<QHoverEvent *>(event);
             showFloatButton(hover_event->pos());
-
 
         } else if (event->type() == QEvent::Leave) {
             hideFloatButton();
