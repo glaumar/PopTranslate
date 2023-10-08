@@ -6,6 +6,7 @@
 #include "appmain.h"
 #include "poptranslate.h"
 #include "poptranslate_dbus.h"
+#include "pybind11_wrap.h"
 
 int main(int argc, char *argv[]) {
     if (PopTranslateDBus::isRegistered()) {
@@ -36,6 +37,11 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
+
+    // initialize python interpreter
+    pybind11::scoped_interpreter python;
+    // release GIL
+    pybind11::gil_scoped_release release;
 
     AppMain app_main;
 

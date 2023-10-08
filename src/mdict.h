@@ -16,7 +16,7 @@ class __attribute__((visibility("default"))) MDict : public AbstractTranslator {
     Q_OBJECT
    public:
     explicit MDict(QObject* parent = nullptr);
-    virtual ~MDict() = default;
+    virtual ~MDict();
     void translate(const QString& text) override;
     void abort() override;
 
@@ -24,14 +24,14 @@ class __attribute__((visibility("default"))) MDict : public AbstractTranslator {
     void addDict(const DictionaryInfo& dict_info);
     void addDicts(const QVector<DictionaryInfo>& info_vec);
     void setDicts(const QVector<DictionaryInfo>& info_vec);
+    void setDictsAsync(const QVector<DictionaryInfo>& info_vec);
     void removeDict(const DictionaryInfo& dict_info);
     void removeDicts(const QVector<DictionaryInfo>& info_vec);
     void lookup(const QString& text);
 
    private:
-    pybind11::scoped_interpreter py_guard_;
-    pybind11::object index_builder_;
     bool fileCheck(const QString& filename);
     QMap<DictionaryInfo, pybind11::object> dicts_;
     QVector<DictionaryInfo> dict_info_vec_;
+    pybind11::object index_builder_;
 };

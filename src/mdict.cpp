@@ -3,12 +3,14 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QStandardPaths>
+#include <QtConcurrent>
 
 #include "poptranslatesettings.h"
 
 namespace py = pybind11;
 
-MDict::MDict(QObject* parent) : AbstractTranslator(parent), py_guard_() {
+MDict::MDict(QObject* parent) : AbstractTranslator(parent) {
+    py::gil_scoped_acquire acquire;
     py::module_ sys = py::module_::import("sys");
     QString mdict_query_path =
         QStandardPaths::locate(QStandardPaths::AppDataLocation,
@@ -18,23 +20,29 @@ MDict::MDict(QObject* parent) : AbstractTranslator(parent), py_guard_() {
     sys.attr("path").attr("append")(mdict_query_path.toStdString());
     index_builder_ = py::module_::import("mdict_query").attr("IndexBuilder");
 
-    setDicts(PopTranslateSettings::instance().dictionaries());
+    setDictsAsync(PopTranslateSettings::instance().dictionaries());
     connect(&PopTranslateSettings::instance(),
             &PopTranslateSettings::dictionariesChanged,
             this,
-            &MDict::setDicts);
+            &MDict::setDictsAsync);
+}
+
+MDict::~MDict() {
+    clear();
+    py::gil_scoped_acquire acquire;
+    index_builder_ = py::none();
+    index_builder_.release();
 }
 
 void MDict::clear() {
+    py::gil_scoped_acquire acquire;
     dicts_.clear();
     dict_info_vec_.clear();
 }
 
 void MDict::addDict(const DictionaryInfo& dict_info) {
-    pybind11::gil_scoped_acquire acquire;
+    py::gil_scoped_acquire acquire;
     if (dicts_.contains(dict_info)) {
-        // qDebug() << tr("dictionary already exists: %1")
-        //                 .arg(dict_info.filename);
         return;
     }
 
@@ -56,24 +64,12 @@ void MDict::addDicts(const QVector<DictionaryInfo>& info_vec) {
 }
 
 void MDict::setDicts(const QVector<DictionaryInfo>& info_vec) {
-    if (dict_info_vec_.empty()) {
-        addDicts(info_vec);
-        return;
-    }
-
-    QSet<DictionaryInfo> old_set(dict_info_vec_.begin(), dict_info_vec_.end());
-    QSet<DictionaryInfo> new_set(info_vec.begin(), info_vec.end());
-    auto diff = old_set - new_set;
-
-    removeDicts(QVector<DictionaryInfo>(diff.begin(), diff.end()));
+    clear();
     addDicts(info_vec);
-    dict_info_vec_ = info_vec;
-    QMutableVectorIterator<DictionaryInfo> it(dict_info_vec_);
-    while (it.hasNext()) {
-        if (!dicts_.contains(it.next())) {
-            it.remove();
-        }
-    };
+}
+
+void MDict::setDictsAsync(const QVector<DictionaryInfo>& info_vec) {
+    QtConcurrent::run(this, &MDict::setDicts, info_vec);
 }
 
 void MDict::removeDict(const DictionaryInfo& dict_info) {
@@ -81,6 +77,7 @@ void MDict::removeDict(const DictionaryInfo& dict_info) {
         return;
     }
 
+    py::gil_scoped_acquire acquire;
     dicts_.remove(dict_info);
     for (int i = 0; i < dict_info_vec_.size(); i++) {
         if (dict_info_vec_[i] == dict_info) {
@@ -98,14 +95,14 @@ void MDict::removeDicts(const QVector<DictionaryInfo>& info_vec) {
 }
 
 void MDict::translate(const QString& text) {
-    // QtConcurrent::run(this, &MDict::lookup, text);
-    lookup(text);
+    QtConcurrent::run(this, &MDict::lookup, text);
 }
 
 void MDict::abort() { /*abort_ = true; */
 }
 
 void MDict::lookup(const QString& text) {
+    py::gil_scoped_acquire acquire;
     for (auto it = dict_info_vec_.begin(); it != dict_info_vec_.end(); ++it) {
         if (it->target_language != QOnlineTranslator::Auto &&
             it->target_language != targetLanguage()) {
