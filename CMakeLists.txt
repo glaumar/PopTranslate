@@ -20,8 +20,9 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 
 set(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
 
@@ -33,6 +34,8 @@ find_package(KF5WindowSystem REQUIRED)
 find_package(KF5WidgetsAddons REQUIRED)
 find_package(KF5XmlGui REQUIRED)
 find_package(pybind11 REQUIRED) 
+#find_package(QCoro5 REQUIRED COMPONENTS Core Network DBus)
+find_package(QCoro5 REQUIRED COMPONENTS Core)
 
 # Find Tesseract and Leptonica libraries using PkgConfig
 find_package(PkgConfig REQUIRED)
@@ -97,7 +100,8 @@ target_link_libraries(${EXE_NAME} PRIVATE
     QOnlineTranslator
     ${Tesseract_LIBRARIES}
     ${Leptonica_LIBRARIES}
-    pybind11::embed)
+    pybind11::embed
+    QCoro5::Core)
 
 install(TARGETS ${EXE_NAME} DESTINATION bin)
 install(FILES data/${DESKTOP_FILE_NAME} DESTINATION share/applications)

@@ -149,7 +149,13 @@
         "qonlinetranslator": "cpp",
         "qdragmoveevent": "cpp",
         "qnetworkproxy": "cpp",
-        "qthread": "cpp"
+        "qthread": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "slist": "cpp",
+        "qcoroasyncgenerator": "cpp",
+        "qcorotask": "cpp",
+        "qcoro": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

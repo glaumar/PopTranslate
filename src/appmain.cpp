@@ -186,10 +186,7 @@ void AppMain::initPopupWindow() {
     });
 
     // stop translate and speking when PopupDialog hidden
-    connect(&pop_, &PopupDialog::hidden, [this] {
-        tts_.stop();
-        translator_manager_.abortAll();
-    });
+    connect(&pop_, &PopupDialog::hidden, [this] { tts_.stop(); });
 }
 
 void AppMain::trayActivated(QSystemTrayIcon::ActivationReason reason) {

@@ -1,9 +1,12 @@
 #include "mdict.h"
 
+#include <QCoroTimer>
 #include <QDebug>
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QtConcurrent>
+
+using namespace std::chrono_literals;
 
 #include "poptranslatesettings.h"
 
@@ -94,40 +97,37 @@ void MDict::removeDicts(const QVector<DictionaryInfo>& info_vec) {
     }
 }
 
-void MDict::translate(const QString& text) {
-    QtConcurrent::run(this, &MDict::lookup, text);
-}
-
-void MDict::abort() { /*abort_ = true; */
-}
-
-void MDict::lookup(const QString& text) {
-    py::gil_scoped_acquire acquire;
+QCoro::AsyncGenerator<AbstractTranslator::Result> MDict::translate(
+    const QString& text) {
     for (auto it = dict_info_vec_.begin(); it != dict_info_vec_.end(); ++it) {
         if (it->target_language != QOnlineTranslator::Auto &&
             it->target_language != targetLanguage()) {
             continue;
         }
 
-        py::object md = dicts_.value(*it);
-        py::list results = md.attr("mdx_lookup")(text.toStdString());
-        if (results.empty()) {
-            continue;
+        std::string content;
+
+        // python code block
+        {
+            py::gil_scoped_acquire acquire;
+            py::object md = dicts_.value(*it);
+            py::list results = md.attr("mdx_lookup")(text.toStdString());
+            if (results.empty()) {
+                continue;
+            }
+            content = results[0].cast<std::string>();
         }
-        auto content = results[0].cast<std::string>();
+
         if (content != "") {
             QString content_qstr = QString::fromStdString(content);
             content_qstr.remove(QRegExp("`[0-9]`|</?br>"));
             auto dict_basename = QFileInfo(it->filename).baseName();
-            AbstractTranslator::Result result{dict_basename,
-                                              content_qstr,
-                                              text};
-            emit resultAvailable(result);
+            AbstractTranslator::Result result{dict_basename, content_qstr};
             qDebug()
                 << tr("Dictionaries Lookup Success: %1").arg(dict_basename);
+            co_yield result;
         }
     }
-    emit finished(text);
 }
 
 bool MDict::fileCheck(const QString& filename) {

@@ -1,4 +1,6 @@
 #pragma once
+#include <QCoroTask>
+
 #include "abstracttranslator.h"
 #include "qonlinetranslator.h"
 
@@ -7,10 +9,11 @@ class OnlineTranslator : public AbstractTranslator {
    public:
     explicit OnlineTranslator(QObject *parent = nullptr);
     virtual ~OnlineTranslator() = default;
-    void translate(const QString &text) override;
-    void abort() override;
+    QCoro::AsyncGenerator<AbstractTranslator::Result> translate(
+        const QString &text) override;
 
    private:
+    QCoro::Task<AbstractTranslator::Result> translateCoro(const QString &text);
+
     QOnlineTranslator translator_;
-    bool retry_flag;
 };

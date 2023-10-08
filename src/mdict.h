@@ -17,8 +17,8 @@ class __attribute__((visibility("default"))) MDict : public AbstractTranslator {
    public:
     explicit MDict(QObject* parent = nullptr);
     virtual ~MDict();
-    void translate(const QString& text) override;
-    void abort() override;
+    QCoro::AsyncGenerator<AbstractTranslator::Result> translate(
+        const QString& text) override;
 
     void clear();
     void addDict(const DictionaryInfo& dict_info);
@@ -27,7 +27,6 @@ class __attribute__((visibility("default"))) MDict : public AbstractTranslator {
     void setDictsAsync(const QVector<DictionaryInfo>& info_vec);
     void removeDict(const DictionaryInfo& dict_info);
     void removeDicts(const QVector<DictionaryInfo>& info_vec);
-    void lookup(const QString& text);
 
    private:
     bool fileCheck(const QString& filename);

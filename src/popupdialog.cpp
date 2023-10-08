@@ -170,7 +170,7 @@ void PopupDialog::setOpacity(qreal opacity) {
 
 void PopupDialog::showTranslateResult(
     const AbstractTranslator::Result &result) {
-    auto &[title, t_text, unuse] = result;
+    auto &[title, t_text] = result;
 
     QFontMetrics metrics(ui->title_label->font());
     if (metrics.horizontalAdvance(title) > ui->title_label->width()) {

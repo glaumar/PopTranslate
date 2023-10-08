@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCoroAsyncGenerator>
 #include <QObject>
 #include <QString>
 
@@ -12,7 +13,6 @@ class AbstractTranslator : public QObject {
     struct Result {
         QString title;
         QString content;
-        QString source_text;
     };
 
     explicit AbstractTranslator(QObject *parent = nullptr)
@@ -25,8 +25,9 @@ class AbstractTranslator : public QObject {
     };
 
     virtual ~AbstractTranslator() = default;
-    virtual void translate(const QString &text) = 0;
-    virtual void abort() { emit finished(sourceText()); };
+
+    virtual QCoro::AsyncGenerator<AbstractTranslator::Result> translate(
+        const QString &text) = 0;
 
     virtual QOnlineTranslator::Language sourceLanguage() const {
         return source_language_;
@@ -42,12 +43,6 @@ class AbstractTranslator : public QObject {
     };
     virtual void setSourceText(const QString &text) { source_text_ = text; };
     virtual QString sourceText() const { return source_text_; };
-
-   signals:
-    // emit once for each result obtained
-    void resultAvailable(AbstractTranslator::Result result);
-    // emit after abort() or  all results are obtained
-    void finished(QString source_text);
 
    protected:
     QOnlineTranslator::Language source_language_;
