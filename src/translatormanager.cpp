@@ -31,7 +31,6 @@ void TranslatorManager::setTargetLanguage(
 
 void TranslatorManager::translate(const QString& text) {
     source_text_ = text;
-
     for (AbstractTranslator* t : translators_) {
         translateCoro(t, text);
     }
@@ -46,7 +45,7 @@ QCoro::Task<void> TranslatorManager::translateCoro(AbstractTranslator* t,
     auto result_it = co_await result_generator.begin();
     while (result_it != result_generator.end()) {
         auto result = *result_it;
-        if (!result.content.isEmpty()) {
+        if (!result.content.isEmpty() && text == source_text_) {
             emit resultAvailable(result);
         }
         co_await ++result_it;

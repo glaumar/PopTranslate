@@ -107,12 +107,7 @@ void MDict::removeDicts(const QVector<DictionaryInfo>& info_vec) {
 
 QCoro::AsyncGenerator<AbstractTranslator::Result> MDict::translate(
     const QString& text) {
-    auto lookup_coro = [this](const DictionaryInfo& info,
-                              const QString& text) -> QCoro::Task<QString> {
-        auto result =
-            co_await QtConcurrent::run(this, &MDict::lookup, info, text);
-        co_return result;
-    };
+    source_text_ = text;
 
     for (auto it = dict_info_vec_.begin(); it != dict_info_vec_.end(); ++it) {
         if (it->target_language != QOnlineTranslator::Auto &&
@@ -124,13 +119,33 @@ QCoro::AsyncGenerator<AbstractTranslator::Result> MDict::translate(
             continue;
         }
 
-        QString result = co_await lookup_coro(*it, text);
+        QString result = co_await lookupCoro(*it, text);
+
+        if (result.isEmpty()) {
+            // search again with lower case
+            result = co_await lookupCoro(*it, text.toLower());
+            if (source_text_ != text) {
+                break;
+            }
+        }
+
+        if (result.isEmpty()) {
+            // search again with upper case
+            result = co_await lookupCoro(*it, text.toUpper());
+            if (source_text_ != text) {
+                break;
+            }
+        }
 
         if (!result.isEmpty()) {
             // auto dereference
             if (result.startsWith("@@@LINK=")) {
                 auto link_word = result.replace("@@@LINK=", "").trimmed();
-                result = co_await lookup_coro(*it, link_word);
+                result = co_await lookupCoro(*it, link_word);
+            }
+
+            if (source_text_ != text) {
+                break;
             }
 
             auto dict_basename = QFileInfo(it->filename).baseName();
@@ -152,6 +167,12 @@ QString MDict::lookup(const DictionaryInfo& info, const QString& text) {
     }
     // TODO: support multiple results
     return QString::fromStdString(results[0].cast<std::string>());
+}
+
+QCoro::Task<QString> MDict::lookupCoro(const DictionaryInfo& info,
+                                       const QString& text) {
+    auto result = co_await QtConcurrent::run(this, &MDict::lookup, info, text);
+    co_return result;
 }
 
 QString MDict::toHtml(const QString& text) {

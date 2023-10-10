@@ -32,8 +32,11 @@ class __attribute__((visibility("default"))) MDict : public AbstractTranslator {
     bool fileCheck(const QString& filename);
     QString toHtml(const QString& text);
     QString lookup(const DictionaryInfo& info, const QString& text);
+    QCoro::Task<QString> lookupCoro(const DictionaryInfo& info,
+                                    const QString& text);
 
     QMap<DictionaryInfo, pybind11::object> dicts_;
     QVector<DictionaryInfo> dict_info_vec_;
     pybind11::object index_builder_;
+    QString source_text_;
 };
