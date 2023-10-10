@@ -1,12 +1,11 @@
 #include "mdict.h"
 
-#include <QCoroTimer>
+#include <QCoroFuture>
 #include <QDebug>
 #include <QFileInfo>
+#include <QScopedPointer>
 #include <QStandardPaths>
 #include <QtConcurrent>
-
-using namespace std::chrono_literals;
 
 #include "poptranslatesettings.h"
 
@@ -23,11 +22,11 @@ MDict::MDict(QObject* parent) : AbstractTranslator(parent) {
     sys.attr("path").attr("append")(mdict_query_path.toStdString());
     index_builder_ = py::module_::import("mdict_query").attr("IndexBuilder");
 
-    setDictsAsync(PopTranslateSettings::instance().dictionaries());
+    setDicts(PopTranslateSettings::instance().dictionaries());
     connect(&PopTranslateSettings::instance(),
             &PopTranslateSettings::dictionariesChanged,
             this,
-            &MDict::setDictsAsync);
+            &MDict::setDicts);
 }
 
 MDict::~MDict() {
@@ -43,20 +42,33 @@ void MDict::clear() {
     dict_info_vec_.clear();
 }
 
-void MDict::addDict(const DictionaryInfo& dict_info) {
-    py::gil_scoped_acquire acquire;
+QCoro::Task<void> MDict::addDict(const DictionaryInfo& dict_info) {
     if (dicts_.contains(dict_info)) {
-        return;
+        co_return;
     }
 
     if (!fileCheck(dict_info.filename)) {
-        return;
+        co_return;
     }
 
-    py::object md = index_builder_(dict_info.filename.toStdString());
-    dicts_.insert(dict_info, md);
+    // Since dictionary loading is asynchronous, dictionary information is added
+    // to dict_info_vec_ first, and then the dictionary is loaded. This ensures
+    // that the query order of the dictionary is consistent with the order of
+    // addition.
     dict_info_vec_.append(dict_info);
 
+    // load dictionary
+    py::object* md = co_await QtConcurrent::run([this, dict_info]() {
+        py::gil_scoped_acquire acquire;
+        py::object* md = new py::object();
+        *md = index_builder_(dict_info.filename.toStdString());
+        py::gil_scoped_release release;
+        return md;
+    });
+    py::gil_scoped_acquire acquire;
+    QScopedPointer<py::object> md_ptr(std::move(md));
+
+    dicts_.insert(dict_info, *md_ptr);
     qDebug() << tr("%1 load success").arg(dict_info.filename);
 }
 
@@ -69,10 +81,6 @@ void MDict::addDicts(const QVector<DictionaryInfo>& info_vec) {
 void MDict::setDicts(const QVector<DictionaryInfo>& info_vec) {
     clear();
     addDicts(info_vec);
-}
-
-void MDict::setDictsAsync(const QVector<DictionaryInfo>& info_vec) {
-    QtConcurrent::run(this, &MDict::setDicts, info_vec);
 }
 
 void MDict::removeDict(const DictionaryInfo& dict_info) {
@@ -99,35 +107,87 @@ void MDict::removeDicts(const QVector<DictionaryInfo>& info_vec) {
 
 QCoro::AsyncGenerator<AbstractTranslator::Result> MDict::translate(
     const QString& text) {
+    auto lookup_coro = [this](const DictionaryInfo& info,
+                              const QString& text) -> QCoro::Task<QString> {
+        auto result =
+            co_await QtConcurrent::run(this, &MDict::lookup, info, text);
+        co_return result;
+    };
+
     for (auto it = dict_info_vec_.begin(); it != dict_info_vec_.end(); ++it) {
         if (it->target_language != QOnlineTranslator::Auto &&
             it->target_language != targetLanguage()) {
             continue;
         }
 
-        std::string content;
-
-        // python code block
-        {
-            py::gil_scoped_acquire acquire;
-            py::object md = dicts_.value(*it);
-            py::list results = md.attr("mdx_lookup")(text.toStdString());
-            if (results.empty()) {
-                continue;
-            }
-            content = results[0].cast<std::string>();
+        if (!dicts_.contains(*it)) {
+            continue;
         }
 
-        if (content != "") {
-            QString content_qstr = QString::fromStdString(content);
-            content_qstr.remove(QRegExp("`[0-9]`|</?br>"));
+        QString result = co_await lookup_coro(*it, text);
+
+        if (!result.isEmpty()) {
+            // auto dereference
+            if (result.startsWith("@@@LINK=")) {
+                auto link_word = result.replace("@@@LINK=", "").trimmed();
+                result = co_await lookup_coro(*it, link_word);
+            }
+
             auto dict_basename = QFileInfo(it->filename).baseName();
-            AbstractTranslator::Result result{dict_basename, content_qstr};
-            qDebug()
-                << tr("Dictionaries Lookup Success: %1").arg(dict_basename);
-            co_yield result;
+            co_yield AbstractTranslator::Result{dict_basename, toHtml(result)};
         }
     }
+}
+
+QString MDict::lookup(const DictionaryInfo& info, const QString& text) {
+    py::gil_scoped_acquire acquire;
+    py::object md = dicts_.value(info);
+
+    // If “ignorecase = True” is used, the query speed will be very slow
+    py::list results =
+        md.attr("mdx_lookup")(text.toStdString() /*, "ignorecase = True"*/);
+
+    if (results.empty()) {
+        return QString();
+    }
+    // TODO: support multiple results
+    return QString::fromStdString(results[0].cast<std::string>());
+}
+
+QString MDict::toHtml(const QString& text) {
+    static const QString html_template =
+        R"(<!DOCTYPE html><html><body><div>%1</div></body></html>)";
+    static const QStringList tag_template = {
+        R"(%1)",
+        R"(<font size="+1"><b>%1</b></font>)",
+        R"(<font><br>%1</font>)",
+        R"(<font color="dodgerblue">%1</font>)",
+        R"(<font color="gray" size="-1">%1</font>)",
+        R"(<font color="orange">%1</font>)",
+        R"(<font>%1</font>)",
+        R"(%1)"};
+
+    QStringList result;
+
+    QRegExp rx("`([0-9])`([^`]*)");
+
+    int pos = rx.indexIn(text, pos);
+    if (pos == -1) {
+        auto result = text;
+        return html_template.arg(result.replace("</br>", "<br>"));
+    }
+
+    do {
+        int index = rx.cap(1).toInt();
+        if (index < 0 || index >= tag_template.size()) {
+            index = 0;
+        }
+        result << tag_template[index].arg(rx.cap(2).replace("</br>", "<br>"));
+        pos += rx.matchedLength();
+        pos = rx.indexIn(text, pos);
+    } while (pos != -1);
+
+    return result.join("");
 }
 
 bool MDict::fileCheck(const QString& filename) {

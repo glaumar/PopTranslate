@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCoroTask>
 #include <QFuture>
 #include <QMap>
 #include <QSharedPointer>
@@ -21,15 +22,17 @@ class __attribute__((visibility("default"))) MDict : public AbstractTranslator {
         const QString& text) override;
 
     void clear();
-    void addDict(const DictionaryInfo& dict_info);
+    QCoro::Task<void> addDict(const DictionaryInfo& dict_info);
     void addDicts(const QVector<DictionaryInfo>& info_vec);
     void setDicts(const QVector<DictionaryInfo>& info_vec);
-    void setDictsAsync(const QVector<DictionaryInfo>& info_vec);
     void removeDict(const DictionaryInfo& dict_info);
     void removeDicts(const QVector<DictionaryInfo>& info_vec);
 
    private:
     bool fileCheck(const QString& filename);
+    QString toHtml(const QString& text);
+    QString lookup(const DictionaryInfo& info, const QString& text);
+
     QMap<DictionaryInfo, pybind11::object> dicts_;
     QVector<DictionaryInfo> dict_info_vec_;
     pybind11::object index_builder_;

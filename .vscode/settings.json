@@ -155,7 +155,8 @@
         "slist": "cpp",
         "qcoroasyncgenerator": "cpp",
         "qcorotask": "cpp",
-        "qcoro": "cpp"
+        "qcoro": "cpp",
+        "qscopedpointer": "cpp"
     },
     "commentTranslate.hover.enabled": false,
     "files.watcherExclude": {

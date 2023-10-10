@@ -44,7 +44,6 @@ QCoro::Task<void> TranslatorManager::translateCoro(AbstractTranslator* t,
     auto result_generator = t->translate(text);
 
     auto result_it = co_await result_generator.begin();
-
     while (result_it != result_generator.end()) {
         auto result = *result_it;
         if (!result.content.isEmpty()) {

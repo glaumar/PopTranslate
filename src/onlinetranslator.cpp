@@ -59,8 +59,9 @@ QCoro::Task<AbstractTranslator::Result> OnlineTranslator::translateCoro(
         qWarning() << error_msg;
     } else {
         QString title = PopTranslateSettings::instance().translateEngineStr();
-        OnlineTranslator::Result result{title, translator_.translation()};
-
-        co_return result;
+        QString html_result =
+            QString(R"(<!DOCTYPE html><html><body><div>%1</div></body></html>)")
+                .arg(translator_.translation());
+        co_return OnlineTranslator::Result{title, html_result};
     }
 }
