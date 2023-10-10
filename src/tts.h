@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QCoroTask>
 #include <QMediaPlayer>
 #include <QObject>
 #include <QOnlineTranslator>
@@ -11,8 +12,9 @@ class Tts : public QObject {
    public:
     explicit Tts(QObject *parent = nullptr);
 
-    void speak(const QString &text,
-               QOnlineTranslator::Language lang = QOnlineTranslator::Auto);
+    QCoro::Task<void> speak(
+        const QString text,
+        QOnlineTranslator::Language lang = QOnlineTranslator::Auto);
     void stop();
 
    private:
@@ -23,5 +25,4 @@ class Tts : public QObject {
 
     QMediaPlayer player_;
     QOnlineTranslator translator_;
-    QString text_;
 };
