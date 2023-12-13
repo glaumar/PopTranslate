@@ -6,9 +6,6 @@
 
 PopTranslateSettings::PopTranslateSettings()
     : settings_(APPLICATION_NAME, APPLICATION_NAME) {
-    qRegisterMetaTypeStreamOperators<DictionaryInfo>("DictionaryInfo");
-    qRegisterMetaTypeStreamOperators<QVector<DictionaryInfo>>(
-        "QVector<DictionaryInfo>");
     load();
 }
 
@@ -80,11 +77,6 @@ void PopTranslateSettings::load() {
     // all_.show_src_text =
     //     settings_.value("show_src_text", default_settings.show_src_text)
     //         .value<bool>();
-    all_.dictionaries_info =
-        settings_
-            .value("dictionaries_info",
-                   QVariant::fromValue(default_settings.dictionaries_info))
-            .value<QVector<DictionaryInfo>>();
     all_.ocr_languages =
         settings_.value("ocr_languages", default_settings.ocr_languages)
             .value<QStringList>();
@@ -230,16 +222,6 @@ void PopTranslateSettings::setPopupWindowSize(QSize size) {
 //     settings_.setValue("show_src_text", enable);
 //     emit showSrcTextChanged(enable);
 // };
-
-void PopTranslateSettings::setDictionaries(
-    QVector<DictionaryInfo> dictionaries_info) {
-    all_.dictionaries_info = dictionaries_info;
-    settings_.setValue("dictionaries_info",
-                       QVariant::fromValue(dictionaries_info));
-    emit dictionariesChanged(dictionaries_info);
-    qDebug() << tr(
-        "Settings: Change dictionaries_info");  // TODO: add dictionaries info
-};
 
 void PopTranslateSettings::setOcrLanguages(QStringList ocr_languages) {
     all_.ocr_languages = ocr_languages;

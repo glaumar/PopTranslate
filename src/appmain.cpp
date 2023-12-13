@@ -15,7 +15,6 @@
 #include <QSystemTrayIcon>
 #include <QTranslator>
 
-#include "mdict.h"
 #include "onlinetranslator.h"
 #include "poptranslate.h"
 #include "poptranslate_dbus.h"
@@ -169,7 +168,6 @@ void AppMain::initTts() {
 void AppMain::initTranslatorManager() {
     translator_manager_.addTranslator(
         new OnlineTranslator(&translator_manager_));
-    translator_manager_.addTranslator(new MDict(&translator_manager_));
     connect(&translator_manager_,
             &TranslatorManager::resultAvailable,
             &pop_,

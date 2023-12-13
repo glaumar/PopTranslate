@@ -1,6 +1,6 @@
 [submodule "AUR"]
 	path = AUR
 	url = https://aur.archlinux.org/poptranslate.git
-[submodule "mdict-query"]
-	path = mdict-query
-	url = https://github.com/mmjang/mdict-query.git
+# [submodule "mdict-query"]
+# 	path = mdict-query
+# 	url = https://github.com/mmjang/mdict-query.git

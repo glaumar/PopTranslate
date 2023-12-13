@@ -15,7 +15,6 @@
 #include <QStyle>
 
 #include "lang2iso639.h"
-#include "mdict.h"
 #include "onlinetranslator.h"
 #include "poptranslate.h"
 #include "qonlinetranslator.h"

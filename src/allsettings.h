@@ -3,8 +3,6 @@
 #include <QOnlineTranslator>
 #include <QStringList>
 
-#include "dictionaryinfo.h"
-
 // get variable name as string, void(Variable) force compiler to check if
 // variable exists
 // #define VAR2STR(Variable) (void(Variable),#Variable)
@@ -33,7 +31,7 @@ class AllSettings {
           ocr_shortcut("Ctrl+Meta+G"),
           popup_window_size(512, 384),
           //   show_src_text(false),
-          dictionaries_info(),
+          //   dictionaries_info(),
           ocr_languages("eng"),
           monitor_clipboard(false) {}
 
@@ -55,7 +53,7 @@ class AllSettings {
     QKeySequence ocr_shortcut;
     QSize popup_window_size;
     // bool show_src_text;
-    QVector<DictionaryInfo> dictionaries_info;
+    // QVector<DictionaryInfo> dictionaries_info;
     QStringList ocr_languages;
     bool monitor_clipboard;
 
