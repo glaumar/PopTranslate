@@ -33,7 +33,6 @@ find_package(KF5Wayland REQUIRED)
 find_package(KF5WindowSystem REQUIRED)
 find_package(KF5WidgetsAddons REQUIRED)
 find_package(KF5XmlGui REQUIRED)
-find_package(pybind11 REQUIRED) 
 find_package(QCoro5 REQUIRED COMPONENTS Core)
 
 # Find Tesseract and Leptonica libraries using PkgConfig
