@@ -25,9 +25,6 @@ GoldenDict, Crow Translate and other translation software are very useful, but d
 paru -S poptranslate
 ```
 
-## Kubuntu
-Get deb package from [release page](https://github.com/glaumar/PopTranslate/releases)
-
 ## Other (Flatpak)
 Get flatpak package from [release page](https://github.com/glaumar/PopTranslate/releases)
 
@@ -43,6 +40,7 @@ Get flatpak package from [release page](https://github.com/glaumar/PopTranslate/
     - KWidgetsAddons
     - KXmlGui
 - [QOnlineTranslator](https://github.com/crow-translate/QOnlineTranslator) - provides free usage of Google, Yandex and Bing translate API
+- [QCoro](https://qcoro.dvratil.cz/)
 - [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) >= 5.0.0
 - [tessdata](https://github.com/tesseract-ocr/tessdata) 
 

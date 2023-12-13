@@ -30,9 +30,6 @@ GoldenDict, Crow Translate等等翻译软件都很好用,但由于 wayland 协�
 paru -S poptranslate
 ```
 
-## Kubuntu
-从 [release page](https://github.com/glaumar/PopTranslate/releases) 获取 deb 包
-
 ## 其他 (Flatpak)
 从 [release page](https://github.com/glaumar/PopTranslate/releases) 获取 flatpak 包
 # 依赖
@@ -47,6 +44,7 @@ paru -S poptranslate
     - KWidgetsAddons
     - KXmlGui
 - [QOnlineTranslator](https://github.com/crow-translate/QOnlineTranslator) - 提供 Google, Yandex 和 Bing 的翻译 API
+- [QCoro](https://qcoro.dvratil.cz/)
 - [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) >= 5.0.0
 - [tessdata](https://github.com/tesseract-ocr/tessdata) 
 
